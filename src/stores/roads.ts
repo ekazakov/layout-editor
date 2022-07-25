@@ -113,9 +113,9 @@ export class NodesStore {
     this.segments.set(segment.id, segment);
   }
 
-  removeNode = (id: string) => {
-    this.nodes.delete(id);
-  };
+  // removeNode = (id: string) => {
+  //   this.nodes.delete(id);
+  // };
 
   toggleNodeSelection = (id: string) => {
     const node = this.nodes.get(id);
@@ -137,6 +137,36 @@ export class NodesStore {
     node.selected = true;
     this.selectedNodeId = id;
   };
+
+  resetSelectedNode() {
+    if (this.selectedNodeId) {
+      this.getNode(this.selectedNodeId)!.selected = false;
+    }
+    this.selectedNodeId = "";
+  }
+
+  deleteNode(nodeId: string) {
+    const node = this.getNode(nodeId);
+    if (!node) {
+      return false;
+    }
+
+    if (node.segmentIds.size > 0) {
+      for (const segmentId of node.segmentIds) {
+        this.segments.delete(segmentId);
+      }
+    }
+
+    if (this.selectedNodeId === nodeId) {
+      this.selectedNodeId = "";
+    }
+    this.nodes.delete(nodeId);
+    return true;
+  }
+
+  deleteSelectedNode() {
+    return this.deleteNode(this.selectedNodeId);
+  }
 
   getNode = (id: string): RoadNode | undefined => {
     return this.nodes.get(id);

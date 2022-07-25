@@ -1,5 +1,5 @@
 import "./styles.css";
-import { Canvas } from "./Canvas";
+import { Canvas } from "./components/canvas";
 
 export default function App() {
   return (
