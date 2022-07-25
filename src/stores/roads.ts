@@ -13,6 +13,13 @@ export class RoadNode {
     this._position = p;
   };
 
+  moveBy = (delta: Position) => {
+    this._position = {
+      x: this._position.x + delta.x,
+      y: this._position.y + delta.y
+    };
+  };
+
   get position() {
     return this._position;
   }
@@ -61,6 +68,11 @@ export class RoadSegment {
     return this._p2.position;
   }
 
+  moveBy = (delta: Position) => {
+    this._p1.moveBy(delta);
+    this._p2.moveBy(delta);
+  };
+
   constructor(nodeStart: RoadNode, nodeEnd: RoadNode, id?: string) {
     makeAutoObservable(this);
     this.id = id ?? nanoid(9);
@@ -76,6 +88,8 @@ export class NodesStore {
   segments: Map<string, RoadSegment> = new Map<string, RoadSegment>();
 
   private selectedNodeId: string = "";
+
+  private selectedSegmentId: string = "";
 
   addNode = (p: Position) => {
     const node = new RoadNode(p);
@@ -113,9 +127,18 @@ export class NodesStore {
     this.segments.set(segment.id, segment);
   }
 
-  // removeNode = (id: string) => {
-  //   this.nodes.delete(id);
-  // };
+  isConnected(aId: string, bId: string) {
+    const node = this.getNode(aId);
+    if (node) {
+      for (const segmentId of node.segmentIds) {
+        const segment = this.getSegment(segmentId)!;
+        if (segment.nodeStartId === bId || segment.nodeEndId === bId) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
   toggleNodeSelection = (id: string) => {
     const node = this.nodes.get(id);
@@ -153,7 +176,7 @@ export class NodesStore {
 
     if (node.segmentIds.size > 0) {
       for (const segmentId of node.segmentIds) {
-        this.segments.delete(segmentId);
+        this.deleteSegment(segmentId);
       }
     }
 
@@ -162,6 +185,20 @@ export class NodesStore {
     }
     this.nodes.delete(nodeId);
     return true;
+  }
+
+  deleteSegment(id: string) {
+    if (this.selectedSegmentId === id) {
+      this.selectedSegmentId = "";
+    }
+    const segment = this.getSegment(id);
+    if (segment) {
+      const nodeStart = this.nodes.get(segment.nodeStartId);
+      nodeStart?.segmentIds.delete(id);
+      const nodeEnd = this.nodes.get(segment.nodeEndId);
+      nodeEnd?.segmentIds.delete(id);
+    }
+    return this.segments.delete(id);
   }
 
   deleteSelectedNode() {
@@ -174,6 +211,39 @@ export class NodesStore {
 
   get selectedNode() {
     return this.getNode(this.selectedNodeId || "");
+  }
+
+  toggleSegmentSelection = (id: string) => {
+    const segment = this.segments.get(id);
+    if (!segment) {
+      throw new Error(`Segment ${id} doesn't exist`);
+    }
+
+    if (this.selectedSegmentId) {
+      this.getSegment(this.selectedSegmentId)!.selected = false;
+
+      if (this.selectedSegmentId === id) {
+        this.selectedSegmentId = "";
+        return;
+      }
+
+      this.selectedSegmentId = "";
+    }
+
+    segment.selected = true;
+    this.selectedSegmentId = id;
+  };
+
+  getSegment(id: string) {
+    return this.segments.get(id);
+  }
+
+  get selectedSegment() {
+    return this.getSegment(this.selectedSegmentId || "");
+  }
+
+  deleteSelectedSegment() {
+    return this.deleteSegment(this.selectedSegmentId);
   }
 
   constructor() {

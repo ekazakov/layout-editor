@@ -30,9 +30,15 @@ export function useHandleMouseDown() {
           break;
         case "road-node": {
           if (selectedNode) {
-            nodesStore.addSegment(selectedNode.id, element.id);
+            if (!nodesStore.isConnected(selectedNode.id, element.id)) {
+              nodesStore.addSegment(selectedNode.id, element.id);
+            }
           }
           nodesStore.toggleNodeSelection(element.id);
+          break;
+        }
+        case "road-segment": {
+          nodesStore.toggleSegmentSelection(element.id);
           break;
         }
 

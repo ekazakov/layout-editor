@@ -7,12 +7,13 @@ export function useShortcuts() {
       nodesStore.resetSelectedNode();
     },
     Delete: () => {
-      console.log("Delete");
+      // console.log("Delete");
       nodesStore.deleteSelectedNode();
     },
     Backspace: () => {
-      console.log("Backspace");
+      // console.log("Backspace");
       nodesStore.deleteSelectedNode();
+      nodesStore.deleteSelectedSegment();
     }
   });
 }
