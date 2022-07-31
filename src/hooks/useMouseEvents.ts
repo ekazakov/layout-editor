@@ -1,12 +1,11 @@
 import React from "react";
 import { runInAction } from "mobx";
 import { nodesStore, cursorStore } from "../stores";
-// import { RoadNode, RoadSegment } from "../stores";
 
-export function useHandleMouseDown() {
+export function useMouseEvents() {
   const { selectedNode } = nodesStore;
 
-  return React.useCallback(
+  const onMouseDown = React.useCallback(
     (evt: React.MouseEvent) => {
       // console.log("target:", evt.target);
       const { altKey } = evt;
@@ -56,4 +55,44 @@ export function useHandleMouseDown() {
     },
     [selectedNode]
   );
+
+  const onMouseMove = React.useCallback((evt: React.MouseEvent) => {
+    cursorStore.setPostion({
+      x: Math.round(evt.clientX),
+      y: Math.round(evt.clientY)
+    });
+  }, []);
+
+  const onMouseUp = React.useCallback((evt: React.MouseEvent) => {}, []);
+
+  const onMouseOver = React.useCallback((evt: React.MouseEvent) => {
+    const element = evt.target as HTMLElement;
+    const {
+      dataset: { type = "none" }
+    } = element;
+
+    switch (type) {
+      case "road-node": {
+        break;
+      }
+      case "road-segment": {
+        break;
+      }
+
+      default:
+        return;
+    }
+  }, []);
+  const onMouseOut = React.useCallback((evt: React.MouseEvent) => {}, []);
+
+  const onClick = React.useCallback((evt: React.MouseEvent) => {}, []);
+
+  return {
+    onMouseDown,
+    onMouseMove,
+    onMouseUp,
+    onMouseOver,
+    onMouseOut,
+    onClick
+  };
 }

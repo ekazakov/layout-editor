@@ -1,56 +1,11 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
 import { nodesStore, cursorStore } from "../stores/index";
-import { RoadNode } from "../stores";
-import { useHandleMouseDown } from "../hooks/useHandleMouseDown";
+// import { RoadNode } from "../stores";
+import { useMouseEvents } from "../hooks/useMouseEvents";
 import { useShortcuts } from "../hooks/useShortcuts";
 import { Segment, NewSegment } from "./segment";
-
-export const Node = observer(function Node({ node }: { node: RoadNode }) {
-  const [isDragging, setIsDragging] = React.useState(false);
-
-  return (
-    <g>
-      <text
-        x={node.position.x + 15}
-        y={node.position.y - 15}
-        textAnchor="start"
-        style={{ fontSize: 12, pointerEvents: "none" }}
-      >
-        s: {node.segmentIds.size}
-      </text>
-      <circle
-        onPointerDown={(evt) => {
-          setIsDragging(() => true);
-          const element = evt.target as HTMLElement;
-
-          element.setPointerCapture(evt.pointerId);
-        }}
-        onPointerUp={(evt) => {
-          setIsDragging(() => false);
-          const element = evt.target as HTMLElement;
-          element.releasePointerCapture(evt.pointerId);
-        }}
-        onPointerMove={(evt) => {
-          if (isDragging) {
-            node.setPostion({
-              x: Math.round(evt.clientX),
-              y: Math.round(evt.clientY)
-            });
-          }
-        }}
-        id={node.id}
-        data-type="road-node"
-        r={10}
-        cx={node.position.x}
-        cy={node.position.y}
-        stroke={node.selected ? "orange" : "blue"}
-        fill={isDragging ? "orange" : "white"}
-        strokeWidth="2px"
-      />
-    </g>
-  );
-});
+import { Node } from "./node";
 
 export const Canvas = observer(function Canvas() {
   const nodes = [...nodesStore.nodes.values()];
@@ -58,15 +13,15 @@ export const Canvas = observer(function Canvas() {
 
   const { selectedNode } = nodesStore;
 
-  const handlerMouseDown = useHandleMouseDown();
+  const {
+    onMouseDown,
+    onMouseMove,
+    onMouseUp,
+    onMouseOver,
+    onMouseOut,
+    onClick
+  } = useMouseEvents();
   useShortcuts();
-
-  const onMouseMove = React.useCallback((evt: React.MouseEvent) => {
-    cursorStore.setPostion({
-      x: Math.round(evt.clientX),
-      y: Math.round(evt.clientY)
-    });
-  }, []);
 
   return (
     <svg
@@ -74,8 +29,12 @@ export const Canvas = observer(function Canvas() {
       width="1000"
       height="1000"
       viewBox="0 0 1000 1000"
-      onMouseDown={handlerMouseDown}
+      onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
+      onMouseOver={onMouseOver}
+      onMouseOut={onMouseOut}
+      onClick={onClick}
     >
       <g>
         {selectedNode && (
