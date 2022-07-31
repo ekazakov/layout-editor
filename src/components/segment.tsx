@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { RoadNode, RoadSegment } from "../stores/roads";
+import { RoadSegment } from "../stores";
 
 export const NewSegment = observer(function NewSegment(props: any) {
   const { p1, p2 } = props;

@@ -1,7 +1,7 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
 import { nodesStore, cursorStore } from "../stores/index";
-import { RoadNode, RoadSegment } from "../stores/roads";
+import { RoadNode } from "../stores";
 import { useHandleMouseDown } from "../hooks/useHandleMouseDown";
 import { useShortcuts } from "../hooks/useShortcuts";
 import { Segment, NewSegment } from "./segment";

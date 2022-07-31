@@ -1,7 +1,7 @@
 import React from "react";
 import { runInAction } from "mobx";
-import { nodesStore, cursorStore } from "../stores/index";
-import { RoadNode, RoadSegment } from "../stores/roads";
+import { nodesStore, cursorStore } from "../stores";
+// import { RoadNode, RoadSegment } from "../stores";
 
 export function useHandleMouseDown() {
   const { selectedNode } = nodesStore;
@@ -9,6 +9,7 @@ export function useHandleMouseDown() {
   return React.useCallback(
     (evt: React.MouseEvent) => {
       // console.log("target:", evt.target);
+      const { altKey } = evt;
       const element = evt.target as HTMLElement;
       const {
         dataset: { type = "none" }
@@ -38,7 +39,14 @@ export function useHandleMouseDown() {
           break;
         }
         case "road-segment": {
-          nodesStore.toggleSegmentSelection(element.id);
+          if (altKey) {
+            nodesStore.splitSegmentAt(element.id, {
+              x: evt.clientX,
+              y: evt.clientY
+            });
+          } else {
+            nodesStore.toggleSegmentSelection(element.id);
+          }
           break;
         }
 

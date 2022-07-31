@@ -1,87 +1,47 @@
 import { makeAutoObservable } from "mobx";
-import { nanoid } from "nanoid";
 import { Position } from "../types";
+import { RoadNode } from "./road-node";
+import { RoadSegment } from "./road-segment";
 
-export class RoadNode {
-  private _position: Position = { x: 0, y: 0 };
-  private _selected = false;
-  public readonly id: string;
+// export class RoadSegment {
+//   public readonly id: string;
+//   private _selected = false;
+//   private _p1: RoadNode;
+//   private _p2: RoadNode;
 
-  segmentIds: Set<string> = new Set<string>();
+//   nodeStartId: string = "";
+//   nodeEndId: string = "";
 
-  setPostion = (p: Position) => {
-    this._position = p;
-  };
+//   set selected(selected: boolean) {
+//     this._selected = selected;
+//   }
 
-  moveBy = (delta: Position) => {
-    this._position = {
-      x: this._position.x + delta.x,
-      y: this._position.y + delta.y
-    };
-  };
+//   get selected() {
+//     return this._selected;
+//   }
 
-  get position() {
-    return this._position;
-  }
+//   get start() {
+//     return this._p1.position;
+//   }
 
-  get selected() {
-    return this._selected;
-  }
+//   get end() {
+//     return this._p2.position;
+//   }
 
-  toggleSelection = () => {
-    this._selected = !this._selected;
-  };
+//   moveBy = (delta: Position) => {
+//     this._p1.moveBy(delta);
+//     this._p2.moveBy(delta);
+//   };
 
-  set selected(selected) {
-    this._selected = selected;
-  }
-
-  constructor(p: Position, id?: string) {
-    makeAutoObservable(this);
-    this._position = p;
-    this.id = id ?? nanoid(9);
-  }
-}
-
-export class RoadSegment {
-  public readonly id: string;
-  private _selected = false;
-  private _p1: RoadNode;
-  private _p2: RoadNode;
-
-  nodeStartId: string = "";
-  nodeEndId: string = "";
-
-  set selected(selected: boolean) {
-    this._selected = selected;
-  }
-
-  get selected() {
-    return this._selected;
-  }
-
-  get start() {
-    return this._p1.position;
-  }
-
-  get end() {
-    return this._p2.position;
-  }
-
-  moveBy = (delta: Position) => {
-    this._p1.moveBy(delta);
-    this._p2.moveBy(delta);
-  };
-
-  constructor(nodeStart: RoadNode, nodeEnd: RoadNode, id?: string) {
-    makeAutoObservable(this);
-    this.id = id ?? nanoid(9);
-    this.nodeStartId = nodeStart.id;
-    this.nodeEndId = nodeEnd.id;
-    this._p1 = nodeStart;
-    this._p2 = nodeEnd;
-  }
-}
+//   constructor(nodeStart: RoadNode, nodeEnd: RoadNode, id?: string) {
+//     makeAutoObservable(this);
+//     this.id = id ?? nanoid(9);
+//     this.nodeStartId = nodeStart.id;
+//     this.nodeEndId = nodeEnd.id;
+//     this._p1 = nodeStart;
+//     this._p2 = nodeEnd;
+//   }
+// }
 
 export class NodesStore {
   nodes: Map<string, RoadNode> = new Map<string, RoadNode>();
@@ -244,6 +204,20 @@ export class NodesStore {
 
   deleteSelectedSegment() {
     return this.deleteSegment(this.selectedSegmentId);
+  }
+
+  splitSegmentAt(id: string, p: Position) {
+    const segment = this.getSegment(id);
+    if (!segment) {
+      throw new Error(`Segment ${id} doesn't exist`);
+    }
+
+    const newNode = this.addNode(p);
+
+    this.addSegment(segment.nodeStartId, newNode.id);
+    this.addSegment(newNode.id, segment.nodeEndId);
+
+    this.deleteSegment(id);
   }
 
   constructor() {

@@ -1,5 +1,7 @@
 import { NodesStore } from "./roads";
 import { CursorStore } from "./cursor";
+export { RoadNode } from "./road-node";
+export { RoadSegment } from "./road-segment";
 
 export const nodesStore = new NodesStore();
 export const cursorStore = new CursorStore();
