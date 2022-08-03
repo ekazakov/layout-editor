@@ -1,3 +1,4 @@
+import { toJS } from "mobx";
 import { NodesStore } from "./roads";
 import { CursorStore } from "./cursor";
 export { RoadNode } from "./road-node";
@@ -27,3 +28,5 @@ pos.forEach(([x, y]) => {
 window.nodesStore = nodesStore;
 // @ts-ignore
 window.cursorStore = cursorStore;
+
+window.toJS = toJS;

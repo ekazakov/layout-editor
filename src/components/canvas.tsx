@@ -11,7 +11,7 @@ export const Canvas = observer(function Canvas() {
   const nodes = [...nodesStore.nodes.values()];
   const segments = [...nodesStore.segments.values()];
 
-  const { selectedNode } = nodesStore;
+  const { selectedNode, intersections } = nodesStore;
 
   const {
     onMouseDown,
@@ -37,7 +37,7 @@ export const Canvas = observer(function Canvas() {
       onClick={onClick}
     >
       <g>
-        {selectedNode && (
+        {selectedNode && cursorStore.metaKey && (
           <NewSegment
             p1={{ x: selectedNode.position.x, y: selectedNode.position.y }}
             p2={{ x: cursorStore.position.x, y: cursorStore.position.y }}
@@ -49,6 +49,23 @@ export const Canvas = observer(function Canvas() {
           return <Segment key={segment.id} segment={segment} />;
         })}
       </g>
+      {cursorStore.metaKey && (
+        <g>
+          {intersections.map(({ segmentId, point }) => (
+            <circle
+              key={segmentId}
+              r={10}
+              cx={point.x}
+              cy={point.y}
+              stroke="blue"
+              strokeWidth="2px"
+              strokeDasharray="4"
+              fill="white"
+              opacity="0.8"
+            />
+          ))}
+        </g>
+      )}
       <g>
         {nodes.map((node) => {
           return <Node key={node.id} node={node} />;

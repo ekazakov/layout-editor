@@ -36,9 +36,17 @@ export class RoadNode {
     this._selected = selected;
   }
 
+  get x() {
+    return this._position.x;
+  }
+
+  get y() {
+    return this._position.y;
+  }
+
   constructor(p: Position, id?: string) {
     makeAutoObservable(this);
     this._position = p;
-    this.id = id ?? nanoid(9);
+    this.id = id ?? `node_${nanoid(7)}`;
   }
 }

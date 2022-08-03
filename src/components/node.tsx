@@ -13,7 +13,7 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
         textAnchor="start"
         style={{ fontSize: 12, pointerEvents: "none" }}
       >
-        s: {node.segmentIds.size}
+        #{node.id} ({node.segmentIds.size})
       </text>
       <circle
         onPointerDown={(evt) => {

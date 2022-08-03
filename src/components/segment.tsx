@@ -26,34 +26,44 @@ export const Segment = observer(function Segment(props: {
   const [isDragging, setIsDragging] = React.useState(false);
 
   return (
-    <line
-      onPointerDown={(evt) => {
-        setIsDragging(() => true);
-        const element = evt.target as HTMLElement;
+    <g>
+      <text
+        x={segment.middle.x + 15}
+        y={segment.middle.y - 15}
+        textAnchor="start"
+        style={{ fontSize: 12, pointerEvents: "none", color: "red" }}
+      >
+        #{segment.id}
+      </text>
+      <line
+        onPointerDown={(evt) => {
+          setIsDragging(() => true);
+          const element = evt.target as HTMLElement;
 
-        element.setPointerCapture(evt.pointerId);
-      }}
-      onPointerUp={(evt) => {
-        setIsDragging(() => false);
-        const element = evt.target as HTMLElement;
-        element.releasePointerCapture(evt.pointerId);
-      }}
-      onPointerMove={(evt) => {
-        if (isDragging) {
-          segment.moveBy({
-            x: Math.round(evt.movementX),
-            y: Math.round(evt.movementY)
-          });
-        }
-      }}
-      id={segment.id}
-      data-type="road-segment"
-      x1={segment.start.x}
-      y1={segment.start.y}
-      x2={segment.end.x}
-      y2={segment.end.y}
-      strokeWidth={5}
-      stroke={segment.selected ? "orange" : "#777"}
-    />
+          element.setPointerCapture(evt.pointerId);
+        }}
+        onPointerUp={(evt) => {
+          setIsDragging(() => false);
+          const element = evt.target as HTMLElement;
+          element.releasePointerCapture(evt.pointerId);
+        }}
+        onPointerMove={(evt) => {
+          if (isDragging) {
+            segment.moveBy({
+              x: Math.round(evt.movementX),
+              y: Math.round(evt.movementY)
+            });
+          }
+        }}
+        id={segment.id}
+        data-type="road-segment"
+        x1={segment.start.x}
+        y1={segment.start.y}
+        x2={segment.end.x}
+        y2={segment.end.y}
+        strokeWidth={5}
+        stroke={segment.selected ? "orange" : "#777"}
+      />
+    </g>
   );
 });
