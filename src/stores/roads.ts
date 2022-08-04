@@ -2,20 +2,16 @@ import { makeAutoObservable, reaction, toJS } from "mobx";
 import { LineSegment, Position, Intersection } from "../types";
 import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
-// import { SelectionStore } from "./selection";
+import { SelectionStore } from "./selection";
 import { hasCommonPoint, segmentIntersection } from "../utils/line";
 
 export class RoadsStore {
   nodes: Map<string, RoadNode> = new Map<string, RoadNode>();
   segments: Map<string, RoadSegment> = new Map<string, RoadSegment>();
 
-  private selectedNodeId: string = "";
+  private selection: SelectionStore;
 
-  private selectedSegmentId: string = "";
-
-  // private selection: SelectionStore;
-
-  intersections: Intersection[] = [];
+  private intersections: Intersection[] = [];
 
   addNode = (p: Position) => {
     const node = new RoadNode(p);
@@ -60,7 +56,7 @@ export class RoadsStore {
     if (node) {
       for (const segmentId of node.segmentIds) {
         const segment = this.getSegment(segmentId)!;
-        if (segment.nodeStartId === bId || segment.nodeEndId === bId) {
+        if (segment.start.id === bId || segment.end.id === bId) {
           return true;
         }
       }
@@ -74,27 +70,57 @@ export class RoadsStore {
       throw new Error(`Node ${id} doesn't exist`);
     }
 
-    if (this.selectedNodeId) {
-      this.getNode(this.selectedNodeId)!.selected = false;
+    const { nodeId } = this.selection;
 
-      if (this.selectedNodeId === id) {
-        this.selectedNodeId = "";
+    this.selection.reset();
+
+    if (nodeId) {
+      // this.getNode(nodeId)!.selected = false;
+
+      if (nodeId === id) {
+        // this.selectedNodeId = "";
         return;
       }
 
-      this.selectedNodeId = "";
+      // this.selectedNodeId = "";
     }
 
-    node.selected = true;
-    this.selectedNodeId = id;
+    // node.selected = true;
+    this.selection.nodeId = id;
   };
 
-  resetSelectedNode() {
-    if (this.selectedNodeId) {
-      this.getNode(this.selectedNodeId)!.selected = false;
+  toggleSegmentSelection = (id: string) => {
+    const segment = this.segments.get(id);
+    if (!segment) {
+      throw new Error(`Segment ${id} doesn't exist`);
     }
-    this.selectedNodeId = "";
-  }
+
+    const { segmentId } = this.selection;
+    this.selection.reset();
+
+    if (segmentId) {
+      // this.getSegment(segmentId)!.selected = false;
+
+      if (segmentId === id) {
+        // this.selectedSegmentId = "";
+        return;
+      }
+
+      // this.selection.reset();
+      // this.selectedSegmentId = "";
+    }
+
+    // segment.selected = true;
+    // this.selectedSegmentId = id;
+    this.selection.segmentId = id;
+  };
+
+  // private resetSelectedNode() {
+  //   if (this.selection.nodeId) {
+  //     // this.getNode(this.selection.nodeId)!.selected = false;
+  //   }
+  //   this.selection.reset();
+  // }
 
   deleteNode(nodeId: string) {
     const node = this.getNode(nodeId);
@@ -108,29 +134,30 @@ export class RoadsStore {
       }
     }
 
-    if (this.selectedNodeId === nodeId) {
-      this.selectedNodeId = "";
+    if (this.selection.nodeId === nodeId) {
+      this.selection.reset();
     }
-    this.nodes.delete(nodeId);
-    return true;
+
+    return this.nodes.delete(nodeId);
   }
 
   deleteSegment(id: string) {
-    if (this.selectedSegmentId === id) {
-      this.selectedSegmentId = "";
+    if (this.selection.segmentId === id) {
+      // this.selectedSegmentId = "";
+      this.selection.reset();
     }
     const segment = this.getSegment(id);
     if (segment) {
-      const nodeStart = this.nodes.get(segment.nodeStartId);
+      const nodeStart = this.nodes.get(segment.start.id);
       nodeStart?.segmentIds.delete(id);
-      const nodeEnd = this.nodes.get(segment.nodeEndId);
+      const nodeEnd = this.nodes.get(segment.end.id);
       nodeEnd?.segmentIds.delete(id);
     }
     return this.segments.delete(id);
   }
 
   deleteSelectedNode() {
-    return this.deleteNode(this.selectedNodeId);
+    return this.deleteNode(this.selection.nodeId);
   }
 
   getNode = (id: string): RoadNode | undefined => {
@@ -138,40 +165,19 @@ export class RoadsStore {
   };
 
   get selectedNode() {
-    return this.getNode(this.selectedNodeId || "");
+    return this.getNode(this.selection.nodeId || "");
   }
-
-  toggleSegmentSelection = (id: string) => {
-    const segment = this.segments.get(id);
-    if (!segment) {
-      throw new Error(`Segment ${id} doesn't exist`);
-    }
-
-    if (this.selectedSegmentId) {
-      this.getSegment(this.selectedSegmentId)!.selected = false;
-
-      if (this.selectedSegmentId === id) {
-        this.selectedSegmentId = "";
-        return;
-      }
-
-      this.selectedSegmentId = "";
-    }
-
-    segment.selected = true;
-    this.selectedSegmentId = id;
-  };
 
   getSegment(id: string) {
     return this.segments.get(id);
   }
 
   get selectedSegment() {
-    return this.getSegment(this.selectedSegmentId || "");
+    return this.getSegment(this.selection.segmentId || "");
   }
 
   deleteSelectedSegment() {
-    return this.deleteSegment(this.selectedSegmentId);
+    return this.deleteSegment(this.selection.segmentId);
   }
 
   splitSegmentAt(id: string, p: Position) {
@@ -182,8 +188,8 @@ export class RoadsStore {
 
     const newNode = this.addNode(p);
 
-    this._addSegment(segment.nodeStartId, newNode.id);
-    this._addSegment(newNode.id, segment.nodeEndId);
+    this._addSegment(segment.start.id, newNode.id);
+    this._addSegment(newNode.id, segment.end.id);
 
     this.deleteSegment(id);
   }
@@ -216,8 +222,8 @@ export class RoadsStore {
 
       const newNode = this.addNode(int.point);
       nodes.push(newNode.id);
-      this._addSegment(segment.nodeStartId, newNode.id);
-      this._addSegment(newNode.id, segment.nodeEndId);
+      this._addSegment(segment.start.id, newNode.id);
+      this._addSegment(newNode.id, segment.end.id);
 
       this.deleteSegment(int.segmentId);
     }
@@ -229,18 +235,32 @@ export class RoadsStore {
     }
   }
 
-  constructor() {
-    // this.selection = selection;
+  constructor(selection: SelectionStore) {
+    this.selection = selection;
 
     makeAutoObservable(this);
 
     reaction(
-      () => this.selectedNodeId,
+      () => this.selection.nodeId,
       (newSelectedNodeId: string) => {
         if (!newSelectedNodeId) {
           this.intersections = [];
         }
       }
     );
+  }
+
+  toJSON() {
+    return {
+      nodes: toJS(
+        [...this.nodes.entries()].map(([key, value]) => [key, value.toJSON()])
+      ),
+      segments: toJS(
+        [...this.segments.entries()].map(([key, value]) => [
+          key,
+          value.toJSON()
+        ])
+      )
+    };
   }
 }

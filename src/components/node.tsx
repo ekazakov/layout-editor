@@ -1,10 +1,10 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { RoadNode } from "../stores";
+import { RoadNode, selectionStore } from "../stores";
 
 export const Node = observer(function Node({ node }: { node: RoadNode }) {
   const [isDragging, setIsDragging] = React.useState(false);
-
+  const selected = node.id === selectionStore.nodeId;
   return (
     <g>
       <text
@@ -40,7 +40,7 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
         r={10}
         cx={node.position.x}
         cy={node.position.y}
-        stroke={node.selected ? "orange" : "blue"}
+        stroke={selected ? "orange" : "blue"}
         fill={isDragging ? "orange" : "white"}
         strokeWidth="2px"
       />

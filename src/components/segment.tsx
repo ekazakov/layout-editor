@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { RoadSegment } from "../stores";
+import { RoadSegment, selectionStore } from "../stores";
 
 export const NewSegment = observer(function NewSegment(props: any) {
   const { p1, p2 } = props;
@@ -25,6 +25,7 @@ export const Segment = observer(function Segment(props: {
   const { segment } = props;
   const [isDragging, setIsDragging] = React.useState(false);
 
+  const selected = segment.id === selectionStore.segmentId;
   return (
     <g>
       <text
@@ -62,7 +63,7 @@ export const Segment = observer(function Segment(props: {
         x2={segment.end.x}
         y2={segment.end.y}
         strokeWidth={5}
-        stroke={segment.selected ? "orange" : "#777"}
+        stroke={selected ? "orange" : "#777"}
       />
     </g>
   );

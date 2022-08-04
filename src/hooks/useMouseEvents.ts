@@ -58,7 +58,7 @@ export function useMouseEvents() {
       });
 
       if (selectedNode && cursorStore.metaKey) {
-        const line = { _p1: selectedNode, _p2: cursorStore.position };
+        const line = { start: selectedNode, end: cursorStore.position };
         roadsStore.updateIntersectionsWithRoad(line);
       }
     },

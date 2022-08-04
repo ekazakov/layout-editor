@@ -4,8 +4,8 @@ export interface Position {
 }
 
 export interface LineSegment {
-  _p1: Position;
-  _p2: Position;
+  start: Position;
+  end: Position;
 }
 
 export interface Intersection {

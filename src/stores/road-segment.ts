@@ -5,27 +5,16 @@ import { RoadNode } from "./road-node";
 
 export class RoadSegment {
   public readonly id: string;
-  private _selected = false;
-  _p1: RoadNode;
-  _p2: RoadNode;
 
-  nodeStartId: string = "";
-  nodeEndId: string = "";
-
-  set selected(selected: boolean) {
-    this._selected = selected;
-  }
-
-  get selected() {
-    return this._selected;
-  }
+  private _p1: RoadNode;
+  private _p2: RoadNode;
 
   get start() {
-    return this._p1.position;
+    return this._p1;
   }
 
   get end() {
-    return this._p2.position;
+    return this._p2;
   }
 
   get middle() {
@@ -43,9 +32,16 @@ export class RoadSegment {
   constructor(nodeStart: RoadNode, nodeEnd: RoadNode, id?: string) {
     makeAutoObservable(this);
     this.id = id ?? `segment_${nanoid(7)}`;
-    this.nodeStartId = nodeStart.id;
-    this.nodeEndId = nodeEnd.id;
+
     this._p1 = nodeStart;
     this._p2 = nodeEnd;
+  }
+
+  toJSON() {
+    return {
+      id: this.id,
+      startNodeId: this._p1.id,
+      endNodeId: this._p2.id
+    };
   }
 }

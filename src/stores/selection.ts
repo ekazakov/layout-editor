@@ -34,7 +34,8 @@ export class SelectionStore {
     }
   }
 
-  resetSelection() {
+  reset() {
+    // console.log("reset");
     this.updateSelection(NoneSelection);
   }
 
@@ -52,6 +53,36 @@ export class SelectionStore {
 
   get isSingle() {
     return this.hasSelection && !this.isMulti;
+  }
+
+  get segmentId() {
+    if (Array.isArray(this.selected) || this.selected.type !== "segment") {
+      return "";
+    }
+    return this.selected.id;
+  }
+
+  set segmentId(id: string) {
+    if (!id) {
+      throw Error(`Segment id can't be empty`);
+    }
+
+    this.updateSelection({ type: "segment", id });
+  }
+
+  get nodeId() {
+    if (Array.isArray(this.selected) || this.selected.type !== "node") {
+      return "";
+    }
+    return this.selected.id;
+  }
+
+  set nodeId(id: string) {
+    if (!id) {
+      throw Error(`Node id can't be empty`);
+    }
+
+    this.updateSelection({ type: "node", id });
   }
 
   constructor() {

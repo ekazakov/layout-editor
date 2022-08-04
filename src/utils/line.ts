@@ -6,8 +6,8 @@ export function segmentIntersection(
   segmentA: LineSegment,
   segmentB: LineSegment
 ): Position | undefined {
-  const { _p1: p1, _p2: p2 } = segmentA;
-  const { _p1: p3, _p2: p4 } = segmentB;
+  const { start: p1, end: p2 } = segmentA;
+  const { start: p3, end: p4 } = segmentB;
   // Check if none of the lines are of length 0
   if ((p1.x === p2.x && p1.y === p2.y) || (p3.x === p4.x && p3.y === p4.y)) {
     return undefined;
@@ -54,9 +54,9 @@ export function isEqualPosition(
 
 export function hasCommonPoint(line1: LineSegment, line2: LineSegment) {
   return (
-    isEqualPosition(line1._p1, line2._p1) ||
-    isEqualPosition(line1._p1, line2._p2) ||
-    isEqualPosition(line1._p2, line2._p1) ||
-    isEqualPosition(line1._p2, line2._p2)
+    isEqualPosition(line1.start, line2.start) ||
+    isEqualPosition(line1.start, line2.end) ||
+    isEqualPosition(line1.end, line2.start) ||
+    isEqualPosition(line1.end, line2.end)
   );
 }
