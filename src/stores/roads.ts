@@ -1,21 +1,19 @@
 import { makeAutoObservable, reaction, toJS } from "mobx";
-import { LineSegment, Position } from "../types";
+import { LineSegment, Position, Intersection } from "../types";
 import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
+// import { SelectionStore } from "./selection";
 import { hasCommonPoint, segmentIntersection } from "../utils/line";
 
-interface Intersection {
-  segmentId: string;
-  point: Position;
-}
-
-export class NodesStore {
+export class RoadsStore {
   nodes: Map<string, RoadNode> = new Map<string, RoadNode>();
   segments: Map<string, RoadSegment> = new Map<string, RoadSegment>();
 
   private selectedNodeId: string = "";
 
   private selectedSegmentId: string = "";
+
+  // private selection: SelectionStore;
 
   intersections: Intersection[] = [];
 
@@ -25,7 +23,7 @@ export class NodesStore {
     return node;
   };
 
-  addSegment(startNodeId: string, endNodeId: string) {
+  private _addSegment(startNodeId: string, endNodeId: string) {
     const startNode = this.getNode(startNodeId);
     if (!startNode) {
       throw new Error(`Node with id: ${startNodeId} doesn't exist`);
@@ -184,8 +182,8 @@ export class NodesStore {
 
     const newNode = this.addNode(p);
 
-    this.addSegment(segment.nodeStartId, newNode.id);
-    this.addSegment(newNode.id, segment.nodeEndId);
+    this._addSegment(segment.nodeStartId, newNode.id);
+    this._addSegment(newNode.id, segment.nodeEndId);
 
     this.deleteSegment(id);
   }
@@ -206,17 +204,10 @@ export class NodesStore {
 
       this.intersections.push({ segmentId: segment.id, point });
     });
-
-    // if (this.intersections.length) {
-    //   this.intersections.push
-    // }
-
-    // console.log(toJS(this.intersections));
   }
 
-  createSegmentsFromIntersections(startId: string, endId: string) {
-    // const startNode = this.getNode(startId)!;
-    const nodes = [startId];
+  addSegment(startId: string, endId: string) {
+    const nodes = [endId];
     for (const int of this.intersections) {
       const segment = this.getSegment(int.segmentId);
       if (!segment) {
@@ -225,30 +216,22 @@ export class NodesStore {
 
       const newNode = this.addNode(int.point);
       nodes.push(newNode.id);
-      this.addSegment(segment.nodeStartId, newNode.id);
-      this.addSegment(newNode.id, segment.nodeEndId);
+      this._addSegment(segment.nodeStartId, newNode.id);
+      this._addSegment(newNode.id, segment.nodeEndId);
 
       this.deleteSegment(int.segmentId);
     }
 
-    nodes.push(endId);
-    console.log("join");
-    for (let i = 0; i < nodes.length - 1; i++) {
-      console.log("join:", nodes[i], nodes[i + 1]);
-      this.addSegment(nodes[i], nodes[i + 1]);
-    }
-    // nodes.unshift(startNode)
+    nodes.push(startId);
 
-    // while (this.intersections.length) {
-    //   const intersection = this.intersections.pop();
-    //   if (intersection) {
-    //     const { segmentId, point } = intersection;
-    //     this.splitSegmentAt(segmentId, point);
-    //   }
-    // }
+    for (let i = 0; i < nodes.length - 1; i++) {
+      this._addSegment(nodes[i], nodes[i + 1]);
+    }
   }
 
   constructor() {
+    // this.selection = selection;
+
     makeAutoObservable(this);
 
     reaction(

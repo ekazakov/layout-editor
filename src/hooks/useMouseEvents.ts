@@ -1,13 +1,12 @@
 import React from "react";
 import { runInAction, toJS } from "mobx";
-import { nodesStore, cursorStore } from "../stores";
+import { roadsStore, cursorStore } from "../stores";
 
 export function useMouseEvents() {
-  const { selectedNode } = nodesStore;
+  const { selectedNode } = roadsStore;
 
   const onMouseDown = React.useCallback(
     (evt: React.MouseEvent) => {
-      // console.log("target:", evt.target);
       const { altKey } = evt;
       const element = evt.target as HTMLElement;
       const {
@@ -19,21 +18,21 @@ export function useMouseEvents() {
           break;
         case "road-node": {
           if (selectedNode && cursorStore.metaKey) {
-            if (!nodesStore.isConnected(selectedNode.id, element.id)) {
-              nodesStore.addSegment(selectedNode.id, element.id);
+            if (!roadsStore.isConnected(selectedNode.id, element.id)) {
+              roadsStore.addSegment(selectedNode.id, element.id);
             }
           }
-          nodesStore.toggleNodeSelection(element.id);
+          roadsStore.toggleNodeSelection(element.id);
           break;
         }
         case "road-segment": {
           if (altKey) {
-            nodesStore.splitSegmentAt(element.id, {
+            roadsStore.splitSegmentAt(element.id, {
               x: evt.clientX,
               y: evt.clientY
             });
           } else {
-            nodesStore.toggleSegmentSelection(element.id);
+            roadsStore.toggleSegmentSelection(element.id);
           }
           break;
         }
@@ -60,7 +59,7 @@ export function useMouseEvents() {
 
       if (selectedNode && cursorStore.metaKey) {
         const line = { _p1: selectedNode, _p2: cursorStore.position };
-        nodesStore.updateIntersectionsWithRoad(line);
+        roadsStore.updateIntersectionsWithRoad(line);
       }
     },
     [selectedNode]
@@ -97,23 +96,13 @@ export function useMouseEvents() {
 
       if (type === "canvas") {
         runInAction(() => {
-          const newNode = nodesStore.addNode({
+          const newNode = roadsStore.addNode({
             x: evt.clientX,
             y: evt.clientY
           });
-          // console.log("newNode:", newNode.id, "selected:", selectedNode?.id);
           if (selectedNode && cursorStore.metaKey) {
-            // const newSegment = nodesStore.addSegment(
-            //   selectedNode.id,
-            //   newNode.id
-            // );
-            // nodesStore.updateIntersectionsWithRoad(newSegment);
-            // console.log(toJS(nodesStore.intersections));
-            nodesStore.createSegmentsFromIntersections(
-              selectedNode.id,
-              newNode.id
-            );
-            nodesStore.toggleNodeSelection(newNode.id);
+            roadsStore.addSegment(selectedNode.id, newNode.id);
+            roadsStore.toggleNodeSelection(newNode.id);
           }
         });
       }

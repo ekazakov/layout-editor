@@ -1,10 +1,10 @@
 import { toJS } from "mobx";
-import { NodesStore } from "./roads";
+import { RoadsStore } from "./roads";
 import { CursorStore } from "./cursor";
 export { RoadNode } from "./road-node";
 export { RoadSegment } from "./road-segment";
 
-export const nodesStore = new NodesStore();
+export const roadsStore = new RoadsStore();
 export const cursorStore = new CursorStore();
 
 const pos: [number, number][] = [
@@ -21,12 +21,12 @@ const pos: [number, number][] = [
 ];
 
 pos.forEach(([x, y]) => {
-  nodesStore.addNode({ x, y });
+  roadsStore.addNode({ x, y });
 });
 
 // @ts-ignore
-window.nodesStore = nodesStore;
+window.roadsStore = roadsStore;
 // @ts-ignore
 window.cursorStore = cursorStore;
-
+// @ts-ignore
 window.toJS = toJS;

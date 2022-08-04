@@ -1,19 +1,19 @@
 import useTinykeys from "use-tinykeys";
-import { nodesStore } from "../stores/index";
+import { roadsStore } from "../stores/index";
 
 export function useShortcuts() {
   useTinykeys({
     Escape: () => {
-      nodesStore.resetSelectedNode();
+      roadsStore.resetSelectedNode();
     },
     Delete: () => {
       // console.log("Delete");
-      nodesStore.deleteSelectedNode();
+      roadsStore.deleteSelectedNode();
     },
     Backspace: () => {
       // console.log("Backspace");
-      nodesStore.deleteSelectedNode();
-      nodesStore.deleteSelectedSegment();
+      roadsStore.deleteSelectedNode();
+      roadsStore.deleteSelectedSegment();
     }
   });
 }
