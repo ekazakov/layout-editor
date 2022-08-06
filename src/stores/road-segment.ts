@@ -1,6 +1,6 @@
 import { makeAutoObservable } from "mobx";
 import { nanoid } from "nanoid";
-import { Position } from "../types";
+import { Position, RoadSegmentDump } from "../types";
 import { RoadNode } from "./road-node";
 
 export class RoadSegment {

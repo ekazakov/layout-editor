@@ -1,5 +1,5 @@
-import { makeAutoObservable, reaction, toJS } from "mobx";
-import { LineSegment, Position, Intersection } from "../types";
+import { makeAutoObservable, observable, reaction, toJS } from "mobx";
+import { LineSegment, Position, Intersection, RoadsDump } from "../types";
 import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
 import { SelectionStore } from "./selection";
@@ -12,6 +12,20 @@ export class RoadsStore {
   private selection: SelectionStore;
 
   private intersections: Intersection[] = [];
+
+  populate(dump: RoadsDump) {
+    this.empty();
+    dump.nodes.forEach((dump) => {
+      const node = RoadNode.populate(dump);
+      this.nodes.set(node.id, node);
+    });
+    dump.segments.forEach((dump) => {
+      const nodeStart = this.nodes.get(dump.startNodeId)!;
+      const nodeEnd = this.nodes.get(dump.endNodeId)!;
+      const segment = new RoadSegment(nodeStart, nodeEnd, dump.id);
+      this.segments.set(segment.id, segment);
+    });
+  }
 
   addNode = (p: Position) => {
     const node = new RoadNode(p);
@@ -36,6 +50,10 @@ export class RoadsStore {
     this.segments.set(segment.id, segment);
 
     return segment;
+  }
+
+  joinNodes(startNodeId: string, endNodeId: string) {
+    this._addSegment(startNodeId, endNodeId);
   }
 
   addSegmentToPosition(startNodeId: string, p: Position) {
@@ -74,18 +92,10 @@ export class RoadsStore {
 
     this.selection.reset();
 
-    if (nodeId) {
-      // this.getNode(nodeId)!.selected = false;
-
-      if (nodeId === id) {
-        // this.selectedNodeId = "";
-        return;
-      }
-
-      // this.selectedNodeId = "";
+    if (nodeId === id) {
+      return;
     }
 
-    // node.selected = true;
     this.selection.nodeId = id;
   };
 
@@ -98,29 +108,12 @@ export class RoadsStore {
     const { segmentId } = this.selection;
     this.selection.reset();
 
-    if (segmentId) {
-      // this.getSegment(segmentId)!.selected = false;
-
-      if (segmentId === id) {
-        // this.selectedSegmentId = "";
-        return;
-      }
-
-      // this.selection.reset();
-      // this.selectedSegmentId = "";
+    if (segmentId === id) {
+      return;
     }
 
-    // segment.selected = true;
-    // this.selectedSegmentId = id;
     this.selection.segmentId = id;
   };
-
-  // private resetSelectedNode() {
-  //   if (this.selection.nodeId) {
-  //     // this.getNode(this.selection.nodeId)!.selected = false;
-  //   }
-  //   this.selection.reset();
-  // }
 
   deleteNode(nodeId: string) {
     const node = this.getNode(nodeId);
@@ -143,7 +136,6 @@ export class RoadsStore {
 
   deleteSegment(id: string) {
     if (this.selection.segmentId === id) {
-      // this.selectedSegmentId = "";
       this.selection.reset();
     }
     const segment = this.getSegment(id);
@@ -210,10 +202,16 @@ export class RoadsStore {
 
       this.intersections.push({ segmentId: segment.id, point });
     });
+    // console.log("Ints:", toJS(this.intersections));
   }
 
   addSegment(startId: string, endId: string) {
+    if (startId === endId) {
+      console.log(`Tring to connect node ${startId} to itself`);
+      return;
+    }
     const nodes = [endId];
+    // console.log("Ints final:", toJS(this.intersections));
     for (const int of this.intersections) {
       const segment = this.getSegment(int.segmentId);
       if (!segment) {
@@ -235,6 +233,12 @@ export class RoadsStore {
     }
   }
 
+  empty() {
+    this.nodes.clear();
+    this.segments.clear();
+    this.selection.reset();
+  }
+
   constructor(selection: SelectionStore) {
     this.selection = selection;
 
@@ -250,17 +254,18 @@ export class RoadsStore {
     );
   }
 
+  get nodeList() {
+    return [...this.nodes.values()];
+  }
+
+  get segmentList() {
+    return [...this.segments.values()];
+  }
+
   toJSON() {
     return {
-      nodes: toJS(
-        [...this.nodes.entries()].map(([key, value]) => [key, value.toJSON()])
-      ),
-      segments: toJS(
-        [...this.segments.entries()].map(([key, value]) => [
-          key,
-          value.toJSON()
-        ])
-      )
-    };
+      nodes: this.nodeList.map((value) => value.toJSON()),
+      segments: this.segmentList.map((value) => value.toJSON())
+    } as RoadsDump;
   }
 }

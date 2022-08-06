@@ -1,15 +1,21 @@
 import { makeAutoObservable, toJS } from "mobx";
 import { nanoid } from "nanoid";
-import { Position } from "../types";
+import { Position, RoadNodeDump } from "../types";
+import { undoManagerStore } from "./index";
 
 export class RoadNode {
   private _position: Position = { x: 0, y: 0 };
   public readonly id: string;
 
+  private tracker = undoManagerStore.createTrackWithDebounce();
+
   segmentIds: Set<string> = new Set<string>();
 
   setPostion = (p: Position) => {
-    this._position = p;
+    this.tracker(() => {
+      // console.log("setPosition", p);
+      this._position = p;
+    });
   };
 
   moveBy = (delta: Position) => {
@@ -31,16 +37,36 @@ export class RoadNode {
     return this._position.y;
   }
 
+  get track() {
+    return {
+      id: this.id,
+      position: {
+        x: this.x,
+        y: this.y
+      },
+      segmentIds: [...this.segmentIds.values()]
+    };
+  }
+
   constructor(p: Position, id?: string) {
     makeAutoObservable(this);
     this._position = p;
     this.id = id ?? `node_${nanoid(7)}`;
   }
 
+  static populate(dump: RoadNodeDump) {
+    const node = new RoadNode(dump.position, dump.id);
+    node.segmentIds = new Set(dump.segmentIds);
+    return node;
+  }
+
   toJSON() {
     return {
       id: this.id,
-      position: toJS(this._position),
+      position: {
+        x: this.x,
+        y: this.y
+      },
       segmentIds: [...this.segmentIds.values()]
     };
   }
