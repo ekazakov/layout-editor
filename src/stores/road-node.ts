@@ -49,9 +49,9 @@ export class RoadNode {
   }
 
   constructor(p: Position, id?: string) {
-    makeAutoObservable(this);
     this._position = p;
     this.id = id ?? `node_${nanoid(7)}`;
+    makeAutoObservable(this);
   }
 
   static populate(dump: RoadNodeDump) {

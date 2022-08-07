@@ -5,6 +5,7 @@ import { useMouseEvents } from "../hooks/useMouseEvents";
 import { useShortcuts } from "../hooks/useShortcuts";
 import { Segment, NewSegment } from "./segment";
 import { Node } from "./node";
+import { Fixture } from "./fixture";
 
 export const Canvas = observer(function Canvas() {
   const nodes = [...roadsStore.nodes.values()];
@@ -47,6 +48,9 @@ export const Canvas = observer(function Canvas() {
         {segments.map((segment) => {
           return <Segment key={segment.id} segment={segment} />;
         })}
+      </g>
+      <g>
+        <Fixture />
       </g>
       {cursorStore.metaKey && (
         <g>
