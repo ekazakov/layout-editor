@@ -8,6 +8,7 @@ import { RoadsDump } from "../types";
 
 export { RoadNode } from "./road-node";
 export { RoadSegment } from "./road-segment";
+export { Fixture } from "./fixture";
 
 export const selectionStore = new SelectionStore();
 export const roadsStore = new RoadsStore(selectionStore);
@@ -19,6 +20,8 @@ export const undoManagerStore = new UndoManagerStore(
     roadsStore.populate(value);
   }
 );
+
+roadsStore.initFixrures();
 
 // roadsStore.populate(dump);
 undoManagerStore.trackChanges();

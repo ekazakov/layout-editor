@@ -19,10 +19,10 @@ export class RoadNode {
   };
 
   moveBy = (delta: Position) => {
-    this._position = {
+    this.setPostion({
       x: this._position.x + delta.x,
       y: this._position.y + delta.y
-    };
+    });
   };
 
   get position() {

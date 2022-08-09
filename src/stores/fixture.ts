@@ -1,10 +1,11 @@
 import { makeAutoObservable, toJS } from "mobx";
 import { nanoid } from "nanoid";
 import { RoadNode } from "./road-node";
-import { Position, RoadNodeDump } from "../types";
+import { Position } from "../types";
 
 export class Gate {
-  connection: RoadNode = undefined;
+  private _connection: RoadNode | undefined = undefined;
+
   public readonly id: string;
   private _position: Position;
 
@@ -21,10 +22,12 @@ export class Gate {
   };
 
   moveBy = (delta: Position) => {
-    this._position = {
+    this.setPostion({
       x: this._position.x + delta.x,
       y: this._position.y + delta.y
-    };
+    });
+
+    this.connection?.moveBy(delta);
   };
 
   get x() {
@@ -35,22 +38,34 @@ export class Gate {
     return this._position.y;
   }
 
+  connect(node: RoadNode) {
+    this._connection = node;
+  }
+
+  get connection() {
+    return this._connection;
+  }
+
   constructor(p: Position) {
-    makeAutoObservable(this);
     this._position = p;
     this.id = `fixture_gate_${nanoid(7)}`;
+    makeAutoObservable(this);
   }
 }
 
-export class Fixtue {
+export class Fixture {
   public readonly id: string;
   private _position: Position;
-  private size = 150;
+  public readonly size = 150;
 
-  gates: Map<string, Gate> = new Map<string, Gate>();
+  private gates: Map<string, Gate> = new Map<string, Gate>();
 
   get position() {
     return this._position;
+  }
+
+  getGate(id: string) {
+    return this.gates.get(id);
   }
 
   setPostion = (p: Position) => {
@@ -62,6 +77,9 @@ export class Fixtue {
       x: this._position.x + delta.x,
       y: this._position.y + delta.y
     };
+    this.gates.forEach((gate) => {
+      gate.moveBy(delta);
+    });
   };
 
   get x() {
@@ -77,12 +95,13 @@ export class Fixtue {
   }
 
   connect(gateId: string, node: RoadNode) {
-    if (!this.gates.has(gateId)) {
-      console.log(`Gate ${gateId} doesn't exist for fixture ${this.id}`);
+    const gate = this.gates.get(gateId);
+    if (!gate) {
+      console.error(`Gate ${gateId} doesn't exist for fixture ${this.id}`);
       return;
     }
-    const gate = this.gates.get(gateId);
-    gate.connection = node;
+
+    gate.connect(node);
   }
 
   constructor(p: Position) {

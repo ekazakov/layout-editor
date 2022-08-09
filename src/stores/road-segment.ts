@@ -2,12 +2,15 @@ import { makeAutoObservable } from "mobx";
 import { nanoid } from "nanoid";
 import { Position, RoadSegmentDump } from "../types";
 import { RoadNode } from "./road-node";
+import { undoManagerStore } from "./index";
 
 export class RoadSegment {
   public readonly id: string;
 
   private _p1: RoadNode;
   private _p2: RoadNode;
+
+  private tracker = undoManagerStore.createTrackWithDebounce();
 
   get start() {
     return this._p1;
@@ -25,8 +28,10 @@ export class RoadSegment {
   }
 
   moveBy = (delta: Position) => {
-    this._p1.moveBy(delta);
-    this._p2.moveBy(delta);
+    this.tracker(() => {
+      this._p1.moveBy(delta);
+      this._p2.moveBy(delta);
+    });
   };
 
   constructor(nodeStart: RoadNode, nodeEnd: RoadNode, id?: string) {

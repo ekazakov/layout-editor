@@ -8,8 +8,9 @@ import { Node } from "./node";
 import { Fixture } from "./fixture";
 
 export const Canvas = observer(function Canvas() {
-  const nodes = [...roadsStore.nodes.values()];
-  const segments = [...roadsStore.segments.values()];
+  const nodes = roadsStore.nodeList;
+  const segments = roadsStore.segmentList;
+  const fixtures = roadsStore.fixtureList;
 
   const { selectedNode, intersections } = roadsStore;
 
@@ -45,12 +46,14 @@ export const Canvas = observer(function Canvas() {
         )}
       </g>
       <g>
-        {segments.map((segment) => {
-          return <Segment key={segment.id} segment={segment} />;
+        {fixtures.map((fixture) => {
+          return <Fixture key={fixture.id} fixture={fixture} />;
         })}
       </g>
       <g>
-        <Fixture />
+        {segments.map((segment) => {
+          return <Segment key={segment.id} segment={segment} />;
+        })}
       </g>
       {cursorStore.metaKey && (
         <g>

@@ -1,13 +1,15 @@
-import { makeAutoObservable, observable, reaction, toJS } from "mobx";
+import { makeAutoObservable, reaction, toJS } from "mobx";
 import { LineSegment, Position, Intersection, RoadsDump } from "../types";
 import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
+import { Fixture } from "./fixture";
 import { SelectionStore } from "./selection";
 import { hasCommonPoint, segmentIntersection } from "../utils/line";
 
 export class RoadsStore {
   nodes: Map<string, RoadNode> = new Map<string, RoadNode>();
   segments: Map<string, RoadSegment> = new Map<string, RoadSegment>();
+  fixtures: Map<string, Fixture> = new Map<string, Fixture>();
 
   private selection: SelectionStore;
 
@@ -114,6 +116,22 @@ export class RoadsStore {
 
     this.selection.segmentId = id;
   };
+
+  toggleFixtureSelection(id: string) {
+    const fixture = this.fixtures.get(id);
+    if (!fixture) {
+      throw new Error(`Fixture ${id} doesn't exist`);
+    }
+
+    const { fixtureId } = this.selection;
+    this.selection.reset();
+
+    if (fixtureId === id) {
+      return;
+    }
+
+    this.selection.fixtureId = id;
+  }
 
   deleteNode(nodeId: string) {
     const node = this.getNode(nodeId);
@@ -233,6 +251,19 @@ export class RoadsStore {
     }
   }
 
+  get fixtureList() {
+    return [...this.fixtures.values()];
+  }
+
+  connectToGate(fixtureId: string, gateId: string, node: RoadNode) {
+    const fixture = this.fixtures.get(fixtureId);
+    if (!fixture) {
+      console.error(`Fixture ${fixtureId} doesn't exist`);
+      return;
+    }
+    fixture.connect(gateId, node);
+  }
+
   empty() {
     this.nodes.clear();
     this.segments.clear();
@@ -252,6 +283,13 @@ export class RoadsStore {
         }
       }
     );
+  }
+
+  initFixrures() {
+    const f1 = new Fixture({ x: 100, y: 100 });
+    const f2 = new Fixture({ x: 700, y: 700 });
+    this.fixtures.set(f1.id, f1);
+    this.fixtures.set(f2.id, f2);
   }
 
   get nodeList() {

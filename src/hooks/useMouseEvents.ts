@@ -17,29 +17,9 @@ export function useMouseEvents() {
         break;
       case "road-node":
         break;
-      // case "road-node": {
-      //   if (selectedNode && cursorStore.metaKey) {
-      //     if (!roadsStore.isConnected(selectedNode.id, element.id)) {
-      //       roadsStore.addSegment(selectedNode.id, element.id);
-      //     }
-      //   }
-      //   roadsStore.toggleNodeSelection(element.id);
-      //   break;
-      // }
-      case "road-segment": {
-        if (altKey) {
-          roadsStore.splitSegmentAt(element.id, {
-            x: evt.clientX,
-            y: evt.clientY
-          });
-        } else {
-          roadsStore.toggleSegmentSelection(element.id);
-        }
-        break;
-      }
 
-      default:
-        console.error("Unknow type:", type);
+      // default:
+      // console.error("Unknow type:", type);
     }
   }, []);
 
@@ -64,30 +44,36 @@ export function useMouseEvents() {
     [selectedNode]
   );
 
-  const onMouseUp = React.useCallback((evt: React.MouseEvent) => {}, []);
-
-  const onMouseOver = React.useCallback((evt: React.MouseEvent) => {
+  const onMouseUp = React.useCallback((evt: React.MouseEvent) => {
     const element = evt.target as HTMLElement;
     const {
       dataset: { type = "none" }
     } = element;
 
     switch (type) {
-      case "road-node": {
-        break;
-      }
-      case "road-segment": {
+      case "fixture-gate": {
+        console.log("up");
+        if (selectedNode && cursorStore.metaKey) {
+        }
         break;
       }
 
       default:
-        return;
+        break;
     }
+  }, []);
+
+  const onMouseOver = React.useCallback((evt: React.MouseEvent) => {
+    const element = evt.target as HTMLElement;
+    const {
+      dataset: { type = "none" }
+    } = element;
   }, []);
   const onMouseOut = React.useCallback((evt: React.MouseEvent) => {}, []);
 
   const onClick = React.useCallback(
     (evt: React.MouseEvent) => {
+      const { altKey } = evt;
       const element = evt.target as HTMLElement;
       const {
         dataset: { type = "none" }
@@ -103,6 +89,40 @@ export function useMouseEvents() {
           roadsStore.toggleNodeSelection(element.id);
           break;
         }
+        case "road-segment": {
+          if (altKey) {
+            roadsStore.splitSegmentAt(element.id, {
+              x: evt.clientX,
+              y: evt.clientY
+            });
+          } else {
+            roadsStore.toggleSegmentSelection(element.id);
+          }
+          break;
+        }
+        case "fixture": {
+          roadsStore.toggleFixtureSelection(element.id);
+          break;
+        }
+        case "fixture-gate": {
+          runInAction(() => {
+            if (selectedNode && cursorStore.metaKey) {
+              const newNode = roadsStore.addNode({
+                x: evt.clientX,
+                y: evt.clientY
+              });
+              roadsStore.addSegment(selectedNode.id, newNode.id);
+              roadsStore.toggleNodeSelection(newNode.id);
+              roadsStore.connectToGate(
+                element.dataset.fixtureId!,
+                element.id,
+                newNode
+              );
+            }
+          });
+          break;
+        }
+
         case "canvas": {
           runInAction(() => {
             const newNode = roadsStore.addNode({
