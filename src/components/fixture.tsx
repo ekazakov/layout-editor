@@ -25,27 +25,28 @@ export const Fixture = observer(function Fixture({ fixture }: FixtureProps) {
   const selected = fixture.id === selectionStore.fixtureId;
 
   return (
-    <g>
-      <StyledRect
-        onPointerDown={(evt) => {
-          setIsDragging(() => true);
-          const element = evt.target as HTMLElement;
+    <g
+      onPointerDown={(evt) => {
+        setIsDragging(() => true);
+        const element = evt.target as HTMLElement;
 
-          element.setPointerCapture(evt.pointerId);
-        }}
-        onPointerUp={(evt) => {
-          setIsDragging(() => false);
-          const element = evt.target as HTMLElement;
-          element.releasePointerCapture(evt.pointerId);
-        }}
-        onPointerMove={(evt) => {
-          if (isDragging) {
-            fixture.moveBy({
-              x: Math.round(evt.movementX),
-              y: Math.round(evt.movementY)
-            });
-          }
-        }}
+        element.setPointerCapture(evt.pointerId);
+      }}
+      onPointerUp={(evt) => {
+        setIsDragging(() => false);
+        const element = evt.target as HTMLElement;
+        element.releasePointerCapture(evt.pointerId);
+      }}
+      onPointerMove={(evt) => {
+        if (isDragging) {
+          fixture.moveBy({
+            x: Math.round(evt.movementX),
+            y: Math.round(evt.movementY)
+          });
+        }
+      }}
+    >
+      <StyledRect
         selected={selected}
         id={fixture.id}
         data-type="fixture"

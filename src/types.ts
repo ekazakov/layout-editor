@@ -32,3 +32,11 @@ export interface RoadsDump {
   nodes: RoadNodeDump[];
   segments: RoadSegmentDump[];
 }
+
+export type ElementType =
+  | "canvas"
+  | "road-node"
+  | "road-segment"
+  | "fixture"
+  | "fixture-gate"
+  | "none";

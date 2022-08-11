@@ -1,6 +1,7 @@
 import React from "react";
 import { runInAction, toJS } from "mobx";
 import { roadsStore, cursorStore } from "../stores";
+import { matchElementTypeAtPosition } from "../utils/find-hovered-element";
 
 export function useMouseEvents() {
   const { selectedNode } = roadsStore;
@@ -44,24 +45,42 @@ export function useMouseEvents() {
     [selectedNode]
   );
 
-  const onMouseUp = React.useCallback((evt: React.MouseEvent) => {
-    const element = evt.target as HTMLElement;
-    const {
-      dataset: { type = "none" }
-    } = element;
+  const onMouseUp = React.useCallback(
+    (evt: React.MouseEvent) => {
+      const element = evt.target as HTMLElement;
+      const {
+        dataset: { type = "none" }
+      } = element;
 
-    switch (type) {
-      case "fixture-gate": {
-        console.log("up");
-        if (selectedNode && cursorStore.metaKey) {
+      switch (type) {
+        case "road-node": {
+          const gate = matchElementTypeAtPosition(
+            cursorStore.position,
+            "fixture-gate"
+          );
+          // console.log("g:", gate, "n:", selectedNode);
+          if (gate && selectedNode) {
+            roadsStore.connectToGate(
+              gate.dataset.fixtureId!,
+              gate.id,
+              selectedNode
+            );
+          }
+          // selectedNode?.position;
+          break;
         }
-        break;
-      }
+        case "fixture-gate": {
+          if (selectedNode && cursorStore.metaKey) {
+          }
+          break;
+        }
 
-      default:
-        break;
-    }
-  }, []);
+        default:
+          break;
+      }
+    },
+    [selectedNode]
+  );
 
   const onMouseOver = React.useCallback((evt: React.MouseEvent) => {
     const element = evt.target as HTMLElement;
