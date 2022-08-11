@@ -40,6 +40,15 @@ export class Gate {
 
   connect(node: RoadNode) {
     this._connection = node;
+    node.gateId = this.id;
+  }
+
+  disconnect() {
+    if (!this._connection) {
+      return;
+    }
+    this._connection.gateId = undefined;
+    this._connection = undefined;
   }
 
   get connection() {

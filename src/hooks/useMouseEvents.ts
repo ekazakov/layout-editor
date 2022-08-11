@@ -60,11 +60,7 @@ export function useMouseEvents() {
           );
           // console.log("g:", gate, "n:", selectedNode);
           if (gate && selectedNode) {
-            roadsStore.connectToGate(
-              gate.dataset.fixtureId!,
-              gate.id,
-              selectedNode
-            );
+            roadsStore.connectToGate(gate.id, selectedNode);
           }
           // selectedNode?.position;
           break;
@@ -132,11 +128,7 @@ export function useMouseEvents() {
               });
               roadsStore.addSegment(selectedNode.id, newNode.id);
               roadsStore.toggleNodeSelection(newNode.id);
-              roadsStore.connectToGate(
-                element.dataset.fixtureId!,
-                element.id,
-                newNode
-              );
+              roadsStore.connectToGate(element.id, newNode);
             }
           });
           break;

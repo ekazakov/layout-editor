@@ -1,11 +1,14 @@
 import { makeAutoObservable, toJS } from "mobx";
 import { nanoid } from "nanoid";
 import { Position, RoadNodeDump } from "../types";
+import { Gate } from "./fixture";
 import { undoManagerStore } from "./index";
 
 export class RoadNode {
   private _position: Position = { x: 0, y: 0 };
   public readonly id: string;
+
+  gateId: string | undefined = undefined;
 
   private tracker = undoManagerStore.createTrackWithDebounce();
 

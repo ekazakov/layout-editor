@@ -1,6 +1,8 @@
 # TODO
 
 - Cleanup gate connection when node deleted
+- Create fixture
+- Delete fixture
 - Make fiture gates selectable
 - Undo for fixtures
 - Multiselection

@@ -149,6 +149,12 @@ export class RoadsStore {
       this.selection.reset();
     }
 
+    if (node.gateId) {
+      const gate = this.getGate(node.gateId);
+
+      gate?.disconnect();
+    }
+
     return this.nodes.delete(nodeId);
   }
 
@@ -255,13 +261,19 @@ export class RoadsStore {
     return [...this.fixtures.values()];
   }
 
-  connectToGate(fixtureId: string, gateId: string, node: RoadNode) {
-    const fixture = this.fixtures.get(fixtureId);
-    if (!fixture) {
-      console.error(`Fixture ${fixtureId} doesn't exist`);
+  connectToGate(gateId: string, node: RoadNode) {
+    const gate = this.getGate(gateId);
+    if (!gate) {
+      console.error(`Gate ${gateId} doesn't exist`);
       return;
     }
-    fixture.connect(gateId, node);
+    gate.connect(node);
+  }
+
+  getGate(id: string) {
+    return this.fixtureList
+      .find((fixtue) => fixtue.getGate(id) !== null)
+      ?.getGate(id);
   }
 
   empty() {
