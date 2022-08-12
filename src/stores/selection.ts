@@ -3,7 +3,7 @@ import { LineSegment, Position } from "../types";
 import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
 
-type ElementType = "segment" | "node" | "fixture";
+type ElementType = "segment" | "node" | "fixture" | "gate";
 
 type SelectionItem = { type: ElementType; id: string };
 export type NoneSelectionItem = Readonly<{ type: "none"; id: "" }>;
@@ -97,6 +97,21 @@ export class SelectionStore {
     }
 
     this.updateSelection({ type: "fixture", id });
+  }
+
+  get gateId() {
+    if (Array.isArray(this.selected) || this.selected.type !== "gate") {
+      return "";
+    }
+    return this.selected.id;
+  }
+
+  set gateId(id: string) {
+    if (!id) {
+      throw Error(`Fixture id can't be empty`);
+    }
+
+    this.updateSelection({ type: "gate", id });
   }
 
   constructor() {

@@ -8,7 +8,7 @@ import { RoadsDump } from "../types";
 
 export { RoadNode } from "./road-node";
 export { RoadSegment } from "./road-segment";
-export { Fixture } from "./fixture";
+export { Fixture, Gate } from "./fixture";
 
 export const selectionStore = new SelectionStore();
 export const roadsStore = new RoadsStore(selectionStore);

@@ -133,6 +133,22 @@ export class RoadsStore {
     this.selection.fixtureId = id;
   }
 
+  toggleGateSelection(id: string) {
+    const gate = this.getGate(id);
+    if (!gate) {
+      throw new Error(`Gate ${id} doesn't exist`);
+    }
+
+    const { gateId } = this.selection;
+    this.selection.reset();
+
+    if (gateId === id) {
+      return;
+    }
+
+    this.selection.gateId = id;
+  }
+
   deleteNode(nodeId: string) {
     const node = this.getNode(nodeId);
     if (!node) {
@@ -180,16 +196,34 @@ export class RoadsStore {
     return this.nodes.get(id);
   };
 
-  get selectedNode() {
-    return this.getNode(this.selection.nodeId || "");
-  }
-
   getSegment(id: string) {
     return this.segments.get(id);
   }
 
+  getFixture(id: string) {
+    return this.fixtures.get(id);
+  }
+
+  getGate(id: string) {
+    return this.fixtureList
+      .find((fixtue) => fixtue.getGate(id) !== null)
+      ?.getGate(id);
+  }
+
   get selectedSegment() {
     return this.getSegment(this.selection.segmentId || "");
+  }
+
+  get selectedNode() {
+    return this.getNode(this.selection.nodeId || "");
+  }
+
+  get selectedFixture() {
+    return this.getFixture(this.selection.fixtureId || "");
+  }
+
+  get selectedGate() {
+    return this.getGate(this.selection.gateId || "");
   }
 
   deleteSelectedSegment() {
@@ -267,13 +301,8 @@ export class RoadsStore {
       console.error(`Gate ${gateId} doesn't exist`);
       return;
     }
+    console.log("connect gate:", gateId, "with node:", node.id);
     gate.connect(node);
-  }
-
-  getGate(id: string) {
-    return this.fixtureList
-      .find((fixtue) => fixtue.getGate(id) !== null)
-      ?.getGate(id);
   }
 
   empty() {

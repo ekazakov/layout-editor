@@ -2,9 +2,10 @@ import React from "react";
 import { runInAction, toJS } from "mobx";
 import { roadsStore, cursorStore } from "../stores";
 import { matchElementTypeAtPosition } from "../utils/find-hovered-element";
+import { getDistance } from "../utils/get-distance";
 
 export function useMouseEvents() {
-  const { selectedNode } = roadsStore;
+  const { selectedNode, selectedGate } = roadsStore;
 
   const onMouseDown = React.useCallback((evt: React.MouseEvent) => {
     const { altKey } = evt;
@@ -18,9 +19,6 @@ export function useMouseEvents() {
         break;
       case "road-node":
         break;
-
-      // default:
-      // console.error("Unknow type:", type);
     }
   }, []);
 
@@ -37,12 +35,29 @@ export function useMouseEvents() {
         metaKey: evt.metaKey
       });
 
-      if (selectedNode && cursorStore.metaKey) {
-        const line = { start: selectedNode, end: cursorStore.position };
+      const selectedItem = selectedNode || selectedGate;
+      if (selectedItem && cursorStore.metaKey) {
+        const line = {
+          start: selectedItem,
+          end: cursorStore.position
+        };
         roadsStore.updateIntersectionsWithRoad(line);
+        return;
       }
+      if (selectedNode?.gateId) {
+        const gate = roadsStore.getGate(selectedNode.gateId)!;
+        if (getDistance(gate, selectedNode) > 10) {
+          gate.disconnect();
+        }
+        return;
+      }
+      // if (selectedGate && cursorStore.metaKey) {
+      //   const line = { start: selectedGate, end: cursorStore.position };
+      //   roadsStore.updateIntersectionsWithRoad(line);
+      //   return;
+      // }
     },
-    [selectedNode]
+    [selectedNode, selectedGate]
   );
 
   const onMouseUp = React.useCallback(
@@ -54,14 +69,16 @@ export function useMouseEvents() {
 
       switch (type) {
         case "road-node": {
-          const gate = matchElementTypeAtPosition(
-            cursorStore.position,
-            "fixture-gate"
-          );
-          // console.log("g:", gate, "n:", selectedNode);
-          if (gate && selectedNode) {
-            roadsStore.connectToGate(gate.id, selectedNode);
-          }
+          runInAction(() => {
+            const gate = matchElementTypeAtPosition(
+              cursorStore.position,
+              "fixture-gate"
+            );
+            // console.log("g:", gate, "n:", selectedNode);
+            if (gate && selectedNode && !cursorStore.metaKey) {
+              roadsStore.connectToGate(gate.id, selectedNode);
+            }
+          });
           // selectedNode?.position;
           break;
         }
@@ -128,7 +145,10 @@ export function useMouseEvents() {
               });
               roadsStore.addSegment(selectedNode.id, newNode.id);
               roadsStore.toggleNodeSelection(newNode.id);
+
               roadsStore.connectToGate(element.id, newNode);
+            } else {
+              roadsStore.toggleGateSelection(element.id);
             }
           });
           break;
@@ -143,12 +163,17 @@ export function useMouseEvents() {
             if (selectedNode && cursorStore.metaKey) {
               roadsStore.addSegment(selectedNode.id, newNode.id);
               roadsStore.toggleNodeSelection(newNode.id);
+            } else if (selectedGate && cursorStore.metaKey) {
+              const startNode = roadsStore.addNode(selectedGate.position);
+              roadsStore.connectToGate(selectedGate.id, startNode);
+              roadsStore.addSegment(startNode.id, newNode.id);
+              roadsStore.toggleNodeSelection(newNode.id);
             }
           });
         }
       }
     },
-    [selectedNode]
+    [selectedNode, selectedGate]
   );
 
   return {

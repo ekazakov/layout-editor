@@ -12,7 +12,7 @@ export const Canvas = observer(function Canvas() {
   const segments = roadsStore.segmentList;
   const fixtures = roadsStore.fixtureList;
 
-  const { selectedNode, intersections } = roadsStore;
+  const { selectedNode, selectedGate, intersections } = roadsStore;
 
   const {
     onMouseDown,
@@ -23,6 +23,8 @@ export const Canvas = observer(function Canvas() {
     onClick
   } = useMouseEvents();
   useShortcuts();
+
+  const selection = selectedNode || selectedGate;
 
   return (
     <svg
@@ -38,9 +40,9 @@ export const Canvas = observer(function Canvas() {
       onClick={onClick}
     >
       <g>
-        {selectedNode && cursorStore.metaKey && (
+        {selection && cursorStore.metaKey && (
           <NewSegment
-            p1={{ x: selectedNode.position.x, y: selectedNode.position.y }}
+            p1={{ x: selection.position.x, y: selection.position.y }}
             p2={{ x: cursorStore.position.x, y: cursorStore.position.y }}
           />
         )}

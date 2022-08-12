@@ -1,9 +1,9 @@
 # TODO
 
-- Cleanup gate connection when node deleted
+- [x] Cleanup gate connection when node deleted
 - Create fixture
 - Delete fixture
-- Make fiture gates selectable
+- [] Make fiture gates selectable
 - Undo for fixtures
 - Multiselection
 - Build road from gate

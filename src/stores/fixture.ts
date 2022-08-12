@@ -47,6 +47,7 @@ export class Gate {
     if (!this._connection) {
       return;
     }
+    console.log("disconnect gate:", this.id, "from node:", this._connection.id);
     this._connection.gateId = undefined;
     this._connection = undefined;
   }
@@ -103,15 +104,15 @@ export class Fixture {
     return [...this.gates.values()];
   }
 
-  connect(gateId: string, node: RoadNode) {
-    const gate = this.gates.get(gateId);
-    if (!gate) {
-      console.error(`Gate ${gateId} doesn't exist for fixture ${this.id}`);
-      return;
-    }
+  // connect(gateId: string, node: RoadNode) {
+  //   const gate = this.gates.get(gateId);
+  //   if (!gate) {
+  //     console.error(`Gate ${gateId} doesn't exist for fixture ${this.id}`);
+  //     return;
+  //   }
 
-    gate.connect(node);
-  }
+  //   gate.connect(node);
+  // }
 
   constructor(p: Position) {
     this._position = p;
