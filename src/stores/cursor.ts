@@ -28,7 +28,10 @@ export class CursorStore {
   }
 
   get position() {
-    return this._position;
+    return {
+      x: this._position.x,
+      y: this._position.y
+    };
   }
 
   constructor() {

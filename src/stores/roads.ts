@@ -76,9 +76,7 @@ export class RoadsStore {
   getFixture = (id: string) => this.fixtures.get(id);
 
   getGate(id: string) {
-    return this.fixtureList
-      .find((fixtue) => fixtue.getGate(id) !== null)
-      ?.getGate(id);
+    return this.fixtureList.find((fixtue) => fixtue.getGate(id))?.getGate(id);
   }
 
   get selectedSegment() {

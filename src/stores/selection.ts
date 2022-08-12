@@ -66,6 +66,10 @@ export class SelectionStore {
       throw Error(`Segment id can't be empty`);
     }
 
+    if (!id.startsWith("segment")) {
+      throw new Error(`Tring assign to segment selection wrong id ${id}`);
+    }
+
     this.updateSelection({ type: "segment", id });
   }
 
@@ -81,6 +85,9 @@ export class SelectionStore {
       throw Error(`Node id can't be empty`);
     }
 
+    if (!id.startsWith("node")) {
+      throw new Error(`Tring assign to node selection wrong id ${id}`);
+    }
     this.updateSelection({ type: "node", id });
   }
 
@@ -96,6 +103,9 @@ export class SelectionStore {
       throw Error(`Fixture id can't be empty`);
     }
 
+    if (!id.startsWith("fixture")) {
+      throw new Error(`Tring assign to fixture selection wrong id ${id}`);
+    }
     this.updateSelection({ type: "fixture", id });
   }
 
@@ -109,6 +119,10 @@ export class SelectionStore {
   set gateId(id: string) {
     if (!id) {
       throw Error(`Fixture id can't be empty`);
+    }
+
+    if (!id.startsWith("fixture_gate")) {
+      throw new Error(`Tring assign to gate selection wrong id ${id}`);
     }
 
     this.updateSelection({ type: "gate", id });
