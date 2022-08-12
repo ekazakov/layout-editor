@@ -15,27 +15,25 @@ export class UndoManagerStore<T> {
   undoPointer: number;
 
   trackChanges = () => {
-    this.stopTrackingChanges = reaction(
-      this.readObservable,
-      (newValue) => {
-        if (this.isDisposed) throw new Error("Undo already disposed");
-
-        // console.log("newValue:", newValue);
-        this.undoPointer += 1;
-        this.undoStack[this.undoPointer] = newValue;
-        this.undoStack.length = this.undoPointer + 1;
-      },
-      { equals: comparer.structural }
-    );
+    this.stopTrackingChanges = () => {};
+    // this.stopTrackingChanges = reaction(
+    //   this.readObservable,
+    //   (newValue) => {
+    //     if (this.isDisposed) throw new Error("Undo already disposed");
+    //     // console.log("newValue:", newValue);
+    //     this.undoPointer += 1;
+    //     this.undoStack[this.undoPointer] = newValue;
+    //     this.undoStack.length = this.undoPointer + 1;
+    //   },
+    //   { equals: comparer.structural }
+    // );
   };
 
   createTrackWithDebounce = (delay = 150) => {
-    // console.log("create tracker");
     const updateUndoStackDebounced = debounce(() => {
-      // console.log("track changes");
-      this.undoPointer += 1;
-      this.undoStack[this.undoPointer] = this.readObservable();
-      this.undoStack.length = this.undoPointer + 1;
+      // this.undoPointer += 1;
+      // this.undoStack[this.undoPointer] = this.readObservable();
+      // this.undoStack.length = this.undoPointer + 1;
     }, delay);
 
     return action((callback: () => void) => {
@@ -48,17 +46,17 @@ export class UndoManagerStore<T> {
   };
 
   doNotTrack = (notTrackableCallback: () => void) => {
-    this.stopTrackingChanges();
-    notTrackableCallback();
-    this.trackChanges();
+    // this.stopTrackingChanges();
+    // notTrackableCallback();
+    // this.trackChanges();
   };
 
   resetTracker = () => {
-    this.stopTrackingChanges();
-    this.undoStack = [this.readObservable()];
-    this.undoPointer = 0;
-    this.setObservable(this.undoStack[this.undoPointer]);
-    this.trackChanges();
+    // this.stopTrackingChanges();
+    // this.undoStack = [this.readObservable()];
+    // this.undoPointer = 0;
+    // this.setObservable(this.undoStack[this.undoPointer]);
+    // this.trackChanges();
   };
 
   undo = () => {
@@ -86,9 +84,9 @@ export class UndoManagerStore<T> {
   };
 
   updateTracker = () => {
-    this.stopTrackingChanges();
-    this.setObservable(this.undoStack[this.undoPointer]);
-    this.trackChanges();
+    // this.stopTrackingChanges();
+    // this.setObservable(this.undoStack[this.undoPointer]);
+    // this.trackChanges();
   };
 
   constructor(readObservable: () => T, setObservable: (value: T) => void) {
