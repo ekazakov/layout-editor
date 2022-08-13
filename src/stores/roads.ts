@@ -4,6 +4,7 @@ import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
 import { Fixture } from "./fixture";
 import { SelectionStore } from "./selection";
+import { projectionPoint } from "../utils/line";
 import * as nh from "./utils/node-helpers";
 import * as sh from "./utils/segment-helpers";
 import * as fh from "./utils/fixture-helpers";
@@ -16,6 +17,8 @@ export class RoadsStore {
   private selection: SelectionStore;
 
   private intersections: Intersection[] = [];
+
+  private snapPoints: Position[] = [];
 
   populate(dump: RoadsDump) {
     this.empty();
@@ -123,6 +126,17 @@ export class RoadsStore {
 
   connectToGate = (gateId: string, node: RoadNode) =>
     fh.connectToGate(this.fixtureList, gateId, node);
+
+  updateSnapPoints(p: Position) {
+    this.snapPoints = [];
+    this.segments.forEach((segment) => {
+      this.snapPoints.push(projectionPoint(p, segment));
+    });
+
+    if (this.snapPoints.length > 0) {
+      console.log("snap:", toJS(this.snapPoints));
+    }
+  }
 
   empty() {
     this.nodes.clear();

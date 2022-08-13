@@ -12,7 +12,7 @@ export const Canvas = observer(function Canvas() {
   const segments = roadsStore.segmentList;
   const fixtures = roadsStore.fixtureList;
 
-  const { selectedNode, selectedGate, intersections } = roadsStore;
+  const { selectedNode, selectedGate, intersections, snapPoints } = roadsStore;
 
   const {
     onMouseDown,
@@ -57,6 +57,7 @@ export const Canvas = observer(function Canvas() {
           return <Segment key={segment.id} segment={segment} />;
         })}
       </g>
+
       {cursorStore.metaKey && (
         <g>
           {intersections.map(({ segmentId, point }) => (
@@ -79,6 +80,23 @@ export const Canvas = observer(function Canvas() {
           return <Node key={node.id} node={node} />;
         })}
       </g>
+      {cursorStore.metaKey && snapPoints && (
+        <g>
+          {snapPoints.map((point, index) => {
+            console.log("!");
+            return (
+              <circle
+                key={index}
+                r={5}
+                cx={point.x}
+                cy={point.y}
+                fill="red"
+                opacity="0.8"
+              />
+            );
+          })}
+        </g>
+      )}
     </svg>
   );
 });

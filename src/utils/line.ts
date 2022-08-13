@@ -60,3 +60,44 @@ export function hasCommonPoint(line1: LineSegment, line2: LineSegment) {
     isEqualPosition(line1.end, line2.end)
   );
 }
+
+/*
+final double xDelta = p2.getX() - p1.getX();
+	final double yDelta = p2.getY() - p1.getY();
+
+	if ((xDelta == 0) && (yDelta == 0)) {
+	    throw new IllegalArgumentException("p1 and p2 cannot be the same point");
+	}
+
+	final double u = ((p3.getX() - p1.getX()) * xDelta + (p3.getY() - p1.getY()) * yDelta) / (xDelta * xDelta + yDelta * yDelta);
+
+	final Point2D closestPoint;
+	if (u < 0) {
+	    closestPoint = p1;
+	} else if (u > 1) {
+	    closestPoint = p2;
+	} else {
+	    closestPoint = new Point2D.Double(p1.getX() + u * xDelta, p1.getY() + u * yDelta);
+	}
+*/
+
+export function projectionPoint(p: Position, line: LineSegment) {
+  const dx = line.end.x - line.start.x;
+  const dy = line.end.y - line.start.y;
+
+  // if ((dx == 0) && (dy == 0)) {
+  //   throw new Error("p1 and p2 cannot be the same point");
+
+  const u =
+    ((p.x - line.start.x) * dx + (p.y - line.start.y) * dy) /
+    (dx ** 2 + dy ** 2);
+
+  if (u < 0) {
+    return { x: line.start.x, y: line.start.y };
+  }
+  if (u > 1) {
+    return { x: line.end.x, y: line.end.y };
+  }
+
+  return { x: line.start.x + u * dx, y: line.start.y + u * dy };
+}

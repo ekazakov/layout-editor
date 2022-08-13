@@ -37,6 +37,7 @@ export function useMouseEvents() {
             end: cursorStore.position
           };
           roadsStore.updateIntersectionsWithRoad(line);
+          roadsStore.updateSnapPoints(cursorStore.position);
           return;
         }
         if (selectedNode?.gateId) {
