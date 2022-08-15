@@ -43,7 +43,10 @@ export const Canvas = observer(function Canvas() {
         {selection && cursorStore.metaKey && (
           <NewSegment
             p1={{ x: selection.position.x, y: selection.position.y }}
-            p2={{ x: cursorStore.position.x, y: cursorStore.position.y }}
+            p2={{
+              x: cursorStore.snapPosition.x,
+              y: cursorStore.snapPosition.y
+            }}
           />
         )}
       </g>
@@ -82,10 +85,10 @@ export const Canvas = observer(function Canvas() {
       </g>
       {cursorStore.metaKey && snapPoints && (
         <g>
-          {snapPoints.map((point, index) => {
-            console.log("!");
+          {snapPoints.map(([point], index) => {
             return (
               <circle
+                style={{ pointerEvents: "none" }}
                 key={index}
                 r={5}
                 cx={point.x}

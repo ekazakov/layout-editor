@@ -4,10 +4,11 @@ import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
 import { Fixture } from "./fixture";
 import { SelectionStore } from "./selection";
-import { projectionPoint } from "../utils/line";
+import { projectionPoint, magnitude } from "../utils/line";
 import * as nh from "./utils/node-helpers";
 import * as sh from "./utils/segment-helpers";
 import * as fh from "./utils/fixture-helpers";
+import { CursorStore } from "./cursor";
 
 export class RoadsStore {
   nodes: Map<string, RoadNode> = new Map<string, RoadNode>();
@@ -16,9 +17,11 @@ export class RoadsStore {
 
   private selection: SelectionStore;
 
+  private cursor: CursorStore;
+
   private intersections: Intersection[] = [];
 
-  private snapPoints: Position[] = [];
+  private snapPoints: [Position, string][] = [];
 
   populate(dump: RoadsDump) {
     this.empty();
@@ -130,12 +133,32 @@ export class RoadsStore {
   updateSnapPoints(p: Position) {
     this.snapPoints = [];
     this.segments.forEach((segment) => {
-      this.snapPoints.push(projectionPoint(p, segment));
+      this.snapPoints.push([projectionPoint(p, segment), segment.id]);
     });
 
-    if (this.snapPoints.length > 0) {
-      console.log("snap:", toJS(this.snapPoints));
+    const distances = this.snapPoints.map(([point]) => {
+      return magnitude(point, this.cursor.position);
+    });
+
+    let minIndex = 0;
+
+    for (let i = 1; i < distances.length; i++) {
+      if (distances[minIndex] > distances[i]) {
+        minIndex = i;
+      }
     }
+
+    if (distances.length === 0 || distances[minIndex] >= 20) {
+      // console.log("Reset snapping");
+      this.cursor.resetSanpping();
+      return;
+    }
+
+    // prettier-ignore
+    // console.log("i:", minIndex, );
+    // "s:", this.snapPoints[minIndex][1], "snaps:", this.snapPoints.length
+
+    this.cursor.setSnapPosition(this.snapPoints[minIndex][0]);
   }
 
   empty() {
@@ -144,9 +167,10 @@ export class RoadsStore {
     this.selection.reset();
   }
 
-  constructor(selection: SelectionStore) {
+  constructor(selection: SelectionStore, cursor: CursorStore) {
     makeAutoObservable(this);
     this.selection = selection;
+    this.cursor = cursor;
 
     reaction(
       () => this.selection.nodeId,

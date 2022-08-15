@@ -11,8 +11,8 @@ export { RoadSegment } from "./road-segment";
 export { Fixture, Gate } from "./fixture";
 
 export const selectionStore = new SelectionStore();
-export const roadsStore = new RoadsStore(selectionStore);
 export const cursorStore = new CursorStore();
+export const roadsStore = new RoadsStore(selectionStore, cursorStore);
 
 export const undoManagerStore = new UndoManagerStore(
   () => roadsStore.toJSON(),
