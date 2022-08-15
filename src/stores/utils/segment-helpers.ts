@@ -107,6 +107,7 @@ export function splitSegmentAt(
   addSegmentInternal(nodes, segments, segment.start.id, newNode.id);
   addSegmentInternal(nodes, segments, newNode.id, segment.end.id);
   deleteSegment(nodes, segments, selection, id);
+  return newNode;
 }
 
 export function updateIntersectionsWithRoad(

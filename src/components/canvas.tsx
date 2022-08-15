@@ -65,6 +65,7 @@ export const Canvas = observer(function Canvas() {
         <g>
           {intersections.map(({ segmentId, point }) => (
             <circle
+              style={{ pointerEvents: "none" }}
               key={segmentId}
               r={10}
               cx={point.x}
@@ -94,7 +95,7 @@ export const Canvas = observer(function Canvas() {
                 cx={point.x}
                 cy={point.y}
                 fill="red"
-                opacity="0.8"
+                opacity="0.4"
               />
             );
           })}

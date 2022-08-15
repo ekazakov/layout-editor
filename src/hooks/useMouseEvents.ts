@@ -119,15 +119,21 @@ export function useMouseEvents() {
           break;
         }
         case "road-segment": {
-          if (altKey) {
-            roadsStore.splitSegmentAt(element.id, {
-              x: evt.clientX,
-              y: evt.clientY
-            });
-          } else {
+          runInAction(() => {
+            if (altKey) {
+              roadsStore.splitSegmentAt(element.id, cursorStore);
+              return;
+            }
+
+            if (selectedNode && cursorStore.metaKey) {
+              const node = roadsStore.splitSegmentAt(element.id, cursorStore);
+              roadsStore.joinNodes(selectedNode.id, node.id);
+              return;
+            }
+
             selectionStore.segmentId = element.id;
             // roadsStore.toggleSegmentSelection(element.id);
-          }
+          });
           break;
         }
         case "fixture": {
