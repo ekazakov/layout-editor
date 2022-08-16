@@ -9,7 +9,7 @@
 - Undo for fixtures
 - Multiselection
 - [x] Build road from gate
-- Snap node to gate
+- [] Snap node to gate
 - [x] Snap new segment to road
 - [x] Split road by new segment
 - Movement constraints

@@ -2,13 +2,25 @@ import { makeAutoObservable, reaction, toJS } from "mobx";
 import { LineSegment, Position, Intersection, RoadsDump } from "../types";
 import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
-import { Fixture } from "./fixture";
+import { Fixture, Gate } from "./fixture";
 import { SelectionStore } from "./selection";
 import { projectionPoint, magnitude } from "../utils/line";
 import * as nh from "./utils/node-helpers";
 import * as sh from "./utils/segment-helpers";
 import * as fh from "./utils/fixture-helpers";
 import { CursorStore } from "./cursor";
+
+function getMinIndex(arr: any[]) {
+  let minIndex = 0;
+
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[minIndex] > arr[i]) {
+      minIndex = i;
+    }
+  }
+
+  return minIndex;
+}
 
 export class RoadsStore {
   nodes: Map<string, RoadNode> = new Map<string, RoadNode>();
@@ -22,6 +34,8 @@ export class RoadsStore {
   private intersections: Intersection[] = [];
 
   private snapPoints: [Position, string][] = [];
+
+  private snapGates: Gate[] = [];
 
   populate(dump: RoadsDump) {
     this.empty();
@@ -127,6 +141,10 @@ export class RoadsStore {
     return [...this.fixtures.values()];
   }
 
+  get gateList() {
+    return this.fixtureList.flatMap((fixtue) => fixtue.gateList);
+  }
+
   connectToGate = (gateId: string, node: RoadNode) =>
     fh.connectToGate(this.fixtureList, gateId, node);
 
@@ -140,13 +158,7 @@ export class RoadsStore {
       return magnitude(point, this.cursor.position);
     });
 
-    let minIndex = 0;
-
-    for (let i = 1; i < distances.length; i++) {
-      if (distances[minIndex] > distances[i]) {
-        minIndex = i;
-      }
-    }
+    const minIndex = getMinIndex(distances);
 
     if (distances.length === 0 || distances[minIndex] >= 20) {
       // console.log("Reset snapping");
@@ -154,11 +166,37 @@ export class RoadsStore {
       return;
     }
 
-    // prettier-ignore
-    // console.log("i:", minIndex, );
-    // "s:", this.snapPoints[minIndex][1], "snaps:", this.snapPoints.length
-
     this.cursor.setSnapPosition(this.snapPoints[minIndex][0]);
+  }
+
+  updateSnapGates() {
+    this.snapGates = [];
+
+    if (!this.selectedNode) {
+      return;
+    }
+
+    const node = this.selectedNode;
+
+    if (node.gateId) {
+      return;
+    }
+
+    const distances = this.gateList.map((gate) => {
+      return magnitude(gate, node);
+    });
+
+    const minIndex = getMinIndex(distances);
+
+    if (distances.length === 0 || distances[minIndex] >= 30) {
+      this.cursor.resetSanpping();
+      return;
+    }
+
+    // console.log("updateSnapGates");
+    const gate = this.gateList[minIndex];
+    this.cursor.setSnapPosition(gate);
+    this.connectToGate(gate.id, node);
   }
 
   empty() {

@@ -40,9 +40,15 @@ export function useMouseEvents() {
           roadsStore.updateSnapPoints(cursorStore.position);
           return;
         }
+
+        if (!selectedNode?.gateId) {
+          roadsStore.updateSnapGates();
+          return;
+        }
+
         if (selectedNode?.gateId) {
           const gate = roadsStore.getGate(selectedNode.gateId)!;
-          if (getDistance(gate, selectedNode) > 10) {
+          if (getDistance(gate, selectedNode) > 30) {
             gate.disconnect();
           }
           return;
@@ -68,14 +74,14 @@ export function useMouseEvents() {
       switch (type) {
         case "road-node": {
           runInAction(() => {
-            const gate = matchElementTypeAtPosition(
-              cursorStore.position,
-              "fixture-gate"
-            );
+            // const gate = matchElementTypeAtPosition(
+            //   cursorStore.position,
+            //   "fixture-gate"
+            // );
             // console.log("g:", gate, "n:", selectedNode);
-            if (gate && selectedNode && !cursorStore.metaKey) {
-              roadsStore.connectToGate(gate.id, selectedNode);
-            }
+            // if (gate && selectedNode && !cursorStore.metaKey) {
+            //   roadsStore.connectToGate(gate.id, selectedNode);
+            // }
           });
 
           break;

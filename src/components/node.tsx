@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { RoadNode, selectionStore } from "../stores";
+import { RoadNode, selectionStore, cursorStore } from "../stores";
 
 export const Node = observer(function Node({ node }: { node: RoadNode }) {
   const [isDragging, setIsDragging] = React.useState(false);
@@ -17,22 +17,22 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
       </text>
       <circle
         onPointerDown={(evt) => {
+          // console.log("start dragging");
           setIsDragging(() => true);
           const element = evt.target as HTMLElement;
 
           element.setPointerCapture(evt.pointerId);
         }}
         onPointerUp={(evt) => {
+          // console.log("end dragging");
           setIsDragging(() => false);
           const element = evt.target as HTMLElement;
           element.releasePointerCapture(evt.pointerId);
+          cursorStore.resetSanpping();
         }}
         onPointerMove={(evt) => {
           if (isDragging) {
-            node.setPostion({
-              x: Math.round(evt.clientX),
-              y: Math.round(evt.clientY)
-            });
+            node.setPostion(cursorStore.snapPosition);
           }
         }}
         id={node.id}

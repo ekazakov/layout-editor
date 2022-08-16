@@ -1,7 +1,6 @@
 import { makeAutoObservable, toJS } from "mobx";
 import { nanoid } from "nanoid";
 import { Position, RoadNodeDump } from "../types";
-import { Gate } from "./fixture";
 import { undoManagerStore } from "./index";
 
 export class RoadNode {
@@ -17,7 +16,10 @@ export class RoadNode {
   setPostion = (p: Position) => {
     this.tracker(() => {
       // console.log("setPosition", p);
-      this._position = p;
+      this._position = {
+        x: p.x,
+        y: p.y
+      };
     });
   };
 
