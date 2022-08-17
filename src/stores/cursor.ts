@@ -6,6 +6,7 @@ interface State {
   ctrlKey: boolean;
   shiftKey: boolean;
   metaKey: boolean;
+  buttons: number;
 }
 
 export class CursorStore {
@@ -15,6 +16,7 @@ export class CursorStore {
   ctrlKey = false;
   shiftKey = false;
   metaKey = false;
+  buttons = 0;
 
   setPostion(p: Position) {
     this._position.x = p.x;
@@ -26,6 +28,7 @@ export class CursorStore {
     this.ctrlKey = state.ctrlKey;
     this.shiftKey = state.shiftKey;
     this.metaKey = state.metaKey;
+    this.buttons = state.buttons;
   }
 
   setSnapPosition(p: Position) {
