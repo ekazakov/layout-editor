@@ -19,14 +19,10 @@ export function useShortcuts() {
       selectionStore.reset();
     },
     Delete: () => {
-      // console.log("Delete");
-      roadsStore.deleteSelectedNode();
-      roadsStore.deleteSelectedSegment();
+      roadsStore.deleteSelection();
     },
     Backspace: () => {
-      // console.log("Backspace");
-      roadsStore.deleteSelectedNode();
-      roadsStore.deleteSelectedSegment();
+      roadsStore.deleteSelection();
     },
     "$mod+K": () => {
       roadsStore.empty();

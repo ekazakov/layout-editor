@@ -2,6 +2,7 @@ import { hasCommonPoint, segmentIntersection } from "../../utils/line";
 import { LineSegment, Position, Intersection } from "../../types";
 import { RoadNode } from "../road-node";
 import { RoadSegment } from "../road-segment";
+import { Fixture } from "../fixture";
 import { SelectionStore } from "../selection";
 import * as nh from "./node-helpers";
 
@@ -12,6 +13,7 @@ export function getSegment(segments: Map<string, RoadSegment>, id: string) {
 export function deleteSegment(
   nodes: Map<string, RoadNode>,
   segments: Map<string, RoadSegment>,
+  fixtures: Fixture[],
   selection: SelectionStore,
   id: string
 ) {
@@ -19,13 +21,21 @@ export function deleteSegment(
     selection.reset();
   }
   const segment = getSegment(segments, id);
+
+  segments.delete(id);
   if (segment) {
     const nodeStart = nodes.get(segment.start.id);
+
     nodeStart?.segmentIds.delete(id);
+    if (nodeStart?.segmentIds.size === 0) {
+      nh.deleteNode(nodes, segments, fixtures, selection, nodeStart.id);
+    }
     const nodeEnd = nodes.get(segment.end.id);
     nodeEnd?.segmentIds.delete(id);
+    if (nodeEnd?.segmentIds.size === 0) {
+      nh.deleteNode(nodes, segments, fixtures, selection, nodeEnd.id);
+    }
   }
-  return segments.delete(id);
 }
 
 export function toggleSegmentSelection(
@@ -93,6 +103,7 @@ export function addSegmentToPosition(
 export function splitSegmentAt(
   nodes: Map<string, RoadNode>,
   segments: Map<string, RoadSegment>,
+  fixtures: Fixture[],
   selection: SelectionStore,
   id: string,
   p: Position
@@ -106,7 +117,7 @@ export function splitSegmentAt(
   const newNode = nh.addNode(nodes, p);
   addSegmentInternal(nodes, segments, segment.start.id, newNode.id);
   addSegmentInternal(nodes, segments, newNode.id, segment.end.id);
-  deleteSegment(nodes, segments, selection, id);
+  deleteSegment(nodes, segments, fixtures, selection, id);
   return newNode;
 }
 
@@ -136,6 +147,7 @@ export function updateIntersectionsWithRoad(
 export function addSegment(
   nodes: Map<string, RoadNode>,
   segments: Map<string, RoadSegment>,
+  fixtures: Fixture[],
   selection: SelectionStore,
   intersections: Intersection[],
   startId: string,
@@ -158,7 +170,7 @@ export function addSegment(
     addSegmentInternal(nodes, segments, segment.start.id, newNode.id);
     addSegmentInternal(nodes, segments, newNode.id, segment.end.id);
 
-    deleteSegment(nodes, segments, selection, int.segmentId);
+    deleteSegment(nodes, segments, fixtures, selection, int.segmentId);
   }
 
   nodesToJoin.push(startId);

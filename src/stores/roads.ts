@@ -35,8 +35,6 @@ export class RoadsStore {
 
   private snapPoints: [Position, string][] = [];
 
-  private snapGates: Gate[] = [];
-
   populate(dump: RoadsDump) {
     this.empty();
     dump.nodes.forEach((dump) => {
@@ -85,9 +83,16 @@ export class RoadsStore {
     nh.deleteNode(this.nodes, this.segments, this.fixtureList, this.selection, nodeId);
 
   deleteSegment = (id: string) =>
-    sh.deleteSegment(this.nodes, this.segments, this.selection, id);
+    sh.deleteSegment(
+      this.nodes,
+      this.segments,
+      this.fixtureList,
+      this.selection,
+      id
+    );
 
-  deleteSelectedNode = () => this.deleteNode(this.selection.nodeId);
+  deleteFixture = (fixtureId: string) =>
+    fh.deleteFixture(this.fixtures, this.selection, fixtureId);
 
   getNode = (id: string): RoadNode | undefined => this.nodes.get(id);
 
@@ -115,12 +120,32 @@ export class RoadsStore {
     return this.getGate(this.selection.gateId || "");
   }
 
-  deleteSelectedSegment() {
-    return this.deleteSegment(this.selection.segmentId);
+  deleteSelection() {
+    if (Array.isArray(this.selection.selected)) {
+      return false;
+    }
+
+    switch (this.selection.selected.type) {
+      case "fixture":
+        return this.deleteFixture(this.selection.fixtureId);
+      case "node":
+        return this.deleteNode(this.selection.nodeId);
+      case "segment":
+        return this.deleteSegment(this.selection.segmentId);
+      default:
+        return false;
+    }
   }
 
   splitSegmentAt = (id: string, p: Position) =>
-    sh.splitSegmentAt(this.nodes, this.segments, this.selection, id, p);
+    sh.splitSegmentAt(
+      this.nodes,
+      this.segments,
+      this.fixtureList,
+      this.selection,
+      id,
+      p
+    );
 
   updateIntersectionsWithRoad(line: LineSegment) {
     this.intersections = sh.updateIntersectionsWithRoad(this.segments, line);
@@ -130,6 +155,7 @@ export class RoadsStore {
     sh.addSegment(
       this.nodes,
       this.segments,
+      this.fixtureList,
       this.selection,
       this.intersections,
       startId,
@@ -170,8 +196,6 @@ export class RoadsStore {
   }
 
   updateSnapGates() {
-    this.snapGates = [];
-
     if (!this.selectedNode) {
       return;
     }

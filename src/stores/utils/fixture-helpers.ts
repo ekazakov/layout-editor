@@ -60,3 +60,14 @@ export function connectToGate(
   console.log("connect gate:", gateId, "with node:", node.id);
   gate.connect(node);
 }
+
+export function deleteFixture(
+  fixtures: Map<string, Fixture>,
+  selection: SelectionStore,
+  fixtureId: string
+) {
+  if (selection.fixtureId === fixtureId) {
+    selection.reset();
+  }
+  return fixtures.delete(fixtureId);
+}

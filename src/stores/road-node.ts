@@ -49,7 +49,8 @@ export class RoadNode {
         x: this.x,
         y: this.y
       },
-      segmentIds: [...this.segmentIds.values()]
+      segmentIds: [...this.segmentIds.values()],
+      gateId: this.gateId
     };
   }
 
@@ -66,13 +67,6 @@ export class RoadNode {
   }
 
   toJSON() {
-    return {
-      id: this.id,
-      position: {
-        x: this.x,
-        y: this.y
-      },
-      segmentIds: [...this.segmentIds.values()]
-    };
+    return this.track;
   }
 }

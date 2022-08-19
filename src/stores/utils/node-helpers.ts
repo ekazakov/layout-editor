@@ -43,23 +43,24 @@ export function deleteNode(
     return false;
   }
 
-  if (node.segmentIds.size > 0) {
-    for (const segmentId of node.segmentIds) {
-      sh.deleteSegment(nodes, segments, selection, segmentId);
-    }
+  nodes.delete(nodeId);
+  const { gateId, segmentIds } = node;
+
+  for (const segmentId of segmentIds) {
+    sh.deleteSegment(nodes, segments, fixtures, selection, segmentId);
   }
 
   if (selection.nodeId === nodeId) {
     selection.reset();
   }
 
-  if (node.gateId) {
-    const gate = fh.getGate(fixtures, node.gateId);
+  if (gateId) {
+    const gate = fh.getGate(fixtures, gateId);
 
     gate?.disconnect();
   }
 
-  return nodes.delete(nodeId);
+  return true;
 }
 
 export function addNode(nodes: Map<string, RoadNode>, p: Position) {
