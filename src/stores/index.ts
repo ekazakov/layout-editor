@@ -21,9 +21,9 @@ export const undoManagerStore = new UndoManagerStore(
   }
 );
 
-roadsStore.initFixrures();
+// roadsStore.initFixrures();
 
-// roadsStore.populate(dump);
+roadsStore.populate(dump);
 undoManagerStore.trackChanges();
 
 // @ts-ignore

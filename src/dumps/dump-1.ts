@@ -2,255 +2,177 @@ import { RoadsDump } from "../types";
 
 export const dump = {
   nodes: [
-    [
-      "node_hKmHinA",
-      {
-        id: "node_hKmHinA",
-        position: {
-          x: 446,
-          y: 197
-        },
-        segmentIds: ["segment_T_QwfIH", "segment_gW09k_I"]
-      }
-    ],
-    [
-      "node_FGsPr8i",
-      {
-        id: "node_FGsPr8i",
-        position: {
-          x: 191,
-          y: 495
-        },
-        segmentIds: ["segment_uinXe3D", "segment_EPs5Aqw"]
-      }
-    ],
-    [
-      "node_x84cLwf",
-      {
-        id: "node_x84cLwf",
-        position: {
-          x: 715,
-          y: 303
-        },
-        segmentIds: ["segment_T_QwfIH", "segment_rbi4TdK"]
-      }
-    ],
-    [
-      "node__ePCDdK",
-      {
-        id: "node__ePCDdK",
-        position: {
-          x: 786,
-          y: 569
-        },
-        segmentIds: ["segment_rbi4TdK", "segment_i72ppsw"]
-      }
-    ],
-    [
-      "node_pKJiY8C",
-      {
-        id: "node_pKJiY8C",
-        position: {
-          x: 708,
-          y: 706
-        },
-        segmentIds: ["segment_i72ppsw", "segment_WVnNKGS", "segment_O8638VV"]
-      }
-    ],
-    [
-      "node_DPrxw0U",
-      {
-        id: "node_DPrxw0U",
-        position: {
-          x: 414,
-          y: 741
-        },
-        segmentIds: ["segment_WVnNKGS", "segment_MU05SJM"]
-      }
-    ],
-    [
-      "node_79HQsZa",
-      {
-        id: "node_79HQsZa",
-        position: {
-          x: 602,
-          y: 377
-        },
-        segmentIds: ["segment_jYCSRL3", "segment_CXn-mkG"]
-      }
-    ],
-    [
-      "node_I9rI0xo",
-      {
-        id: "node_I9rI0xo",
-        position: {
-          x: 251,
-          y: 296
-        },
-        segmentIds: ["segment_ATFBJWQ"]
-      }
-    ],
-    [
-      "node_YBs0v4o",
-      {
-        id: "node_YBs0v4o",
-        position: {
-          x: 352,
-          y: 374
-        },
-        segmentIds: [
-          "segment_gW09k_I",
-          "segment_uinXe3D",
-          "segment_ATFBJWQ",
-          "segment_8-HPyYa"
-        ]
-      }
-    ],
-    [
-      "node__sh8kUS",
-      {
-        id: "node__sh8kUS",
-        position: {
-          x: 427,
-          y: 458
-        },
-        segmentIds: [
-          "segment_EPs5Aqw",
-          "segment_jYCSRL3",
-          "segment_8-HPyYa",
-          "segment_h7MbTVx"
-        ]
-      }
-    ],
-    [
-      "node_n8C64fy",
-      {
-        id: "node_n8C64fy",
-        position: {
-          x: 520,
-          y: 568
-        },
-        segmentIds: [
-          "segment_CXn-mkG",
-          "segment_MU05SJM",
-          "segment_h7MbTVx",
-          "segment_O8638VV"
-        ]
-      }
-    ]
+    {
+      id: "node_WKsi-W-",
+      position: {
+        x: 502,
+        y: 179
+      },
+      segmentIds: ["segment_-0TvklC"]
+    },
+    {
+      id: "node_rwLbxdS",
+      position: {
+        x: 695,
+        y: 316
+      },
+      segmentIds: ["segment_-0TvklC", "segment_MKHDD8u"]
+    },
+    {
+      id: "node_GVr457s",
+      position: {
+        x: 773,
+        y: 522
+      },
+      segmentIds: ["segment_MKHDD8u", "segment_JiMUgl-"]
+    },
+    {
+      id: "node_YaPfNzr",
+      position: {
+        x: 776,
+        y: 699
+      },
+      segmentIds: ["segment_JiMUgl-"],
+      gateId: "fixture_gate_2bXB2Aa"
+    },
+    {
+      id: "node_C62AQxe",
+      position: {
+        x: 200,
+        y: 722
+      },
+      segmentIds: ["segment_9-RLIhh", "segment_5WT4Y-0"]
+    },
+    {
+      id: "node_PiDQVrn",
+      position: {
+        x: 175,
+        y: 250
+      },
+      segmentIds: ["segment_9-RLIhh"],
+      gateId: "fixture_gate_EN4Zzej"
+    },
+    {
+      id: "node_oWw0CMT",
+      position: {
+        x: 699,
+        y: 774
+      },
+      segmentIds: ["segment_5WT4Y-0"],
+      gateId: "fixture_gate_zJuMDVM"
+    }
   ],
   segments: [
-    [
-      "segment_T_QwfIH",
-      {
-        id: "segment_T_QwfIH",
-        startNodeId: "node_x84cLwf",
-        endNodeId: "node_hKmHinA"
-      }
-    ],
-    [
-      "segment_rbi4TdK",
-      {
-        id: "segment_rbi4TdK",
-        startNodeId: "node__ePCDdK",
-        endNodeId: "node_x84cLwf"
-      }
-    ],
-    [
-      "segment_i72ppsw",
-      {
-        id: "segment_i72ppsw",
-        startNodeId: "node_pKJiY8C",
-        endNodeId: "node__ePCDdK"
-      }
-    ],
-    [
-      "segment_WVnNKGS",
-      {
-        id: "segment_WVnNKGS",
-        startNodeId: "node_DPrxw0U",
-        endNodeId: "node_pKJiY8C"
-      }
-    ],
-    [
-      "segment_gW09k_I",
-      {
-        id: "segment_gW09k_I",
-        startNodeId: "node_hKmHinA",
-        endNodeId: "node_YBs0v4o"
-      }
-    ],
-    [
-      "segment_uinXe3D",
-      {
-        id: "segment_uinXe3D",
-        startNodeId: "node_YBs0v4o",
-        endNodeId: "node_FGsPr8i"
-      }
-    ],
-    [
-      "segment_EPs5Aqw",
-      {
-        id: "segment_EPs5Aqw",
-        startNodeId: "node_FGsPr8i",
-        endNodeId: "node__sh8kUS"
-      }
-    ],
-    [
-      "segment_jYCSRL3",
-      {
-        id: "segment_jYCSRL3",
-        startNodeId: "node__sh8kUS",
-        endNodeId: "node_79HQsZa"
-      }
-    ],
-    [
-      "segment_CXn-mkG",
-      {
-        id: "segment_CXn-mkG",
-        startNodeId: "node_79HQsZa",
-        endNodeId: "node_n8C64fy"
-      }
-    ],
-    [
-      "segment_MU05SJM",
-      {
-        id: "segment_MU05SJM",
-        startNodeId: "node_n8C64fy",
-        endNodeId: "node_DPrxw0U"
-      }
-    ],
-    [
-      "segment_ATFBJWQ",
-      {
-        id: "segment_ATFBJWQ",
-        startNodeId: "node_I9rI0xo",
-        endNodeId: "node_YBs0v4o"
-      }
-    ],
-    [
-      "segment_8-HPyYa",
-      {
-        id: "segment_8-HPyYa",
-        startNodeId: "node_YBs0v4o",
-        endNodeId: "node__sh8kUS"
-      }
-    ],
-    [
-      "segment_h7MbTVx",
-      {
-        id: "segment_h7MbTVx",
-        startNodeId: "node__sh8kUS",
-        endNodeId: "node_n8C64fy"
-      }
-    ],
-    [
-      "segment_O8638VV",
-      {
-        id: "segment_O8638VV",
-        startNodeId: "node_n8C64fy",
-        endNodeId: "node_pKJiY8C"
-      }
-    ]
+    {
+      id: "segment_-0TvklC",
+      startNodeId: "node_rwLbxdS",
+      endNodeId: "node_WKsi-W-"
+    },
+    {
+      id: "segment_MKHDD8u",
+      startNodeId: "node_GVr457s",
+      endNodeId: "node_rwLbxdS"
+    },
+    {
+      id: "segment_JiMUgl-",
+      startNodeId: "node_YaPfNzr",
+      endNodeId: "node_GVr457s"
+    },
+    {
+      id: "segment_9-RLIhh",
+      startNodeId: "node_C62AQxe",
+      endNodeId: "node_PiDQVrn"
+    },
+    {
+      id: "segment_5WT4Y-0",
+      startNodeId: "node_oWw0CMT",
+      endNodeId: "node_C62AQxe"
+    }
+  ],
+  fixtures: [
+    {
+      id: "fixture_9wMKgMU",
+      position: {
+        x: 100,
+        y: 100
+      },
+      size: 150,
+      gates: [
+        {
+          id: "fixture_gate_5wugnGU",
+          position: {
+            x: 100,
+            y: 175
+          },
+          connectionId: null
+        },
+        {
+          id: "fixture_gate_fGFsaGO",
+          position: {
+            x: 250,
+            y: 175
+          },
+          connectionId: null
+        },
+        {
+          id: "fixture_gate_lkh_QkH",
+          position: {
+            x: 175,
+            y: 100
+          },
+          connectionId: null
+        },
+        {
+          id: "fixture_gate_EN4Zzej",
+          position: {
+            x: 175,
+            y: 250
+          },
+          connectionId: "node_PiDQVrn"
+        }
+      ]
+    },
+    {
+      id: "fixture_4DpYlzO",
+      position: {
+        x: 700,
+        y: 700
+      },
+      size: 150,
+      gates: [
+        {
+          id: "fixture_gate_zJuMDVM",
+          position: {
+            x: 700,
+            y: 775
+          },
+          connectionId: "node_oWw0CMT"
+        },
+        {
+          id: "fixture_gate_J6NtUDD",
+          position: {
+            x: 850,
+            y: 775
+          },
+          connectionId: null
+        },
+        {
+          id: "fixture_gate_2bXB2Aa",
+          position: {
+            x: 775,
+            y: 700
+          },
+          connectionId: "node_YaPfNzr"
+        },
+        {
+          id: "fixture_gate_P17oNIP",
+          position: {
+            x: 775,
+            y: 850
+          },
+          connectionId: null
+        }
+      ]
+    }
   ]
 } as RoadsDump;

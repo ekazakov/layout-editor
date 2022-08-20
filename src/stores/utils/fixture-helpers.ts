@@ -69,5 +69,10 @@ export function deleteFixture(
   if (selection.fixtureId === fixtureId) {
     selection.reset();
   }
+
+  const fixtue = fixtures.get(fixtureId);
+  if (fixtue) {
+    fixtue.gateList.forEach((gate) => gate.disconnect());
+  }
   return fixtures.delete(fixtureId);
 }

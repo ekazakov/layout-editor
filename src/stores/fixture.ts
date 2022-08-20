@@ -1,11 +1,10 @@
 import { makeAutoObservable, toJS } from "mobx";
 import { nanoid } from "nanoid";
 import { RoadNode } from "./road-node";
-import { Position } from "../types";
+import { Position, FixtureDump, GateDump } from "../types";
 
 export class Gate {
   private _connection: RoadNode | undefined = undefined;
-
   public readonly id: string;
   private _position: Position;
 
@@ -56,9 +55,20 @@ export class Gate {
     return this._connection;
   }
 
-  constructor(p: Position) {
+  toJSON() {
+    return {
+      id: this.id,
+      position: {
+        x: this.x,
+        y: this.y
+      },
+      connectionId: this._connection?.id ?? null
+    };
+  }
+
+  constructor(p: Position, id?: string) {
     this._position = p;
-    this.id = `fixture_gate_${nanoid(7)}`;
+    this.id = id || `fixture_gate_${nanoid(7)}`;
     makeAutoObservable(this);
   }
 }
@@ -66,7 +76,7 @@ export class Gate {
 export class Fixture {
   public readonly id: string;
   private _position: Position;
-  public readonly size = 150;
+  public readonly size: number;
 
   private gates: Map<string, Gate> = new Map<string, Gate>();
 
@@ -104,32 +114,73 @@ export class Fixture {
     return [...this.gates.values()];
   }
 
-  // connect(gateId: string, node: RoadNode) {
-  //   const gate = this.gates.get(gateId);
-  //   if (!gate) {
-  //     console.error(`Gate ${gateId} doesn't exist for fixture ${this.id}`);
-  //     return;
-  //   }
+  private createGates() {
+    const g1 = new Gate({ x: this.x, y: this.y + this.size / 2 });
+    const g2 = new Gate({ x: this.x + this.size, y: this.y + this.size / 2 });
+    const g3 = new Gate({ x: this.x + this.size / 2, y: this.y });
+    const g4 = new Gate({ x: this.x + this.size / 2, y: this.y + this.size });
 
-  //   gate.connect(node);
-  // }
+    this.gates.set(g1.id, g1);
+    this.gates.set(g2.id, g2);
+    this.gates.set(g3.id, g3);
+    this.gates.set(g4.id, g4);
+  }
 
-  constructor(p: Position) {
+  private populateGates(gates: GateDump[], nodes: Map<string, RoadNode>) {
+    gates.forEach((dump) => {
+      const gate = new Gate(dump.position, dump.id);
+      if (dump.connectionId) {
+        const node = nodes.get(dump.connectionId);
+        if (!node) {
+          throw Error(`Can't find node ${dump.connectionId}`);
+        }
+        gate.connect(node);
+      }
+      this.gates.set(gate.id, gate);
+    });
+  }
+
+  private constructor(p: Position, size?: number, id?: string) {
     this._position = p;
-    this.id = `fixture_${nanoid(7)}`;
+    this.id = id ?? `fixture_${nanoid(7)}`;
+    this.size = size ?? 150;
 
-    const g1 = new Gate({ x: p.x, y: p.y + this.size / 2 });
-    const g2 = new Gate({ x: p.x + this.size, y: p.y + this.size / 2 });
-    const g3 = new Gate({ x: p.x + this.size / 2, y: p.y });
-    const g4 = new Gate({ x: p.x + this.size / 2, y: p.y + this.size });
+    // const g1 = new Gate({ x: p.x, y: p.y + this.size / 2 });
+    // const g2 = new Gate({ x: p.x + this.size, y: p.y + this.size / 2 });
+    // const g3 = new Gate({ x: p.x + this.size / 2, y: p.y });
+    // const g4 = new Gate({ x: p.x + this.size / 2, y: p.y + this.size });
 
     this.gates = new Map([
-      [g1.id, g1],
-      [g2.id, g2],
-      [g3.id, g3],
-      [g4.id, g4]
+      // [g1.id, g1],
+      // [g2.id, g2],
+      // [g3.id, g3],
+      // [g4.id, g4]
     ]);
 
     makeAutoObservable(this);
+  }
+
+  static createFixture(p: Position) {
+    const fixture = new Fixture(p);
+    fixture.createGates();
+    return fixture;
+  }
+
+  static populate(dump: FixtureDump, nodes: Map<string, RoadNode>) {
+    const fixture = new Fixture(dump.position, dump.size, dump.id);
+    fixture.populateGates(dump.gates, nodes);
+    return fixture;
+  }
+
+  toJSON() {
+    return {
+      id: this.id,
+      position: {
+        x: this.x,
+        y: this.y
+      },
+      size: this.size,
+      gates: toJS(this.gateList.map((gate) => gate.toJSON()))
+    };
   }
 }

@@ -47,6 +47,10 @@ export class RoadsStore {
       const segment = new RoadSegment(nodeStart, nodeEnd, dump.id);
       this.segments.set(segment.id, segment);
     });
+    dump.fixtures.forEach((dump) => {
+      const fixture = Fixture.populate(dump, this.nodes);
+      this.fixtures.set(fixture.id, fixture);
+    });
   }
 
   addNode = (p: Position) => nh.addNode(this.nodes, p);
@@ -245,10 +249,10 @@ export class RoadsStore {
   }
 
   initFixrures() {
-    const f1 = new Fixture({ x: 100, y: 100 });
-    const f2 = new Fixture({ x: 700, y: 700 });
-    this.fixtures.set(f1.id, f1);
-    this.fixtures.set(f2.id, f2);
+    // const f1 = Fixture.createFixture({ x: 100, y: 100 });
+    // const f2 = Fixture.createFixture({ x: 700, y: 700 });
+    // this.fixtures.set(f1.id, f1);
+    // this.fixtures.set(f2.id, f2);
   }
 
   get nodeList() {
@@ -262,7 +266,8 @@ export class RoadsStore {
   toJSON() {
     return {
       nodes: this.nodeList.map((value) => value.toJSON()),
-      segments: this.segmentList.map((value) => value.toJSON())
+      segments: this.segmentList.map((value) => value.toJSON()),
+      fixtures: this.fixtureList.map((value) => value.toJSON())
     } as RoadsDump;
   }
 }

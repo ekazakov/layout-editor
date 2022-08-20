@@ -28,9 +28,29 @@ export interface RoadSegmentDump {
   endNodeId: string;
 }
 
+export interface GateDump {
+  id: string;
+  position: {
+    x: number;
+    y: number;
+  };
+  connectionId: string | null;
+}
+
+export interface FixtureDump {
+  id: string;
+  position: {
+    x: number;
+    y: number;
+  };
+  size: number;
+  gates: GateDump[];
+}
+
 export interface RoadsDump {
   nodes: RoadNodeDump[];
   segments: RoadSegmentDump[];
+  fixtures: FixtureDump[];
 }
 
 export type ElementType =
