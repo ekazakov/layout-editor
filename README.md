@@ -8,6 +8,7 @@
   - [x] When node deleted manually
 - [x] Serialize fixture
 - [x] Make fiture gates selectable
+- [] Fixture resize
 - [] Improve undo performance
 - [] Undo for fixtures
 - [] Multiselection

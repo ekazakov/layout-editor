@@ -73,7 +73,15 @@ export function useMouseEvents() {
           break;
         }
 
+        case "selection-rect": {
+          console.log("selection rect selected");
+          break;
+        }
+
         case "canvas": {
+          // selectionStore.reset();
+          selectionStore.setStat(cursorStore.position);
+
           break;
         }
       }
@@ -83,6 +91,10 @@ export function useMouseEvents() {
 
   const onMouseMove = React.useCallback(
     (evt: React.MouseEvent) => {
+      const element = evt.target as HTMLElement;
+      const {
+        dataset: { type = "none" }
+      } = element;
       runInAction(() => {
         cursorStore.setPostion({
           x: Math.round(evt.clientX),
@@ -140,6 +152,12 @@ export function useMouseEvents() {
       const {
         dataset: { type = "none" }
       } = element;
+
+      // console.log("s:", selectionStore.start, "e:", selectionStore.end);
+      if (selectionStore.start && !selectionStore.end) {
+        selectionStore.setEnd(cursorStore.position);
+        roadsStore.updateMultiSelect();
+      }
 
       switch (type) {
         case "road-node": {
@@ -246,8 +264,6 @@ export function useMouseEvents() {
               // roadsStore.toggleNodeSelection(newNode.id);
               return;
             }
-
-            selectionStore.reset();
           });
         }
       }

@@ -1,11 +1,12 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { roadsStore, cursorStore } from "../stores/index";
+import { roadsStore, cursorStore, selectionStore } from "../stores/index";
 import { useMouseEvents } from "../hooks/useMouseEvents";
 import { useShortcuts } from "../hooks/useShortcuts";
 import { Segment, NewSegment } from "./segment";
 import { Node } from "./node";
 import { Fixture } from "./fixture";
+import { SelectionRect } from "./selection-rect";
 
 export const Canvas = observer(function Canvas() {
   const nodes = roadsStore.nodeList;
@@ -38,6 +39,9 @@ export const Canvas = observer(function Canvas() {
       onMouseOver={onMouseOver}
       onMouseOut={onMouseOut}
       onClick={onClick}
+      style={{
+        userSelect: selectionStore.multiSelectInProgress ? "none" : "auto"
+      }}
     >
       <g>
         {selection && cursorStore.metaKey && (
@@ -101,6 +105,7 @@ export const Canvas = observer(function Canvas() {
           })}
         </g>
       )}
+      <SelectionRect />
     </svg>
   );
 });

@@ -8,6 +8,15 @@ export interface LineSegment {
   end: Position;
 }
 
+export interface Rect {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+  width: number;
+  height: number;
+}
+
 export interface Intersection {
   segmentId: string;
   point: Position;

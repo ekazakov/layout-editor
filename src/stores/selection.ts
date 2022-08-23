@@ -1,11 +1,11 @@
 import { makeAutoObservable, reaction, toJS } from "mobx";
-import { LineSegment, Position } from "../types";
+import { LineSegment, Position, Rect } from "../types";
 import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
 
 type ElementType = "segment" | "node" | "fixture" | "gate";
 
-type SelectionItem = { type: ElementType; id: string };
+export type SelectionItem = { type: ElementType; id: string };
 export type NoneSelectionItem = Readonly<{ type: "none"; id: "" }>;
 
 export const NoneSelection: NoneSelectionItem = {
@@ -18,6 +18,8 @@ type Selected = SelectionItem | SelectionItem[] | NoneSelectionItem;
 export class SelectionStore {
   selected: Selected = NoneSelection;
   isMultiSelection: boolean = false;
+  private selectionStart: Position | undefined = undefined;
+  private selectionEnd: Position | undefined = undefined;
 
   updateSelection(newSelection: NoneSelectionItem): void;
   updateSelection(newSelection: SelectionItem): void;
@@ -35,6 +37,8 @@ export class SelectionStore {
   }
 
   reset() {
+    this.selectionStart = undefined;
+    this.selectionEnd = undefined;
     this.updateSelection(NoneSelection);
   }
 
@@ -126,6 +130,72 @@ export class SelectionStore {
     }
 
     this.updateSelection({ type: "gate", id });
+  }
+
+  setStat(p: Position) {
+    // console.log("start", toJS(p));
+    this.reset();
+    this.selectionStart = { x: p.x, y: p.y };
+    this.selectionEnd = undefined;
+  }
+
+  setEnd(p: Position) {
+    // console.log("end", toJS(p));
+    this.selectionEnd = { x: p.x, y: p.y };
+
+    // TODO: reset if  nothing selected
+    const rect = this.selectionRect;
+    if (!rect) {
+      return;
+    }
+
+    if (rect.width <= 2 || rect.height <= 2) {
+      this.reset();
+    }
+  }
+
+  get multiSelectInProgress() {
+    return this.start && !this.end;
+  }
+
+  get selectionRect(): Readonly<Rect> | undefined {
+    if (!this.start || !this.end) {
+      return;
+    }
+
+    let top, left, right, bottom;
+    if (this.start.x <= this.end.x) {
+      left = this.start.x;
+      right = this.end.x;
+    } else {
+      left = this.end.x;
+      right = this.start.x;
+    }
+
+    if (this.start.y <= this.end.y) {
+      top = this.start.y;
+      bottom = this.end.y;
+    } else {
+      top = this.end.y;
+      bottom = this.start.y;
+    }
+
+    return {
+      top,
+      left,
+      right,
+      bottom,
+      width: Math.abs(left - right),
+      height: Math.abs(top - bottom)
+    };
+  }
+
+  get start() {
+    return this.selectionStart;
+  }
+
+  get end() {
+    return this.selectionEnd;
   }
 
   constructor() {

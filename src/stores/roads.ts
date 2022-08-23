@@ -3,11 +3,13 @@ import { LineSegment, Position, Intersection, RoadsDump } from "../types";
 import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
 import { Fixture, Gate } from "./fixture";
-import { SelectionStore } from "./selection";
+import { SelectionItem, SelectionStore } from "./selection";
 import { projectionPoint, magnitude } from "../utils/line";
+import { isInsideRect } from "../utils/is-inside-rect";
 import * as nh from "./utils/node-helpers";
 import * as sh from "./utils/segment-helpers";
 import * as fh from "./utils/fixture-helpers";
+
 import { CursorStore } from "./cursor";
 
 function getMinIndex(arr: any[]) {
@@ -126,6 +128,16 @@ export class RoadsStore {
 
   deleteSelection() {
     if (Array.isArray(this.selection.selected)) {
+      this.selection.selected.forEach((item) => {
+        switch (item.type) {
+          case "fixture":
+            return this.deleteFixture(item.id);
+          case "node":
+            return this.deleteNode(item.id);
+          case "segment":
+            return this.deleteSegment(item.id);
+        }
+      });
       return false;
     }
 
@@ -221,10 +233,30 @@ export class RoadsStore {
       return;
     }
 
-    // console.log("updateSnapGates");
     const gate = this.gateList[minIndex];
     this.cursor.setSnapPosition(gate);
     this.connectToGate(gate.id, node);
+  }
+
+  updateMultiSelect() {
+    const selection = new Map<string, SelectionItem>();
+    if (this.selection.selectionRect === undefined) {
+      console.warn("Multi selection is not active");
+      return;
+    }
+    const rect = this.selection.selectionRect;
+    this.nodeList.forEach((node) => {
+      if (isInsideRect(node.position, rect)) {
+        selection.set(node.id, { id: node.id, type: "node" });
+        node.segmentIds.forEach((segmentId) => {
+          selection.set(segmentId, { id: segmentId, type: "segment" });
+        });
+      }
+    });
+
+    if (selection.size > 0) {
+      this.selection.updateSelection([...selection.values()]);
+    }
   }
 
   empty() {
