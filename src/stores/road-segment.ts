@@ -23,11 +23,15 @@ export class RoadSegment {
   get middle() {
     return {
       x: (this._p1.x + this._p2.x) / 2,
-      y: (this._p1.y + this._p2.y) / 2
+      y: (this._p1.y + this._p2.y) / 2,
     };
   }
 
-  moveBy = (delta: Position) => {
+  moveBy = (delta: Position, moveNodes = true) => {
+    if (!moveNodes) {
+      return;
+    }
+
     this.tracker(() => {
       this._p1.moveBy(delta);
       this._p2.moveBy(delta);
@@ -46,7 +50,7 @@ export class RoadSegment {
     return {
       id: this.id,
       startNodeId: this._p1.id,
-      endNodeId: this._p2.id
+      endNodeId: this._p2.id,
     };
   }
 }

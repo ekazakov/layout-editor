@@ -10,7 +10,7 @@ export type NoneSelectionItem = Readonly<{ type: "none"; id: "" }>;
 
 export const NoneSelection: NoneSelectionItem = {
   type: "none",
-  id: ""
+  id: "",
 };
 
 type Selected = SelectionItem | SelectionItem[] | NoneSelectionItem;
@@ -24,9 +24,7 @@ export class SelectionStore {
   updateSelection(newSelection: NoneSelectionItem): void;
   updateSelection(newSelection: SelectionItem): void;
   updateSelection(newSelection: SelectionItem[]): void;
-  updateSelection(
-    newSelection: SelectionItem | SelectionItem[] | NoneSelectionItem
-  ): void {
+  updateSelection(newSelection: SelectionItem | SelectionItem[] | NoneSelectionItem): void {
     this.selected = newSelection;
     if (Array.isArray(newSelection)) {
       if (newSelection.length === 0) {
@@ -186,7 +184,7 @@ export class SelectionStore {
       right,
       bottom,
       width: Math.abs(left - right),
-      height: Math.abs(top - bottom)
+      height: Math.abs(top - bottom),
     };
   }
 

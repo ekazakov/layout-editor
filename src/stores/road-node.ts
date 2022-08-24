@@ -13,7 +13,7 @@ export class RoadNode {
 
   segmentIds: Set<string> = new Set<string>();
 
-  setPostion = (p: Position) => {
+  setPosition = (p: Position) => {
     this.tracker(() => {
       // console.log("setPosition", p);
       this._position = {
@@ -24,7 +24,7 @@ export class RoadNode {
   };
 
   moveBy = (delta: Position) => {
-    this.setPostion({
+    this.setPosition({
       x: this._position.x + delta.x,
       y: this._position.y + delta.y
     });

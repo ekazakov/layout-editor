@@ -78,8 +78,8 @@ export function isConnected(
   const node = getNode(nodes, aId);
   if (node) {
     for (const segmentId of node.segmentIds) {
-      const segment = sh.getSegment(segments, segmentId)!;
-      if (segment.start.id === bId || segment.end.id === bId) {
+      const segment = sh.getSegment(segments, segmentId);
+      if (segment!.start.id === bId || segment!.end.id === bId) {
         return true;
       }
     }

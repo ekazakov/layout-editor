@@ -1,7 +1,7 @@
 import { makeAutoObservable, toJS } from "mobx";
 import { nanoid } from "nanoid";
 import { RoadNode } from "./road-node";
-import { Position, FixtureDump, GateDump } from "../types";
+import { Position, FixtureDump, GateDump, Rect } from "../types";
 
 export class Gate {
   private _connection: RoadNode | undefined = undefined;
@@ -16,16 +16,19 @@ export class Gate {
     return this._position;
   }
 
-  setPostion = (p: Position) => {
+  setPosition = (p: Position) => {
     this._position = p;
   };
 
-  moveBy = (delta: Position) => {
-    this.setPostion({
+  moveBy = (delta: Position, moveNodes = true) => {
+    this.setPosition({
       x: this._position.x + delta.x,
-      y: this._position.y + delta.y
+      y: this._position.y + delta.y,
     });
 
+    if (!moveNodes) {
+      return;
+    }
     this.connection?.moveBy(delta);
   };
 
@@ -60,9 +63,9 @@ export class Gate {
       id: this.id,
       position: {
         x: this.x,
-        y: this.y
+        y: this.y,
       },
-      connectionId: this._connection?.id ?? null
+      connectionId: this._connection?.id ?? null,
     };
   }
 
@@ -92,13 +95,14 @@ export class Fixture {
     this._position = p;
   };
 
-  moveBy = (delta: Position) => {
+  moveBy = (delta: Position, moveNodes = true) => {
     this._position = {
       x: this._position.x + delta.x,
-      y: this._position.y + delta.y
+      y: this._position.y + delta.y,
     };
+
     this.gates.forEach((gate) => {
-      gate.moveBy(delta);
+      gate.moveBy(delta, moveNodes);
     });
   };
 
@@ -108,6 +112,17 @@ export class Fixture {
 
   get y() {
     return this._position.y;
+  }
+
+  get rect(): Rect {
+    return {
+      left: this.x,
+      top: this.y,
+      right: this.x + this.size,
+      bottom: this.y + this.size,
+      height: this.size,
+      width: this.size,
+    };
   }
 
   get gateList() {
@@ -177,10 +192,10 @@ export class Fixture {
       id: this.id,
       position: {
         x: this.x,
-        y: this.y
+        y: this.y,
       },
       size: this.size,
-      gates: toJS(this.gateList.map((gate) => gate.toJSON()))
+      gates: toJS(this.gateList.map((gate) => gate.toJSON())),
     };
   }
 }

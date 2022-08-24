@@ -11,6 +11,7 @@ import * as sh from "./utils/segment-helpers";
 import * as fh from "./utils/fixture-helpers";
 
 import { CursorStore } from "./cursor";
+import { isRectIntersection } from "../utils/is-rect-intersection";
 
 function getMinIndex(arr: any[]) {
   let minIndex = 0;
@@ -29,7 +30,7 @@ export class RoadsStore {
   segments: Map<string, RoadSegment> = new Map<string, RoadSegment>();
   fixtures: Map<string, Fixture> = new Map<string, Fixture>();
 
-  private selection: SelectionStore;
+  private readonly selection: SelectionStore;
 
   private cursor: CursorStore;
 
@@ -64,41 +65,32 @@ export class RoadsStore {
     this._addSegment(startNodeId, endNodeId);
   }
 
-  addSegmentToPosition(startNodeId: string, p: Position) {
-    sh.addSegmentToPosition(this.nodes, this.segments, startNodeId, p);
-  }
+  // addSegmentToPosition(startNodeId: string, p: Position) {
+  //   sh.addSegmentToPosition(this.nodes, this.segments, startNodeId, p);
+  // }
 
-  isConnected = (aId: string, bId: string) =>
-    nh.isConnected(this.nodes, this.segments, aId, bId);
+  isConnected = (aId: string, bId: string) => nh.isConnected(this.nodes, this.segments, aId, bId);
 
-  toggleNodeSelection = (id: string) =>
-    nh.toggleNodeSelection(this.nodes, this.selection, id);
-
-  toggleSegmentSelection = (id: string) =>
-    sh.toggleSegmentSelection(this.segments, this.selection, id);
-
-  toggleFixtureSelection = (id: string) =>
-    fh.toggleFixtureSelection(this.fixtures, this.selection, id);
-
-  toggleGateSelection(id: string) {
-    fh.toggleGateSelection(this.fixtureList, this.selection, id);
-  }
+  // toggleNodeSelection = (id: string) => nh.toggleNodeSelection(this.nodes, this.selection, id);
+  //
+  // toggleSegmentSelection = (id: string) =>
+  //   sh.toggleSegmentSelection(this.segments, this.selection, id);
+  //
+  // toggleFixtureSelection = (id: string) =>
+  //   fh.toggleFixtureSelection(this.fixtures, this.selection, id);
+  //
+  // toggleGateSelection(id: string) {
+  //   fh.toggleGateSelection(this.fixtureList, this.selection, id);
+  // }
 
   deleteNode = (nodeId: string) =>
     // prettier-ignore
     nh.deleteNode(this.nodes, this.segments, this.fixtureList, this.selection, nodeId);
 
   deleteSegment = (id: string) =>
-    sh.deleteSegment(
-      this.nodes,
-      this.segments,
-      this.fixtureList,
-      this.selection,
-      id
-    );
+    sh.deleteSegment(this.nodes, this.segments, this.fixtureList, this.selection, id);
 
-  deleteFixture = (fixtureId: string) =>
-    fh.deleteFixture(this.fixtures, this.selection, fixtureId);
+  deleteFixture = (fixtureId: string) => fh.deleteFixture(this.fixtures, this.selection, fixtureId);
 
   getNode = (id: string): RoadNode | undefined => this.nodes.get(id);
 
@@ -154,14 +146,7 @@ export class RoadsStore {
   }
 
   splitSegmentAt = (id: string, p: Position) =>
-    sh.splitSegmentAt(
-      this.nodes,
-      this.segments,
-      this.fixtureList,
-      this.selection,
-      id,
-      p
-    );
+    sh.splitSegmentAt(this.nodes, this.segments, this.fixtureList, this.selection, id, p);
 
   updateIntersectionsWithRoad(line: LineSegment) {
     this.intersections = sh.updateIntersectionsWithRoad(this.segments, line);
@@ -175,7 +160,7 @@ export class RoadsStore {
       this.selection,
       this.intersections,
       startId,
-      endId
+      endId,
     );
   }
 
@@ -254,8 +239,35 @@ export class RoadsStore {
       }
     });
 
+    this.fixtureList.forEach((fixture) => {
+      if (isRectIntersection(fixture.rect, rect)) {
+        selection.set(fixture.id, { id: fixture.id, type: "fixture" });
+      }
+    });
+
     if (selection.size > 0) {
       this.selection.updateSelection([...selection.values()]);
+    }
+  }
+
+  moveSelection(delta: Position) {
+    if (Array.isArray(this.selection.selected)) {
+      const items = this.selection.selected;
+      items.forEach((item) => {
+        switch (item.type) {
+          case "fixture":
+            this.getFixture(item.id)?.moveBy(delta, false);
+            break;
+          case "node":
+            this.getNode(item.id)?.moveBy(delta);
+            break;
+          case "segment":
+            this.getSegment(item.id)?.moveBy(delta, false);
+            break;
+        }
+      });
+    } else {
+      console.warn(`Can't call moveBy for single selection`);
     }
   }
 
@@ -276,7 +288,7 @@ export class RoadsStore {
         if (!newSelectedNodeId) {
           this.intersections = [];
         }
-      }
+      },
     );
   }
 
@@ -299,7 +311,7 @@ export class RoadsStore {
     return {
       nodes: this.nodeList.map((value) => value.toJSON()),
       segments: this.segmentList.map((value) => value.toJSON()),
-      fixtures: this.fixtureList.map((value) => value.toJSON())
+      fixtures: this.fixtureList.map((value) => value.toJSON()),
     } as RoadsDump;
   }
 }

@@ -32,7 +32,7 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
         }}
         onPointerMove={(evt) => {
           if (isDragging) {
-            node.setPostion(cursorStore.snapPosition);
+            node.setPosition(cursorStore.snapPosition);
           }
         }}
         id={node.id}

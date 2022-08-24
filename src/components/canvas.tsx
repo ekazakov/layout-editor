@@ -13,16 +13,11 @@ export const Canvas = observer(function Canvas() {
   const segments = roadsStore.segmentList;
   const fixtures = roadsStore.fixtureList;
 
+  // @ts-ignore
   const { selectedNode, selectedGate, intersections, snapPoints } = roadsStore;
 
-  const {
-    onMouseDown,
-    onMouseMove,
-    onMouseUp,
-    onMouseOver,
-    onMouseOut,
-    onClick
-  } = useMouseEvents();
+  const { onMouseDown, onMouseMove, onMouseUp, onMouseOver, onMouseOut, onClick } =
+    useMouseEvents();
   useShortcuts();
 
   const selection = selectedNode || selectedGate;
@@ -40,7 +35,7 @@ export const Canvas = observer(function Canvas() {
       onMouseOut={onMouseOut}
       onClick={onClick}
       style={{
-        userSelect: selectionStore.multiSelectInProgress ? "none" : "auto"
+        userSelect: selectionStore.multiSelectInProgress ? "none" : "auto",
       }}
     >
       <g>
@@ -49,7 +44,7 @@ export const Canvas = observer(function Canvas() {
             p1={{ x: selection.position.x, y: selection.position.y }}
             p2={{
               x: cursorStore.snapPosition.x,
-              y: cursorStore.snapPosition.y
+              y: cursorStore.snapPosition.y,
             }}
           />
         )}
