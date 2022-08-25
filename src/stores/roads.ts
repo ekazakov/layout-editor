@@ -2,7 +2,7 @@ import { makeAutoObservable, reaction, toJS } from "mobx";
 import { LineSegment, Position, Intersection, RoadsDump } from "../types";
 import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
-import { Fixture, Gate } from "./fixture";
+import { Fixture } from "./fixture";
 import { SelectionItem, SelectionStore } from "./selection";
 import { projectionPoint, magnitude } from "../utils/line";
 import { isInsideRect } from "../utils/is-inside-rect";
@@ -65,23 +65,7 @@ export class RoadsStore {
     this._addSegment(startNodeId, endNodeId);
   }
 
-  // addSegmentToPosition(startNodeId: string, p: Position) {
-  //   sh.addSegmentToPosition(this.nodes, this.segments, startNodeId, p);
-  // }
-
   isConnected = (aId: string, bId: string) => nh.isConnected(this.nodes, this.segments, aId, bId);
-
-  // toggleNodeSelection = (id: string) => nh.toggleNodeSelection(this.nodes, this.selection, id);
-  //
-  // toggleSegmentSelection = (id: string) =>
-  //   sh.toggleSegmentSelection(this.segments, this.selection, id);
-  //
-  // toggleFixtureSelection = (id: string) =>
-  //   fh.toggleFixtureSelection(this.fixtures, this.selection, id);
-  //
-  // toggleGateSelection(id: string) {
-  //   fh.toggleGateSelection(this.fixtureList, this.selection, id);
-  // }
 
   deleteNode = (nodeId: string) =>
     // prettier-ignore
@@ -266,6 +250,7 @@ export class RoadsStore {
             break;
         }
       });
+      this.selection.moveSelectionBy(delta);
     } else {
       console.warn(`Can't call moveBy for single selection`);
     }
@@ -290,13 +275,6 @@ export class RoadsStore {
         }
       },
     );
-  }
-
-  initFixrures() {
-    // const f1 = Fixture.createFixture({ x: 100, y: 100 });
-    // const f2 = Fixture.createFixture({ x: 700, y: 700 });
-    // this.fixtures.set(f1.id, f1);
-    // this.fixtures.set(f2.id, f2);
   }
 
   get nodeList() {

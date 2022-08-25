@@ -25,9 +25,9 @@ export const Canvas = observer(function Canvas() {
   return (
     <svg
       data-type="canvas"
-      width="1000"
-      height="1000"
-      viewBox="0 0 1000 1000"
+      width="2000"
+      height="2000"
+      viewBox="0 0 2000 2000"
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}

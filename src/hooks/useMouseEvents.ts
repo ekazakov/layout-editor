@@ -14,12 +14,12 @@ export function useMouseEvents() {
         ctrlKey: evt.ctrlKey,
         shiftKey: evt.shiftKey,
         metaKey: evt.metaKey,
-        buttons: evt.buttons
+        buttons: evt.buttons,
       });
 
       const element = evt.target as HTMLElement;
       const {
-        dataset: { type = "none" }
+        dataset: { type = "none" },
       } = element;
 
       switch (type) {
@@ -59,7 +59,7 @@ export function useMouseEvents() {
             if (selectedNode && cursorStore.metaKey) {
               const newNode = roadsStore.addNode({
                 x: evt.clientX,
-                y: evt.clientY
+                y: evt.clientY,
               });
               roadsStore.addSegment(selectedNode.id, newNode.id);
               selectionStore.gateId = element.id;
@@ -79,40 +79,41 @@ export function useMouseEvents() {
         }
 
         case "canvas": {
-          // selectionStore.reset();
-          selectionStore.setStat(cursorStore.position);
+          if (cursorStore.noKeys) {
+            selectionStore.setStart(cursorStore.position);
+          }
 
           break;
         }
       }
     },
-    [selectedNode, selectedGate]
+    [selectedNode, selectedGate],
   );
 
   const onMouseMove = React.useCallback(
     (evt: React.MouseEvent) => {
       const element = evt.target as HTMLElement;
       const {
-        dataset: { type = "none" }
+        dataset: { type = "none" },
       } = element;
       runInAction(() => {
         cursorStore.setPostion({
           x: Math.round(evt.clientX),
-          y: Math.round(evt.clientY)
+          y: Math.round(evt.clientY),
         });
         cursorStore.setState({
           altKey: evt.altKey,
           ctrlKey: evt.ctrlKey,
           shiftKey: evt.shiftKey,
           metaKey: evt.metaKey,
-          buttons: evt.buttons
+          buttons: evt.buttons,
         });
 
         const selectedItem = selectedNode || selectedGate;
         if (selectedItem && cursorStore.metaKey) {
           const line = {
             start: selectedItem,
-            end: cursorStore.position
+            end: cursorStore.position,
           };
           roadsStore.updateIntersectionsWithRoad(line);
           roadsStore.updateSnapPoints(cursorStore.position);
@@ -136,7 +137,7 @@ export function useMouseEvents() {
         }
       });
     },
-    [selectedNode, selectedGate]
+    [selectedNode, selectedGate],
   );
 
   const onMouseUp = React.useCallback(
@@ -146,15 +147,15 @@ export function useMouseEvents() {
         ctrlKey: evt.ctrlKey,
         shiftKey: evt.shiftKey,
         metaKey: evt.metaKey,
-        buttons: evt.buttons
+        buttons: evt.buttons,
       });
       const element = evt.target as HTMLElement;
       const {
-        dataset: { type = "none" }
+        dataset: { type = "none" },
       } = element;
 
       // console.log("s:", selectionStore.start, "e:", selectionStore.end);
-      if (selectionStore.start && !selectionStore.end) {
+      if (selectionStore.start && !selectionStore.end && cursorStore.noKeys) {
         selectionStore.setEnd(cursorStore.position);
         roadsStore.updateMultiSelect();
       }
@@ -171,13 +172,13 @@ export function useMouseEvents() {
           break;
       }
     },
-    [selectedNode]
+    [selectedNode],
   );
 
   const onMouseOver = React.useCallback((evt: React.MouseEvent) => {
     const element = evt.target as HTMLElement;
     const {
-      dataset: { type = "none" }
+      dataset: { type = "none" },
     } = element;
   }, []);
   const onMouseOut = React.useCallback((evt: React.MouseEvent) => {}, []);
@@ -187,7 +188,7 @@ export function useMouseEvents() {
       const { altKey } = evt;
       const element = evt.target as HTMLElement;
       const {
-        dataset: { type = "none" }
+        dataset: { type = "none" },
       } = element;
 
       switch (type) {
@@ -222,20 +223,20 @@ export function useMouseEvents() {
           break;
         }
         case "fixture-gate": {
-          runInAction(() => {
-            if (selectedNode && cursorStore.metaKey) {
-              const newNode = roadsStore.addNode({
-                x: evt.clientX,
-                y: evt.clientY
-              });
-              roadsStore.addSegment(selectedNode.id, newNode.id);
-              selectionStore.gateId = element.id;
-              roadsStore.connectToGate(element.id, newNode);
-              return;
-            }
-
-            selectionStore.gateId = element.id;
-          });
+          // runInAction(() => {
+          //   if (selectedNode && cursorStore.metaKey) {
+          //     const newNode = roadsStore.addNode({
+          //       x: evt.clientX,
+          //       y: evt.clientY
+          //     });
+          //     roadsStore.addSegment(selectedNode.id, newNode.id);
+          //     selectionStore.gateId = element.id;
+          //     roadsStore.connectToGate(element.id, newNode);
+          //     return;
+          //   }
+          //
+          //   selectionStore.gateId = element.id;
+          // });
           break;
         }
 
@@ -268,7 +269,7 @@ export function useMouseEvents() {
         }
       }
     },
-    [selectedNode, selectedGate]
+    [selectedNode, selectedGate],
   );
 
   return {
@@ -277,6 +278,6 @@ export function useMouseEvents() {
     onMouseUp,
     onMouseOver,
     onMouseOut,
-    onClick
+    onClick,
   };
 }

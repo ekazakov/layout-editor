@@ -1,7 +1,5 @@
-import { makeAutoObservable, reaction, toJS } from "mobx";
-import { LineSegment, Position, Rect } from "../types";
-import { RoadNode } from "./road-node";
-import { RoadSegment } from "./road-segment";
+import { makeAutoObservable } from "mobx";
+import { Position, Rect } from "../types";
 
 type ElementType = "segment" | "node" | "fixture" | "gate";
 
@@ -28,7 +26,7 @@ export class SelectionStore {
     this.selected = newSelection;
     if (Array.isArray(newSelection)) {
       if (newSelection.length === 0) {
-        throw new Error(`Multiselection cann't be empty array`);
+        throw new Error(`Multi selection can't be empty array`);
       }
       this.isMultiSelection = true;
     }
@@ -46,14 +44,6 @@ export class SelectionStore {
     }
 
     return this.selected.type !== "none";
-  }
-
-  get isMulti() {
-    return Array.isArray(this.selected);
-  }
-
-  get isSingle() {
-    return this.hasSelection && !this.isMulti;
   }
 
   get segmentId() {
@@ -130,7 +120,7 @@ export class SelectionStore {
     this.updateSelection({ type: "gate", id });
   }
 
-  setStat(p: Position) {
+  setStart(p: Position) {
     // console.log("start", toJS(p));
     this.reset();
     this.selectionStart = { x: p.x, y: p.y };
@@ -138,7 +128,6 @@ export class SelectionStore {
   }
 
   setEnd(p: Position) {
-    // console.log("end", toJS(p));
     this.selectionEnd = { x: p.x, y: p.y };
 
     // TODO: reset if  nothing selected
@@ -194,6 +183,19 @@ export class SelectionStore {
 
   get end() {
     return this.selectionEnd;
+  }
+
+  moveSelectionBy(delta: Position) {
+    if (this.selectionStart && this.selectionEnd) {
+      this.selectionStart = {
+        x: this.selectionStart.x + delta.x,
+        y: this.selectionStart.y + delta.y,
+      };
+      this.selectionEnd = {
+        x: this.selectionEnd.x + delta.x,
+        y: this.selectionEnd.y + delta.y,
+      };
+    }
   }
 
   constructor() {

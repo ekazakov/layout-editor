@@ -34,7 +34,7 @@ export class CursorStore {
   setSnapPosition(p: Position) {
     this._snapPosition = {
       x: p.x,
-      y: p.y
+      y: p.y,
     };
   }
 
@@ -49,14 +49,14 @@ export class CursorStore {
 
     return {
       x: this._snapPosition.x,
-      y: this._snapPosition.y
+      y: this._snapPosition.y,
     };
   }
 
   get position() {
     return {
       x: this._position.x,
-      y: this._position.y
+      y: this._position.y,
     };
   }
 
@@ -66,6 +66,10 @@ export class CursorStore {
 
   get y() {
     return this._position.y;
+  }
+
+  get noKeys() {
+    return !(this.altKey || this.ctrlKey || this.shiftKey || this.metaKey);
   }
 
   constructor() {
