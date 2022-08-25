@@ -1,6 +1,13 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { roadsStore, cursorStore, selectionStore } from "../stores/index";
+import {
+  roadsStore,
+  cursorStore,
+  selectionStore,
+  nodeStore,
+  segmentStore,
+  fixtureStore,
+} from "../stores";
 import { useMouseEvents } from "../hooks/useMouseEvents";
 import { useShortcuts } from "../hooks/useShortcuts";
 import { Segment, NewSegment } from "./segment";
@@ -9,9 +16,9 @@ import { Fixture } from "./fixture";
 import { SelectionRect } from "./selection-rect";
 
 export const Canvas = observer(function Canvas() {
-  const nodes = roadsStore.nodeList;
-  const segments = roadsStore.segmentList;
-  const fixtures = roadsStore.fixtureList;
+  const nodes = nodeStore.list;
+  const segments = segmentStore.list;
+  const fixtures = fixtureStore.list;
 
   // @ts-ignore
   const { selectedNode, selectedGate, intersections, snapPoints } = roadsStore;

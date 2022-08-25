@@ -7,6 +7,20 @@ import { RoadSegment } from "./road-segment";
 import * as sh from "./utils/segment-helpers";
 import * as fh from "./utils/fixture-helpers";
 import { SelectionStore } from "./selection";
+import { magnitude, projectionPoint } from "../utils/line";
+import { CursorStore } from "./cursor";
+
+function getMinIndex(arr: any[]) {
+  let minIndex = 0;
+
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[minIndex] > arr[i]) {
+      minIndex = i;
+    }
+  }
+
+  return minIndex;
+}
 
 export class NodeStore {
   private segments: SegmentStore = null!;
@@ -18,6 +32,8 @@ export class NodeStore {
     this.nodes.set(node.id, node);
     return node;
   };
+
+  addNode = (p: Position) => this.add(p);
 
   get = (id: string): RoadNode | undefined => this.nodes.get(id);
 
@@ -49,7 +65,9 @@ export class SegmentStore {
   private nodes: NodeStore = null!;
   private fixtures: FixturesStore = null!;
   private selection: SelectionStore = null!;
+  private cursor: CursorStore;
   private intersections: Intersection[] = [];
+  private snapPoints: [Position, string][] = [];
 
   private _addSegment = (startNodeId: string, endNodeId: string) =>
     sh.addSegmentInternal(this.nodes, this.segments, startNodeId, endNodeId);
@@ -72,6 +90,27 @@ export class SegmentStore {
 
   deleteSegment = (id: string) =>
     sh.deleteSegment(this.nodes, this.segments, this.fixtures, this.selection, id);
+
+  updateSnapPoints(p: Position) {
+    this.snapPoints = [];
+    this.segments.forEach((segment) => {
+      this.snapPoints.push([projectionPoint(p, segment), segment.id]);
+    });
+
+    const distances = this.snapPoints.map(([point]) => {
+      return magnitude(point, this.cursor.position);
+    });
+
+    const minIndex = getMinIndex(distances);
+
+    if (distances.length === 0 || distances[minIndex] >= 20) {
+      // console.log("Reset snapping");
+      this.cursor.resetSanpping();
+      return;
+    }
+
+    this.cursor.setSnapPosition(this.snapPoints[minIndex][0]);
+  }
 
   updateIntersectionsWithRoad(line: LineSegment) {
     this.intersections = sh.updateIntersectionsWithRoad(this.segments, line);
@@ -105,7 +144,9 @@ export class SegmentStore {
 
 export class FixturesStore {
   private fixtures: Map<string, Fixture> = new Map<string, Fixture>();
+  private nodes: NodeStore;
   private selection: SelectionStore = null!;
+  private cursor: CursorStore;
 
   getFixture = (id: string) => this.fixtures.get(id);
 
@@ -113,6 +154,34 @@ export class FixturesStore {
 
   getGate(id: string) {
     return this.list.find((fixture) => fixture.getGate(id))?.getGate(id);
+  }
+
+  connectToGate = (gateId: string, node: RoadNode) => fh.connectToGate(this.list, gateId, node);
+
+  updateSnapGates() {
+    const node = this.nodes.get(this.selection.nodeId);
+    if (!node) {
+      return;
+    }
+
+    if (node.gateId) {
+      return;
+    }
+
+    const distances = this.gates.map((gate) => {
+      return magnitude(gate, node);
+    });
+
+    const minIndex = getMinIndex(distances);
+
+    if (distances.length === 0 || distances[minIndex] >= 30) {
+      this.cursor.resetSanpping();
+      return;
+    }
+
+    const gate = this.gates[minIndex];
+    this.cursor.setSnapPosition(gate);
+    this.connectToGate(gate.id, node);
   }
 
   get list() {

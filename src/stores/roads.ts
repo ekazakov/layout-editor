@@ -56,16 +56,16 @@ export class RoadsStore {
     });
   }
 
-  addNode = (p: Position) => nh.addNode(this.nodes, p);
+  // addNode = (p: Position) => nh.addNode(this.nodes, p);
 
   private _addSegment = (startNodeId: string, endNodeId: string) =>
     sh.addSegmentInternal(this.nodes, this.segments, startNodeId, endNodeId);
 
-  joinNodes(startNodeId: string, endNodeId: string) {
-    this._addSegment(startNodeId, endNodeId);
-  }
+  // joinNodes(startNodeId: string, endNodeId: string) {
+  //   this._addSegment(startNodeId, endNodeId);
+  // }
 
-  isConnected = (aId: string, bId: string) => nh.isConnected(this.nodes, this.segments, aId, bId);
+  // isConnected = (aId: string, bId: string) => nh.isConnected(this.nodes, this.segments, aId, bId);
 
   deleteNode = (nodeId: string) =>
     // prettier-ignore
@@ -86,17 +86,17 @@ export class RoadsStore {
     return this.fixtureList.find((fixtue) => fixtue.getGate(id))?.getGate(id);
   }
 
-  get selectedSegment() {
-    return this.getSegment(this.selection.segmentId || "");
-  }
+  // get selectedSegment() {
+  //   return this.getSegment(this.selection.segmentId || "");
+  // }
 
   get selectedNode() {
     return this.getNode(this.selection.nodeId || "");
   }
 
-  get selectedFixture() {
-    return this.getFixture(this.selection.fixtureId || "");
-  }
+  // get selectedFixture() {
+  //   return this.getFixture(this.selection.fixtureId || "");
+  // }
 
   get selectedGate() {
     return this.getGate(this.selection.gateId || "");
@@ -129,8 +129,8 @@ export class RoadsStore {
     }
   }
 
-  splitSegmentAt = (id: string, p: Position) =>
-    sh.splitSegmentAt(this.nodes, this.segments, this.fixtureList, this.selection, id, p);
+  // splitSegmentAt = (id: string, p: Position) =>
+  //   sh.splitSegmentAt(this.nodes, this.segments, this.fixtureList, this.selection, id, p);
 
   updateIntersectionsWithRoad(line: LineSegment) {
     this.intersections = sh.updateIntersectionsWithRoad(this.segments, line);

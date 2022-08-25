@@ -1,7 +1,13 @@
 import React from "react";
 import { runInAction, toJS } from "mobx";
-import { roadsStore, cursorStore, selectionStore } from "../stores";
-// import { matchElementTypeAtPosition } from "../utils/find-hovered-element";
+import {
+  roadsStore,
+  cursorStore,
+  selectionStore,
+  nodeStore,
+  segmentStore,
+  fixtureStore,
+} from "../stores";
 import { getDistance } from "../utils/get-distance";
 
 export function useMouseEvents() {
@@ -25,8 +31,8 @@ export function useMouseEvents() {
       switch (type) {
         case "road-node": {
           if (selectedNode && cursorStore.metaKey) {
-            if (!roadsStore.isConnected(selectedNode.id, element.id)) {
-              roadsStore.joinNodes(selectedNode.id, element.id);
+            if (!nodeStore.isConnected(selectedNode.id, element.id)) {
+              segmentStore.joinNodes(selectedNode.id, element.id);
             }
           }
           selectionStore.nodeId = element.id;
@@ -36,13 +42,13 @@ export function useMouseEvents() {
         case "road-segment": {
           runInAction(() => {
             if (!selectedNode && cursorStore.altKey) {
-              roadsStore.splitSegmentAt(element.id, cursorStore);
+              segmentStore.splitSegmentAt(element.id, cursorStore);
               return;
             }
 
             if (selectedNode && cursorStore.metaKey) {
-              const node = roadsStore.splitSegmentAt(element.id, cursorStore);
-              roadsStore.joinNodes(selectedNode.id, node.id);
+              const node = segmentStore.splitSegmentAt(element.id, cursorStore);
+              segmentStore.joinNodes(selectedNode.id, node.id);
               return;
             }
 
@@ -57,14 +63,13 @@ export function useMouseEvents() {
         case "fixture-gate": {
           runInAction(() => {
             if (selectedNode && cursorStore.metaKey) {
-              const newNode = roadsStore.addNode({
+              const newNode = nodeStore.addNode({
                 x: evt.clientX,
                 y: evt.clientY,
               });
-              roadsStore.addSegment(selectedNode.id, newNode.id);
+              segmentStore.addSegment(selectedNode.id, newNode.id);
               selectionStore.gateId = element.id;
-
-              roadsStore.connectToGate(element.id, newNode);
+              fixtureStore.connectToGate(element.id, newNode);
               return;
             }
 
@@ -115,19 +120,19 @@ export function useMouseEvents() {
             start: selectedItem,
             end: cursorStore.position,
           };
-          roadsStore.updateIntersectionsWithRoad(line);
-          roadsStore.updateSnapPoints(cursorStore.position);
+          segmentStore.updateIntersectionsWithRoad(line);
+          segmentStore.updateSnapPoints(cursorStore.position);
           return;
         }
 
         if (selectedNode && !selectedNode.gateId && cursorStore.buttons === 1) {
-          roadsStore.updateSnapGates();
+          fixtureStore.updateSnapGates();
 
           return;
         }
 
         if (selectedNode?.gateId && cursorStore.buttons === 1) {
-          const gate = roadsStore.getGate(selectedNode.gateId);
+          const gate = fixtureStore.getGate(selectedNode.gateId);
 
           if (gate && getDistance(gate, cursorStore) > 30) {
             gate.disconnect();
@@ -193,76 +198,39 @@ export function useMouseEvents() {
 
       switch (type) {
         case "road-node": {
-          // if (selectedNode && cursorStore.metaKey) {
-          //   if (!roadsStore.isConnected(selectedNode.id, element.id)) {
-          //     roadsStore.joinNodes(selectedNode.id, element.id);
-          //   }
-          // }
-          // selectionStore.nodeId = element.id;
           break;
         }
         case "road-segment": {
-          // runInAction(() => {
-          //   if (altKey) {
-          //     roadsStore.splitSegmentAt(element.id, cursorStore);
-          //     return;
-          //   }
-
-          //   if (selectedNode && cursorStore.metaKey) {
-          //     const node = roadsStore.splitSegmentAt(element.id, cursorStore);
-          //     roadsStore.joinNodes(selectedNode.id, node.id);
-          //     return;
-          //   }
-
-          //   selectionStore.segmentId = element.id;
-          // });
           break;
         }
         case "fixture": {
-          // selectionStore.fixtureId = element.id;
           break;
         }
         case "fixture-gate": {
-          // runInAction(() => {
-          //   if (selectedNode && cursorStore.metaKey) {
-          //     const newNode = roadsStore.addNode({
-          //       x: evt.clientX,
-          //       y: evt.clientY
-          //     });
-          //     roadsStore.addSegment(selectedNode.id, newNode.id);
-          //     selectionStore.gateId = element.id;
-          //     roadsStore.connectToGate(element.id, newNode);
-          //     return;
-          //   }
-          //
-          //   selectionStore.gateId = element.id;
-          // });
           break;
         }
 
         case "canvas": {
           runInAction(() => {
             if (cursorStore.altKey) {
-              const newNode = roadsStore.addNode(cursorStore.position);
+              const newNode = nodeStore.addNode(cursorStore.position);
               selectionStore.nodeId = newNode.id;
               return;
             }
 
             if (selectedNode && cursorStore.metaKey) {
-              const newNode = roadsStore.addNode(cursorStore.position);
-              roadsStore.addSegment(selectedNode.id, newNode.id);
+              const newNode = nodeStore.addNode(cursorStore.position);
+              segmentStore.addSegment(selectedNode.id, newNode.id);
               selectionStore.nodeId = newNode.id;
-              // roadsStore.toggleNodeSelection(newNode.id);
               return;
             }
 
             if (selectedGate && cursorStore.metaKey) {
-              const newNode = roadsStore.addNode(cursorStore.position);
-              const startNode = roadsStore.addNode(selectedGate.position);
-              roadsStore.connectToGate(selectedGate.id, startNode);
-              roadsStore.addSegment(startNode.id, newNode.id);
+              const newNode = nodeStore.addNode(cursorStore.position);
+              const startNode = nodeStore.addNode(selectedGate.position);
+              fixtureStore.connectToGate(selectedGate.id, startNode);
+              segmentStore.addSegment(startNode.id, newNode.id);
               selectionStore.nodeId = newNode.id;
-              // roadsStore.toggleNodeSelection(newNode.id);
               return;
             }
           });

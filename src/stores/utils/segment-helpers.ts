@@ -1,15 +1,9 @@
 import { hasCommonPoint, segmentIntersection } from "../../utils/line";
 import { LineSegment, Position, Intersection } from "../../types";
-import { RoadNode } from "../road-node";
 import { RoadSegment } from "../road-segment";
-import { Fixture } from "../fixture";
 import { SelectionStore } from "../selection";
 import * as nh from "./node-helpers";
-import { FixturesStore, NodeStore, SegmentStore } from "../nodes";
-
-// export function getSegment(segments: SegmentStore, id: string) {
-//   return segments.get(id);
-// }
+import { FixturesStore, NodeStore } from "../nodes";
 
 export function deleteSegment(
   nodes: NodeStore,
@@ -152,7 +146,7 @@ export function addSegment(
   endId: string,
 ) {
   if (startId === endId) {
-    console.log(`Tring to connect node ${startId} to itself`);
+    console.log(`Trying to connect node ${startId} to itself`);
     return;
   }
   const nodesToJoin = [endId];
