@@ -5,6 +5,8 @@ import * as fh from "./utils/fixture-helpers";
 import { RoadNode } from "./road-node";
 import { magnitude } from "../utils/line";
 import { NodeStore } from "./nodes";
+import { Position } from "../types";
+import { makeAutoObservable } from "mobx";
 
 function getMinIndex(arr: any[]) {
   let minIndex = 0;
@@ -23,6 +25,12 @@ export class FixturesStore {
   private nodes: NodeStore = null!;
   private selection: SelectionStore = null!;
   private cursor: CursorStore = null!;
+
+  addFixture = (p: Position) => {
+    const fixture = Fixture.createFixture(p);
+    this.fixtures.set(fixture.id, fixture);
+    return fixture;
+  };
 
   set = (id: string, fixture: Fixture) => this.fixtures.set(id, fixture);
 
@@ -53,7 +61,7 @@ export class FixturesStore {
     const minIndex = getMinIndex(distances);
 
     if (distances.length === 0 || distances[minIndex] >= 30) {
-      this.cursor.resetSanpping();
+      this.cursor.resetSnapping();
       return;
     }
 
@@ -84,5 +92,9 @@ export class FixturesStore {
 
   setNodes(nodes: NodeStore) {
     this.nodes = nodes;
+  }
+
+  constructor() {
+    makeAutoObservable(this);
   }
 }

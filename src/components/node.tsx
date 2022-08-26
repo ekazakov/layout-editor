@@ -28,7 +28,7 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
           setIsDragging(() => false);
           const element = evt.target as HTMLElement;
           element.releasePointerCapture(evt.pointerId);
-          cursorStore.resetSanpping();
+          cursorStore.resetSnapping();
         }}
         onPointerMove={(evt) => {
           if (isDragging) {

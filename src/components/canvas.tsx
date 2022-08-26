@@ -21,7 +21,6 @@ export const Canvas = observer(function Canvas() {
   const fixtures = fixtureStore.list;
 
   const { selectedNode, selectedGate } = roadsStore;
-  // @ts-ignore
   const { intersections, snapPoints } = segmentStore;
 
   const { onMouseDown, onMouseMove, onMouseUp, onMouseOver, onMouseOut, onClick } =

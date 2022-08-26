@@ -55,7 +55,7 @@ export class CursorStore {
     };
   }
 
-  resetSanpping() {
+  resetSnapping() {
     this._snapPosition = undefined;
   }
 
@@ -87,6 +87,10 @@ export class CursorStore {
 
   get noKeys() {
     return !(this.altKey || this.ctrlKey || this.shiftKey || this.metaKey);
+  }
+
+  get isLeftButtonPressed() {
+    return this.buttons === 1;
   }
 
   constructor() {

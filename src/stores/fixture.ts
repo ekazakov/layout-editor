@@ -92,10 +92,6 @@ export class Fixture {
     return this.gates.get(id);
   }
 
-  setPostion = (p: Position) => {
-    this._position = p;
-  };
-
   moveBy = (delta: Position, moveNodes = true) => {
     this._position = {
       x: this._position.x + delta.x,
@@ -160,11 +156,6 @@ export class Fixture {
     this._position = p;
     this.id = id ?? `fixture_${nanoid(7)}`;
     this.size = size ?? 150;
-
-    // const g1 = new Gate({ x: p.x, y: p.y + this.size / 2 });
-    // const g2 = new Gate({ x: p.x + this.size, y: p.y + this.size / 2 });
-    // const g3 = new Gate({ x: p.x + this.size / 2, y: p.y });
-    // const g4 = new Gate({ x: p.x + this.size / 2, y: p.y + this.size });
 
     this.gates = new Map([
       // [g1.id, g1],

@@ -26,13 +26,21 @@ export class SegmentStore {
   private nodes: NodeStore = null!;
   private selection: SelectionStore = null!;
   private cursor: CursorStore = null!;
-  private intersections: Intersection[] = [];
-  private snapPoints: [Position, string][] = [];
+  private _intersections: Intersection[] = [];
+  private _snapPoints: [Position, string][] = [];
 
   private _addSegment = (startNodeId: string, endNodeId: string) =>
     sh.addSegmentInternal(this.nodes, this, startNodeId, endNodeId);
 
   set = (id: string, segment: RoadSegment) => this.segments.set(id, segment);
+
+  get intersections() {
+    return this._intersections;
+  }
+
+  get snapPoints() {
+    return this._snapPoints;
+  }
 
   addSegment(startId: string, endId: string) {
     sh.addSegment(
@@ -40,7 +48,7 @@ export class SegmentStore {
       this,
       this.fixtures,
       this.selection,
-      this.intersections,
+      this._intersections,
       startId,
       endId,
     );
@@ -56,9 +64,9 @@ export class SegmentStore {
     sh.deleteSegment(this.nodes, this, this.fixtures, this.selection, id);
 
   updateSnapPoints(p: Position) {
-    this.snapPoints = [];
+    this._snapPoints = [];
     this.segments.forEach((segment) => {
-      this.snapPoints.push([projectionPoint(p, segment), segment.id]);
+      this._snapPoints.push([projectionPoint(p, segment), segment.id]);
     });
 
     const distances = this.snapPoints.map(([point]) => {
@@ -68,7 +76,7 @@ export class SegmentStore {
     const minIndex = getMinIndex(distances);
 
     if (distances.length === 0 || distances[minIndex] >= 20) {
-      this.cursor.resetSanpping();
+      this.cursor.resetSnapping();
       return;
     }
 
@@ -76,7 +84,7 @@ export class SegmentStore {
   }
 
   updateIntersectionsWithRoad(line: LineSegment) {
-    this.intersections = sh.updateIntersectionsWithRoad(this.segments, line);
+    this._intersections = sh.updateIntersectionsWithRoad(this.segments, line);
   }
 
   splitSegmentAt = (id: string, p: Position) =>
@@ -106,7 +114,7 @@ export class SegmentStore {
       () => this.selection.nodeId,
       (newSelectedNodeId: string) => {
         if (!newSelectedNodeId) {
-          this.intersections = [];
+          this._intersections = [];
         }
       },
     );

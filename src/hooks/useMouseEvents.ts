@@ -1,5 +1,5 @@
 import React from "react";
-import { runInAction, toJS } from "mobx";
+import { runInAction } from "mobx";
 import {
   roadsStore,
   cursorStore,
@@ -10,24 +10,22 @@ import {
 } from "../stores";
 import { getDistance } from "../utils/get-distance";
 
+function extractItem(evt: React.MouseEvent) {
+  const element = evt.target as HTMLElement;
+  const {
+    dataset: { type = "none" },
+  } = element;
+
+  return { element, type };
+}
+
 export function useMouseEvents() {
   const { selectedNode, selectedGate } = roadsStore;
 
   const onMouseDown = React.useCallback(
     (evt: React.MouseEvent) => {
+      const { element, type } = extractItem(evt);
       cursorStore.update(evt);
-      // cursorStore.setState({
-      //   altKey: evt.altKey,
-      //   ctrlKey: evt.ctrlKey,
-      //   shiftKey: evt.shiftKey,
-      //   metaKey: evt.metaKey,
-      //   buttons: evt.buttons,
-      // });
-
-      const element = evt.target as HTMLElement;
-      const {
-        dataset: { type = "none" },
-      } = element;
 
       switch (type) {
         case "road-node": {
@@ -64,10 +62,7 @@ export function useMouseEvents() {
         case "fixture-gate": {
           runInAction(() => {
             if (selectedNode && cursorStore.metaKey) {
-              const newNode = nodeStore.addNode({
-                x: evt.clientX,
-                y: evt.clientY,
-              });
+              const newNode = nodeStore.addNode(cursorStore.position);
               segmentStore.addSegment(selectedNode.id, newNode.id);
               selectionStore.gateId = element.id;
               fixtureStore.connectToGate(element.id, newNode);
@@ -97,19 +92,9 @@ export function useMouseEvents() {
 
   const onMouseMove = React.useCallback(
     (evt: React.MouseEvent) => {
-      const element = evt.target as HTMLElement;
-      const {
-        dataset: { type = "none" },
-      } = element;
+      // const { element, type } = extractItem(evt);
       runInAction(() => {
         cursorStore.update(evt);
-        // cursorStore.setState({
-        //   altKey: evt.altKey,
-        //   ctrlKey: evt.ctrlKey,
-        //   shiftKey: evt.shiftKey,
-        //   metaKey: evt.metaKey,
-        //   buttons: evt.buttons,
-        // });
 
         const selectedItem = selectedNode || selectedGate;
         if (selectedItem && cursorStore.metaKey) {
@@ -122,18 +107,18 @@ export function useMouseEvents() {
           return;
         }
 
-        if (selectedNode && !selectedNode.gateId && cursorStore.buttons === 1) {
+        if (selectedNode && !selectedNode.gateId && cursorStore.isLeftButtonPressed) {
           fixtureStore.updateSnapGates();
 
           return;
         }
 
-        if (selectedNode?.gateId && cursorStore.buttons === 1) {
+        if (selectedNode?.gateId && cursorStore.isLeftButtonPressed) {
           const gate = fixtureStore.getGate(selectedNode.gateId);
 
           if (gate && getDistance(gate, cursorStore) > 30) {
             gate.disconnect();
-            cursorStore.resetSanpping();
+            cursorStore.resetSnapping();
           }
           return;
         }
@@ -144,18 +129,8 @@ export function useMouseEvents() {
 
   const onMouseUp = React.useCallback(
     (evt: React.MouseEvent) => {
+      const { type } = extractItem(evt);
       cursorStore.update(evt);
-      // cursorStore.setState({
-      //   altKey: evt.altKey,
-      //   ctrlKey: evt.ctrlKey,
-      //   shiftKey: evt.shiftKey,
-      //   metaKey: evt.metaKey,
-      //   buttons: evt.buttons,
-      // });
-      const element = evt.target as HTMLElement;
-      const {
-        dataset: { type = "none" },
-      } = element;
 
       if (selectionStore.start && !selectionStore.end && cursorStore.noKeys) {
         selectionStore.setEnd(cursorStore.position);
@@ -180,21 +155,12 @@ export function useMouseEvents() {
     [selectedNode],
   );
 
-  const onMouseOver = React.useCallback((evt: React.MouseEvent) => {
-    const element = evt.target as HTMLElement;
-    const {
-      dataset: { type = "none" },
-    } = element;
-  }, []);
+  const onMouseOver = React.useCallback((evt: React.MouseEvent) => {}, []);
   const onMouseOut = React.useCallback((evt: React.MouseEvent) => {}, []);
 
   const onClick = React.useCallback(
     (evt: React.MouseEvent) => {
-      const { altKey } = evt;
-      const element = evt.target as HTMLElement;
-      const {
-        dataset: { type = "none" },
-      } = element;
+      const { type } = extractItem(evt);
 
       switch (type) {
         case "road-node": {
@@ -212,6 +178,12 @@ export function useMouseEvents() {
 
         case "canvas": {
           runInAction(() => {
+            if (cursorStore.altKey && cursorStore.shiftKey) {
+              const newFixture = fixtureStore.addFixture(cursorStore.position);
+              selectionStore.fixtureId = newFixture.id;
+              return;
+            }
+
             if (cursorStore.altKey) {
               const newNode = nodeStore.addNode(cursorStore.position);
               selectionStore.nodeId = newNode.id;
