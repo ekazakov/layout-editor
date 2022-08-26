@@ -5,9 +5,8 @@ import { SelectionStore } from "./selection";
 import { UndoManagerStore } from "./undo-manager";
 import { dump } from "../dumps/dump-1";
 import { NodeStore } from "./nodes";
-import { RoadsDump } from "../types";
-import {SegmentStore} from "./segments";
-import {FixturesStore} from "./fixtures";
+import { SegmentStore } from "./segments";
+import { FixturesStore } from "./fixtures";
 
 export { RoadNode } from "./road-node";
 export { RoadSegment } from "./road-segment";
@@ -67,5 +66,5 @@ window.selectionStore = selectionStore;
 window.undoManagerStore = undoManagerStore;
 // @ts-ignore
 window.toJS = toJS;
-export {SegmentStore} from "./segments";
-export {FixturesStore} from "./fixtures";
+export { SegmentStore } from "./segments";
+export { FixturesStore } from "./fixtures";

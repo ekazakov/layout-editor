@@ -13,6 +13,7 @@
 - [] Improve undo performance
 - [] Undo for fixtures
 - [x] Multi selection
+- [] Fix multi selection movement for nodes connected to gates 
 - [] Addition to select
 - [x] Build road from gate
 - [x] Snap node to gate
