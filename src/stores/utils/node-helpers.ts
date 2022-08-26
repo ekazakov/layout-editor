@@ -5,7 +5,9 @@ import { Fixture, Gate } from "../fixture";
 import { SelectionStore } from "../selection";
 import * as sh from "../utils/segment-helpers";
 import * as fh from "../utils/fixture-helpers";
-import { FixturesStore, NodeStore, SegmentStore } from "../nodes";
+import { NodeStore } from "../nodes";
+import {SegmentStore} from "../segments";
+import {FixturesStore} from "../fixtures";
 
 export function getNode(nodes: NodeStore, id: string) {
   return nodes.get(id);

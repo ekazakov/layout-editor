@@ -3,7 +3,9 @@ import { LineSegment, Position, Intersection } from "../../types";
 import { RoadSegment } from "../road-segment";
 import { SelectionStore } from "../selection";
 import * as nh from "./node-helpers";
-import {FixturesStore, NodeStore, SegmentStore} from "../nodes";
+import {NodeStore} from "../nodes";
+import {SegmentStore} from "../segments";
+import {FixturesStore} from "../fixtures";
 
 export function deleteSegment(
   nodes: NodeStore,

@@ -8,7 +8,9 @@ import { isInsideRect } from "../utils/is-inside-rect";
 
 import { CursorStore } from "./cursor";
 import { isRectIntersection } from "../utils/is-rect-intersection";
-import { FixturesStore, NodeStore, SegmentStore } from "./nodes";
+import { NodeStore } from "./nodes";
+import {SegmentStore} from "./segments";
+import {FixturesStore} from "./fixtures";
 
 export class RoadsStore {
   private readonly selection: SelectionStore;

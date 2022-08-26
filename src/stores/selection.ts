@@ -1,6 +1,8 @@
 import { makeAutoObservable } from "mobx";
 import { Position, Rect } from "../types";
-import { FixturesStore, NodeStore, SegmentStore } from "./nodes";
+import { NodeStore } from "./nodes";
+import {SegmentStore} from "./segments";
+import {FixturesStore} from "./fixtures";
 
 type ElementType = "segment" | "node" | "fixture" | "gate";
 

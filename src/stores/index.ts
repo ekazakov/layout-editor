@@ -4,13 +4,15 @@ import { CursorStore } from "./cursor";
 import { SelectionStore } from "./selection";
 import { UndoManagerStore } from "./undo-manager";
 import { dump } from "../dumps/dump-1";
-import { NodeStore, FixturesStore, SegmentStore } from "./nodes";
+import { NodeStore } from "./nodes";
 import { RoadsDump } from "../types";
+import {SegmentStore} from "./segments";
+import {FixturesStore} from "./fixtures";
 
 export { RoadNode } from "./road-node";
 export { RoadSegment } from "./road-segment";
 export { Fixture, Gate } from "./fixture";
-export { NodeStore, FixturesStore, SegmentStore } from "./nodes";
+export { NodeStore } from "./nodes";
 
 export const selectionStore = new SelectionStore();
 export const cursorStore = new CursorStore();
@@ -65,3 +67,5 @@ window.selectionStore = selectionStore;
 window.undoManagerStore = undoManagerStore;
 // @ts-ignore
 window.toJS = toJS;
+export {SegmentStore} from "./segments";
+export {FixturesStore} from "./fixtures";
