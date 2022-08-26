@@ -3,11 +3,11 @@ import { LineSegment, Position, Intersection } from "../../types";
 import { RoadSegment } from "../road-segment";
 import { SelectionStore } from "../selection";
 import * as nh from "./node-helpers";
-import { FixturesStore, NodeStore } from "../nodes";
+import {FixturesStore, NodeStore, SegmentStore} from "../nodes";
 
 export function deleteSegment(
   nodes: NodeStore,
-  segments: Map<string, RoadSegment>,
+  segments: SegmentStore,
   fixtures: FixturesStore,
   selection: SelectionStore,
   id: string,
@@ -17,7 +17,7 @@ export function deleteSegment(
   }
   const segment = segments.get(id);
 
-  segments.delete(id);
+  segments._delete(id);
   if (segment) {
     const nodeStart = nodes.get(segment.start.id);
 
@@ -55,7 +55,7 @@ export function deleteSegment(
 
 export function addSegmentInternal(
   nodes: NodeStore,
-  segments: Map<string, RoadSegment>,
+  segments: SegmentStore,
   startNodeId: string,
   endNodeId: string,
 ) {
@@ -97,7 +97,7 @@ export function addSegmentInternal(
 
 export function splitSegmentAt(
   nodes: NodeStore,
-  segments: Map<string, RoadSegment>,
+  segments: SegmentStore,
   fixtures: FixturesStore,
   selection: SelectionStore,
   id: string,
@@ -138,7 +138,7 @@ export function updateIntersectionsWithRoad(segments: Map<string, RoadSegment>, 
 
 export function addSegment(
   nodes: NodeStore,
-  segments: Map<string, RoadSegment>,
+  segments: SegmentStore,
   fixtures: FixturesStore,
   selection: SelectionStore,
   intersections: Intersection[],

@@ -1,42 +1,21 @@
-import { makeAutoObservable, reaction, toJS } from "mobx";
-import { LineSegment, Position, Intersection, RoadsDump } from "../types";
+import { makeAutoObservable } from "mobx";
+import { Position, RoadsDump } from "../types";
 import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
 import { Fixture } from "./fixture";
 import { SelectionItem, SelectionStore } from "./selection";
-import { projectionPoint, magnitude } from "../utils/line";
 import { isInsideRect } from "../utils/is-inside-rect";
-import * as nh from "./utils/node-helpers";
-import * as sh from "./utils/segment-helpers";
-import * as fh from "./utils/fixture-helpers";
 
 import { CursorStore } from "./cursor";
 import { isRectIntersection } from "../utils/is-rect-intersection";
-
-function getMinIndex(arr: any[]) {
-  let minIndex = 0;
-
-  for (let i = 1; i < arr.length; i++) {
-    if (arr[minIndex] > arr[i]) {
-      minIndex = i;
-    }
-  }
-
-  return minIndex;
-}
+import { FixturesStore, NodeStore, SegmentStore } from "./nodes";
 
 export class RoadsStore {
-  nodes: Map<string, RoadNode> = new Map<string, RoadNode>();
-  segments: Map<string, RoadSegment> = new Map<string, RoadSegment>();
-  fixtures: Map<string, Fixture> = new Map<string, Fixture>();
-
   private readonly selection: SelectionStore;
-
-  private cursor: CursorStore;
-
-  private intersections: Intersection[] = [];
-
-  private snapPoints: [Position, string][] = [];
+  private readonly cursor: CursorStore;
+  private readonly nodes: NodeStore;
+  private readonly fixtures: FixturesStore;
+  private readonly segments: SegmentStore;
 
   populate(dump: RoadsDump) {
     this.empty();
@@ -56,50 +35,12 @@ export class RoadsStore {
     });
   }
 
-  // addNode = (p: Position) => nh.addNode(this.nodes, p);
-
-  private _addSegment = (startNodeId: string, endNodeId: string) =>
-    sh.addSegmentInternal(this.nodes, this.segments, startNodeId, endNodeId);
-
-  // joinNodes(startNodeId: string, endNodeId: string) {
-  //   this._addSegment(startNodeId, endNodeId);
-  // }
-
-  // isConnected = (aId: string, bId: string) => nh.isConnected(this.nodes, this.segments, aId, bId);
-
-  deleteNode = (nodeId: string) =>
-    // prettier-ignore
-    nh.deleteNode(this.nodes, this.segments, this.fixtureList, this.selection, nodeId);
-
-  deleteSegment = (id: string) =>
-    sh.deleteSegment(this.nodes, this.segments, this.fixtureList, this.selection, id);
-
-  deleteFixture = (fixtureId: string) => fh.deleteFixture(this.fixtures, this.selection, fixtureId);
-
-  getNode = (id: string): RoadNode | undefined => this.nodes.get(id);
-
-  getSegment = (id: string) => this.segments.get(id);
-
-  getFixture = (id: string) => this.fixtures.get(id);
-
-  getGate(id: string) {
-    return this.fixtureList.find((fixtue) => fixtue.getGate(id))?.getGate(id);
-  }
-
-  // get selectedSegment() {
-  //   return this.getSegment(this.selection.segmentId || "");
-  // }
-
   get selectedNode() {
-    return this.getNode(this.selection.nodeId || "");
+    return this.nodes.get(this.selection.nodeId || "");
   }
-
-  // get selectedFixture() {
-  //   return this.getFixture(this.selection.fixtureId || "");
-  // }
 
   get selectedGate() {
-    return this.getGate(this.selection.gateId || "");
+    return this.fixtures.getGate(this.selection.gateId || "");
   }
 
   deleteSelection() {
@@ -107,11 +48,11 @@ export class RoadsStore {
       this.selection.selected.forEach((item) => {
         switch (item.type) {
           case "fixture":
-            return this.deleteFixture(item.id);
+            return this.fixtures.deleteFixture(item.id);
           case "node":
-            return this.deleteNode(item.id);
+            return this.nodes.deleteNode(item.id);
           case "segment":
-            return this.deleteSegment(item.id);
+            return this.segments.deleteSegment(item.id);
         }
       });
       return false;
@@ -119,92 +60,14 @@ export class RoadsStore {
 
     switch (this.selection.selected.type) {
       case "fixture":
-        return this.deleteFixture(this.selection.fixtureId);
+        return this.fixtures.deleteFixture(this.selection.fixtureId);
       case "node":
-        return this.deleteNode(this.selection.nodeId);
+        return this.nodes.deleteNode(this.selection.nodeId);
       case "segment":
-        return this.deleteSegment(this.selection.segmentId);
+        return this.segments.deleteSegment(this.selection.segmentId);
       default:
         return false;
     }
-  }
-
-  // splitSegmentAt = (id: string, p: Position) =>
-  //   sh.splitSegmentAt(this.nodes, this.segments, this.fixtureList, this.selection, id, p);
-
-  updateIntersectionsWithRoad(line: LineSegment) {
-    this.intersections = sh.updateIntersectionsWithRoad(this.segments, line);
-  }
-
-  addSegment(startId: string, endId: string) {
-    sh.addSegment(
-      this.nodes,
-      this.segments,
-      this.fixtureList,
-      this.selection,
-      this.intersections,
-      startId,
-      endId,
-    );
-  }
-
-  get fixtureList() {
-    return [...this.fixtures.values()];
-  }
-
-  get gateList() {
-    return this.fixtureList.flatMap((fixtue) => fixtue.gateList);
-  }
-
-  connectToGate = (gateId: string, node: RoadNode) =>
-    fh.connectToGate(this.fixtureList, gateId, node);
-
-  updateSnapPoints(p: Position) {
-    this.snapPoints = [];
-    this.segments.forEach((segment) => {
-      this.snapPoints.push([projectionPoint(p, segment), segment.id]);
-    });
-
-    const distances = this.snapPoints.map(([point]) => {
-      return magnitude(point, this.cursor.position);
-    });
-
-    const minIndex = getMinIndex(distances);
-
-    if (distances.length === 0 || distances[minIndex] >= 20) {
-      // console.log("Reset snapping");
-      this.cursor.resetSanpping();
-      return;
-    }
-
-    this.cursor.setSnapPosition(this.snapPoints[minIndex][0]);
-  }
-
-  updateSnapGates() {
-    if (!this.selectedNode) {
-      return;
-    }
-
-    const node = this.selectedNode;
-
-    if (node.gateId) {
-      return;
-    }
-
-    const distances = this.gateList.map((gate) => {
-      return magnitude(gate, node);
-    });
-
-    const minIndex = getMinIndex(distances);
-
-    if (distances.length === 0 || distances[minIndex] >= 30) {
-      this.cursor.resetSanpping();
-      return;
-    }
-
-    const gate = this.gateList[minIndex];
-    this.cursor.setSnapPosition(gate);
-    this.connectToGate(gate.id, node);
   }
 
   updateMultiSelect() {
@@ -214,7 +77,7 @@ export class RoadsStore {
       return;
     }
     const rect = this.selection.selectionRect;
-    this.nodeList.forEach((node) => {
+    this.nodes.list.forEach((node) => {
       if (isInsideRect(node.position, rect)) {
         selection.set(node.id, { id: node.id, type: "node" });
         node.segmentIds.forEach((segmentId) => {
@@ -223,7 +86,7 @@ export class RoadsStore {
       }
     });
 
-    this.fixtureList.forEach((fixture) => {
+    this.fixtures.list.forEach((fixture) => {
       if (isRectIntersection(fixture.rect, rect)) {
         selection.set(fixture.id, { id: fixture.id, type: "fixture" });
       }
@@ -240,13 +103,13 @@ export class RoadsStore {
       items.forEach((item) => {
         switch (item.type) {
           case "fixture":
-            this.getFixture(item.id)?.moveBy(delta, false);
+            this.fixtures.getFixture(item.id)?.moveBy(delta, false);
             break;
           case "node":
-            this.getNode(item.id)?.moveBy(delta);
+            this.nodes.get(item.id)?.moveBy(delta);
             break;
           case "segment":
-            this.getSegment(item.id)?.moveBy(delta, false);
+            this.segments.get(item.id)?.moveBy(delta, false);
             break;
         }
       });
@@ -262,34 +125,26 @@ export class RoadsStore {
     this.selection.reset();
   }
 
-  constructor(selection: SelectionStore, cursor: CursorStore) {
+  constructor(
+    selection: SelectionStore,
+    cursor: CursorStore,
+    nodes: NodeStore,
+    segments: SegmentStore,
+    fixtures: FixturesStore,
+  ) {
     makeAutoObservable(this);
     this.selection = selection;
     this.cursor = cursor;
-
-    reaction(
-      () => this.selection.nodeId,
-      (newSelectedNodeId: string) => {
-        if (!newSelectedNodeId) {
-          this.intersections = [];
-        }
-      },
-    );
-  }
-
-  get nodeList() {
-    return [...this.nodes.values()];
-  }
-
-  get segmentList() {
-    return [...this.segments.values()];
+    this.nodes = nodes;
+    this.segments = segments;
+    this.fixtures = fixtures;
   }
 
   toJSON() {
     return {
-      nodes: this.nodeList.map((value) => value.toJSON()),
-      segments: this.segmentList.map((value) => value.toJSON()),
-      fixtures: this.fixtureList.map((value) => value.toJSON()),
+      nodes: this.nodes.list.map((value) => value.toJSON()),
+      segments: this.segments.list.map((value) => value.toJSON()),
+      fixtures: this.fixtures.list.map((value) => value.toJSON()),
     } as RoadsDump;
   }
 }

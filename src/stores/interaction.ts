@@ -25,7 +25,7 @@ export class InteractionStore {
       start: selectedItem.position,
       end: this.cursor.position,
     };
-    this.roads.updateIntersectionsWithRoad(line);
+    // this.roads.updateIntersectionsWithRoad(line);
     return "done";
   };
 

@@ -1,5 +1,6 @@
 import { makeAutoObservable } from "mobx";
 import { Position, Rect } from "../types";
+import { FixturesStore, NodeStore, SegmentStore } from "./nodes";
 
 type ElementType = "segment" | "node" | "fixture" | "gate";
 
@@ -16,6 +17,11 @@ type Selected = SelectionItem | SelectionItem[] | NoneSelectionItem;
 export class SelectionStore {
   selected: Selected = NoneSelection;
   isMultiSelection: boolean = false;
+
+  private nodes: NodeStore = null!;
+  private fixtures: FixturesStore = null!;
+  private segments: SegmentStore = null!;
+
   private selectionStart: Position | undefined = undefined;
   private selectionEnd: Position | undefined = undefined;
 
@@ -121,7 +127,6 @@ export class SelectionStore {
   }
 
   setStart(p: Position) {
-    // console.log("start", toJS(p));
     this.reset();
     this.selectionStart = { x: p.x, y: p.y };
     this.selectionEnd = undefined;
@@ -129,16 +134,10 @@ export class SelectionStore {
 
   setEnd(p: Position) {
     this.selectionEnd = { x: p.x, y: p.y };
+  }
 
-    // TODO: reset if  nothing selected
-    const rect = this.selectionRect;
-    if (!rect) {
-      return;
-    }
-
-    if (rect.width <= 2 || rect.height <= 2) {
-      this.reset();
-    }
+  get isEmpty() {
+    return !Array.isArray(this.selected) && this.selected.type === "none";
   }
 
   get multiSelectInProgress() {
@@ -200,5 +199,17 @@ export class SelectionStore {
 
   constructor() {
     makeAutoObservable(this);
+  }
+
+  setNodes(nodes: NodeStore) {
+    this.nodes = nodes;
+  }
+
+  setFixtures(fixtures: FixturesStore) {
+    this.fixtures = fixtures;
+  }
+
+  setSegments(segments: SegmentStore) {
+    this.segments = segments;
   }
 }

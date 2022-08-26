@@ -20,8 +20,9 @@ export const Canvas = observer(function Canvas() {
   const segments = segmentStore.list;
   const fixtures = fixtureStore.list;
 
+  const { selectedNode, selectedGate } = roadsStore;
   // @ts-ignore
-  const { selectedNode, selectedGate, intersections, snapPoints } = roadsStore;
+  const { intersections, snapPoints } = segmentStore;
 
   const { onMouseDown, onMouseMove, onMouseUp, onMouseOver, onMouseOut, onClick } =
     useMouseEvents();

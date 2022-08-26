@@ -2,6 +2,7 @@ import { makeAutoObservable, toJS } from "mobx";
 import { nanoid } from "nanoid";
 import { RoadNode } from "./road-node";
 import { Position, FixtureDump, GateDump, Rect } from "../types";
+import { NodeStore } from "./nodes";
 
 export class Gate {
   private _connection: RoadNode | undefined = undefined;
@@ -141,7 +142,7 @@ export class Fixture {
     this.gates.set(g4.id, g4);
   }
 
-  private populateGates(gates: GateDump[], nodes: Map<string, RoadNode>) {
+  private populateGates(gates: GateDump[], nodes: NodeStore) {
     gates.forEach((dump) => {
       const gate = new Gate(dump.position, dump.id);
       if (dump.connectionId) {
@@ -181,7 +182,7 @@ export class Fixture {
     return fixture;
   }
 
-  static populate(dump: FixtureDump, nodes: Map<string, RoadNode>) {
+  static populate(dump: FixtureDump, nodes: NodeStore) {
     const fixture = new Fixture(dump.position, dump.size, dump.id);
     fixture.populateGates(dump.gates, nodes);
     return fixture;

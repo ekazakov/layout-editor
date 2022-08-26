@@ -14,11 +14,30 @@ export { NodeStore, FixturesStore, SegmentStore } from "./nodes";
 
 export const selectionStore = new SelectionStore();
 export const cursorStore = new CursorStore();
-export const roadsStore = new RoadsStore(selectionStore, cursorStore);
-
 export const nodeStore = new NodeStore();
 export const segmentStore = new SegmentStore();
 export const fixtureStore = new FixturesStore();
+
+export const roadsStore = new RoadsStore(
+  selectionStore,
+  cursorStore,
+  nodeStore,
+  segmentStore,
+  fixtureStore,
+);
+
+nodeStore.setSegments(segmentStore);
+nodeStore.setFixtures(fixtureStore);
+nodeStore.setSelection(selectionStore);
+
+segmentStore.setNodes(nodeStore);
+segmentStore.setFixtures(fixtureStore);
+segmentStore.setCursor(cursorStore);
+segmentStore.setSelection(selectionStore);
+
+fixtureStore.setNodes(nodeStore);
+fixtureStore.setCursor(cursorStore);
+fixtureStore.setSelection(selectionStore);
 
 export const undoManagerStore = new UndoManagerStore(
   () => roadsStore.toJSON(),

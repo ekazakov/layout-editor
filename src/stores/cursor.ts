@@ -1,5 +1,7 @@
 import { makeAutoObservable } from "mobx";
 import { Position } from "../types";
+import { cursorStore } from "./index";
+import React from "react";
 
 interface State {
   altKey: boolean;
@@ -18,7 +20,7 @@ export class CursorStore {
   metaKey = false;
   buttons = 0;
 
-  setPostion(p: Position) {
+  setPosition(p: Position) {
     this._position.x = p.x;
     this._position.y = p.y;
   }
@@ -29,6 +31,21 @@ export class CursorStore {
     this.shiftKey = state.shiftKey;
     this.metaKey = state.metaKey;
     this.buttons = state.buttons;
+  }
+
+  update(evt: MouseEvent | React.MouseEvent) {
+    this.setState({
+      altKey: evt.altKey,
+      ctrlKey: evt.ctrlKey,
+      shiftKey: evt.shiftKey,
+      metaKey: evt.metaKey,
+      buttons: evt.buttons,
+    });
+
+    this.setPosition({
+      x: Math.round(evt.clientX),
+      y: Math.round(evt.clientY),
+    });
   }
 
   setSnapPosition(p: Position) {

@@ -15,13 +15,14 @@ export function useMouseEvents() {
 
   const onMouseDown = React.useCallback(
     (evt: React.MouseEvent) => {
-      cursorStore.setState({
-        altKey: evt.altKey,
-        ctrlKey: evt.ctrlKey,
-        shiftKey: evt.shiftKey,
-        metaKey: evt.metaKey,
-        buttons: evt.buttons,
-      });
+      cursorStore.update(evt);
+      // cursorStore.setState({
+      //   altKey: evt.altKey,
+      //   ctrlKey: evt.ctrlKey,
+      //   shiftKey: evt.shiftKey,
+      //   metaKey: evt.metaKey,
+      //   buttons: evt.buttons,
+      // });
 
       const element = evt.target as HTMLElement;
       const {
@@ -79,7 +80,6 @@ export function useMouseEvents() {
         }
 
         case "selection-rect": {
-          console.log("selection rect selected");
           break;
         }
 
@@ -102,17 +102,14 @@ export function useMouseEvents() {
         dataset: { type = "none" },
       } = element;
       runInAction(() => {
-        cursorStore.setPostion({
-          x: Math.round(evt.clientX),
-          y: Math.round(evt.clientY),
-        });
-        cursorStore.setState({
-          altKey: evt.altKey,
-          ctrlKey: evt.ctrlKey,
-          shiftKey: evt.shiftKey,
-          metaKey: evt.metaKey,
-          buttons: evt.buttons,
-        });
+        cursorStore.update(evt);
+        // cursorStore.setState({
+        //   altKey: evt.altKey,
+        //   ctrlKey: evt.ctrlKey,
+        //   shiftKey: evt.shiftKey,
+        //   metaKey: evt.metaKey,
+        //   buttons: evt.buttons,
+        // });
 
         const selectedItem = selectedNode || selectedGate;
         if (selectedItem && cursorStore.metaKey) {
@@ -147,22 +144,25 @@ export function useMouseEvents() {
 
   const onMouseUp = React.useCallback(
     (evt: React.MouseEvent) => {
-      cursorStore.setState({
-        altKey: evt.altKey,
-        ctrlKey: evt.ctrlKey,
-        shiftKey: evt.shiftKey,
-        metaKey: evt.metaKey,
-        buttons: evt.buttons,
-      });
+      cursorStore.update(evt);
+      // cursorStore.setState({
+      //   altKey: evt.altKey,
+      //   ctrlKey: evt.ctrlKey,
+      //   shiftKey: evt.shiftKey,
+      //   metaKey: evt.metaKey,
+      //   buttons: evt.buttons,
+      // });
       const element = evt.target as HTMLElement;
       const {
         dataset: { type = "none" },
       } = element;
 
-      // console.log("s:", selectionStore.start, "e:", selectionStore.end);
       if (selectionStore.start && !selectionStore.end && cursorStore.noKeys) {
         selectionStore.setEnd(cursorStore.position);
         roadsStore.updateMultiSelect();
+        if (selectionStore.isEmpty) {
+          selectionStore.reset();
+        }
       }
 
       switch (type) {

@@ -13,17 +13,17 @@ export function getNode(nodes: NodeStore, id: string) {
 
 export function deleteNode(
   nodes: NodeStore,
-  segments: Map<string, RoadSegment>,
+  segments: SegmentStore,
   fixtures: FixturesStore,
   selection: SelectionStore,
   nodeId: string,
 ) {
-  const node = getNode(nodes, nodeId);
+  const node = nodes.get(nodeId);
   if (!node) {
     return false;
   }
 
-  nodes.delete(nodeId);
+  nodes._delete(nodeId);
   const { gateId, segmentIds } = node;
 
   for (const segmentId of segmentIds) {

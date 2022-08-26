@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, reaction } from "mobx";
 import { Intersection, LineSegment, Position } from "../types";
 import { RoadNode } from "./road-node";
 import * as nh from "./utils/node-helpers";
@@ -24,8 +24,11 @@ function getMinIndex(arr: any[]) {
 
 export class NodeStore {
   private segments: SegmentStore = null!;
-  private nodes: Map<string, RoadNode> = new Map<string, RoadNode>();
-  private set = (id: string, node: RoadNode) => this.nodes.set(id, node);
+  private fixtures: FixturesStore = null!;
+  private selection: SelectionStore = null!;
+  private readonly nodes: Map<string, RoadNode> = new Map<string, RoadNode>();
+
+  set = (id: string, node: RoadNode) => this.nodes.set(id, node);
 
   add = (p: Position) => {
     const node = new RoadNode(p);
@@ -39,7 +42,10 @@ export class NodeStore {
 
   has = (id: string): boolean => this.nodes.has(id);
 
-  delete = (id: string) => this.nodes.delete(id);
+  _delete = (id: string) => this.nodes.delete(id);
+
+  deleteNode = (id: string) =>
+    nh.deleteNode(this, this.segments, this.fixtures, this.selection, id);
 
   isConnected = (aId: string, bId: string) => nh.isConnected(this.nodes, this.segments, aId, bId);
 
@@ -58,6 +64,14 @@ export class NodeStore {
   setSegments(segments: SegmentStore) {
     this.segments = segments;
   }
+
+  setFixtures(fixtures: FixturesStore) {
+    this.fixtures = fixtures;
+  }
+
+  setSelection(selection: SelectionStore) {
+    this.selection = selection;
+  }
 }
 
 export class SegmentStore {
@@ -65,17 +79,19 @@ export class SegmentStore {
   private nodes: NodeStore = null!;
   private fixtures: FixturesStore = null!;
   private selection: SelectionStore = null!;
-  private cursor: CursorStore;
+  private cursor: CursorStore = null!;
   private intersections: Intersection[] = [];
   private snapPoints: [Position, string][] = [];
 
   private _addSegment = (startNodeId: string, endNodeId: string) =>
-    sh.addSegmentInternal(this.nodes, this.segments, startNodeId, endNodeId);
+    sh.addSegmentInternal(this.nodes, this, startNodeId, endNodeId);
+
+  set = (id: string, segment: RoadSegment) => this.segments.set(id, segment);
 
   addSegment(startId: string, endId: string) {
     sh.addSegment(
       this.nodes,
-      this.segments,
+      this,
       this.fixtures,
       this.selection,
       this.intersections,
@@ -88,8 +104,10 @@ export class SegmentStore {
     this._addSegment(startNodeId, endNodeId);
   }
 
+  _delete = (id: string) => this.segments.delete(id);
+
   deleteSegment = (id: string) =>
-    sh.deleteSegment(this.nodes, this.segments, this.fixtures, this.selection, id);
+    sh.deleteSegment(this.nodes, this, this.fixtures, this.selection, id);
 
   updateSnapPoints(p: Position) {
     this.snapPoints = [];
@@ -117,7 +135,7 @@ export class SegmentStore {
   }
 
   splitSegmentAt = (id: string, p: Position) =>
-    sh.splitSegmentAt(this.nodes, this.segments, this.fixtures, this.selection, id, p);
+    sh.splitSegmentAt(this.nodes, this, this.fixtures, this.selection, id, p);
 
   get = (id: string) => this.segments.get(id);
 
@@ -139,14 +157,32 @@ export class SegmentStore {
 
   setSelection(selection: SelectionStore) {
     this.selection = selection;
+    reaction(
+      () => this.selection.nodeId,
+      (newSelectedNodeId: string) => {
+        if (!newSelectedNodeId) {
+          this.intersections = [];
+        }
+      },
+    );
+  }
+
+  setCursor(cursor: CursorStore) {
+    this.cursor = cursor;
+  }
+
+  constructor() {
+    makeAutoObservable(this);
   }
 }
 
 export class FixturesStore {
   private fixtures: Map<string, Fixture> = new Map<string, Fixture>();
-  private nodes: NodeStore;
+  private nodes: NodeStore = null!;
   private selection: SelectionStore = null!;
-  private cursor: CursorStore;
+  private cursor: CursorStore = null!;
+
+  set = (id: string, fixture: Fixture) => this.fixtures.set(id, fixture);
 
   getFixture = (id: string) => this.fixtures.get(id);
 
@@ -198,5 +234,13 @@ export class FixturesStore {
 
   setSelection(selection: SelectionStore) {
     this.selection = selection;
+  }
+
+  setCursor(cursor: CursorStore) {
+    this.cursor = cursor;
+  }
+
+  setNodes(nodes: NodeStore) {
+    this.nodes = nodes;
   }
 }
