@@ -58,7 +58,6 @@ export class RoadsStore {
   }
 
   deleteSelection() {
-    console.warn("not implemented yet");
     const { selected } = this.selection;
 
     if (selected.type === "multi") {

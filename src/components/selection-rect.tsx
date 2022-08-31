@@ -10,7 +10,7 @@ const style = {
 
 export const SelectionRect = observer(function SelectionRect() {
   const { start, end, rect } = selectionRectStore;
-  const [isDragging, setIsDragging] = React.useState(false);
+  // const [isDragging, setIsDragging] = React.useState(false);
   if (start && !end) {
     return (
       <path
@@ -24,27 +24,27 @@ export const SelectionRect = observer(function SelectionRect() {
     // console.log("rect:", rect);
     return (
       <rect
-        onPointerDown={(evt) => {
-          setIsDragging(() => true);
-          const element = evt.target as HTMLElement;
-
-          element.setPointerCapture(evt.pointerId);
-        }}
-        onPointerUp={(evt) => {
-          setIsDragging(() => false);
-          const element = evt.target as HTMLElement;
-          element.releasePointerCapture(evt.pointerId);
-        }}
-        onPointerMove={(evt) => {
-          if (isDragging) {
-            const delta = {
-              x: Math.round(evt.movementX),
-              y: Math.round(evt.movementY),
-            };
-            selectionRectStore.moveBy(delta);
-            selectionManagerStore.moveMultiSelection(delta);
-          }
-        }}
+        // onPointerDown={(evt) => {
+        //   setIsDragging(() => true);
+        //   const element = evt.target as HTMLElement;
+        //
+        //   element.setPointerCapture(evt.pointerId);
+        // }}
+        // onPointerUp={(evt) => {
+        //   setIsDragging(() => false);
+        //   const element = evt.target as HTMLElement;
+        //   element.releasePointerCapture(evt.pointerId);
+        // }}
+        // onPointerMove={(evt) => {
+        //   if (isDragging) {
+        //     const delta = {
+        //       x: Math.round(evt.movementX),
+        //       y: Math.round(evt.movementY),
+        //     };
+        //     selectionRectStore.moveBy(delta);
+        //     selectionManagerStore.moveMultiSelection(delta);
+        //   }
+        // }}
         data-type="selection-rect"
         x={rect?.left}
         y={rect?.top}

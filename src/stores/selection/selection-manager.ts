@@ -72,7 +72,11 @@ export class SelectionManagerStore {
     };
   }
 
-  addRectToSelection(rect: Rect) {
+  addRectToSelection(rect: Rect | undefined) {
+    if (!rect) {
+      throw new Error(`Selection rect is not defined`);
+    }
+
     if (this.selected.type !== "multi") {
       throw Error(`Multi selection is not active`);
     }
@@ -80,6 +84,7 @@ export class SelectionManagerStore {
     this.selected.value.append(items);
   }
 
+  // TODO: refactor to pass only id and type
   addItemToSelection(item: Item) {
     const selection = this.selected;
     switch (selection.type) {

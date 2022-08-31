@@ -35,6 +35,12 @@ export function useMouseEvents() {
               segmentStore.joinNodes(selectedNode.id, element.id);
             }
           }
+
+          if (cursorStore.shiftKey) {
+            const node = nodeStore.get(element.id)!;
+            selectionManagerStore.addItemToSelection(node);
+            return;
+          }
           selectionManagerStore.selectSingleItem(element.id, "node");
 
           break;
@@ -52,11 +58,21 @@ export function useMouseEvents() {
               return;
             }
 
+            if (cursorStore.shiftKey) {
+              const segment = segmentStore.get(element.id)!;
+              selectionManagerStore.addItemToSelection(segment);
+              return;
+            }
             selectionManagerStore.selectSingleItem(element.id, "segment");
           });
           break;
         }
         case "fixture": {
+          if (cursorStore.shiftKey) {
+            const fixture = fixtureStore.getFixture(element.id)!;
+            selectionManagerStore.addItemToSelection(fixture);
+            return;
+          }
           selectionManagerStore.selectSingleItem(element.id, "fixture");
           break;
         }
@@ -80,7 +96,7 @@ export function useMouseEvents() {
         }
 
         case "canvas": {
-          if (cursorStore.noKeys) {
+          if (cursorStore.noKeys || cursorStore.shiftKey) {
             selectionRectStore.setStart(cursorStore.position);
           }
 
@@ -130,29 +146,37 @@ export function useMouseEvents() {
 
   const onMouseUp = React.useCallback(
     (evt: React.MouseEvent) => {
-      const { type } = extractItem(evt);
-      cursorStore.update(evt);
+      runInAction(() => {
+        const { type } = extractItem(evt);
+        cursorStore.update(evt);
 
-      if (selectionRectStore.inProgress && cursorStore.noKeys) {
-        selectionRectStore.setEnd(cursorStore.position);
-        selectionManagerStore.selectMultiplyItems(selectionRectStore.rect);
-        if (selectionManagerStore.selected.type !== "multi") {
-          selectionManagerStore.reset();
+        if (selectionRectStore.inProgress && cursorStore.noKeys) {
+          selectionRectStore.setEnd(cursorStore.position);
+          selectionManagerStore.selectMultiplyItems(selectionRectStore.rect);
+          selectionRectStore.reset();
+          if (selectionManagerStore.selected.type !== "multi") {
+            selectionManagerStore.reset();
+          }
+        }
+
+        if (selectionRectStore.inProgress && cursorStore.shiftKey) {
+          selectionRectStore.setEnd(cursorStore.position);
+          selectionManagerStore.addRectToSelection(selectionRectStore.rect);
           selectionRectStore.reset();
         }
-      }
 
-      switch (type) {
-        case "road-node": {
-          break;
-        }
-        case "fixture_gate": {
-          break;
-        }
+        switch (type) {
+          case "road-node": {
+            break;
+          }
+          case "fixture_gate": {
+            break;
+          }
 
-        default:
-          break;
-      }
+          default:
+            break;
+        }
+      });
     },
     [selectedNode],
   );
