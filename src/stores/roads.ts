@@ -9,6 +9,7 @@ import { NodeStore } from "./nodes";
 import { SegmentStore } from "./segments";
 import { FixturesStore } from "./fixtures";
 import { SelectionManagerStore } from "./selection/selection-manager";
+import { getItemType } from "./selection/utils/get-item-type";
 
 export class RoadsStore {
   private readonly selection: SelectionManagerStore;
@@ -38,7 +39,7 @@ export class RoadsStore {
   private getSelectedItemId(type: ItemType) {
     const selected = this.selection.selected;
     if (selected.type !== "single") {
-      return ""
+      return "";
     }
 
     if (selected.value.type === type) {
@@ -58,31 +59,38 @@ export class RoadsStore {
 
   deleteSelection() {
     console.warn("not implemented yet");
+    const { selected } = this.selection;
 
-    // if (Array.isArray(this.selection.selected)) {
-    //   this.selection.selected.forEach((item) => {
-    //     switch (item.type) {
-    //       case "fixture":
-    //         return this.fixtures.deleteFixture(item.id);
-    //       case "node":
-    //         return this.nodes.deleteNode(item.id);
-    //       case "segment":
-    //         return this.segments.deleteSegment(item.id);
-    //     }
-    //   });
-    //   return false;
-    // }
-    //
-    // switch (this.selection.selected.type) {
-    //   case "fixture":
-    //     return this.fixtures.deleteFixture(this.selection.fixtureId);
-    //   case "node":
-    //     return this.nodes.deleteNode(this.selection.nodeId);
-    //   case "segment":
-    //     return this.segments.deleteSegment(this.selection.segmentId);
-    //   default:
-    //     return false;
-    // }
+    if (selected.type === "multi") {
+      if (selected.value.list.length === 0) {
+        return false;
+      }
+
+      selected.value.list.forEach((item) => {
+        switch (getItemType(item)) {
+          case "fixture":
+            return this.fixtures.deleteFixture(item.id);
+          case "node":
+            return this.nodes.deleteNode(item.id);
+          case "segment":
+            return this.segments.deleteSegment(item.id);
+        }
+      });
+    }
+
+    if (selected.type === "single") {
+      const id = selected.value.id || "";
+      switch (selected.value.type) {
+        case "fixture":
+          return this.fixtures.deleteFixture(id);
+        case "node":
+          return this.nodes.deleteNode(id);
+        case "segment":
+          return this.segments.deleteSegment(id);
+        default:
+          return false;
+      }
+    }
   }
 
   empty() {
