@@ -1,3 +1,8 @@
+import { Fixture, Gate, RoadNode, RoadSegment } from "./stores";
+import { SingleItem } from "./stores/selection/single-item";
+import { MultiItems } from "./stores/selection/multi-items";
+import { NoneSelectionItem } from "./stores/selection/selection-manager";
+
 export interface Position {
   x: number;
   y: number;
@@ -67,5 +72,14 @@ export type ElementType =
   | "road-node"
   | "road-segment"
   | "fixture"
-  | "fixture-gate"
+  | "fixture_gate"
   | "none";
+
+export type ItemType = "segment" | "node" | "fixture" | "fixture_gate";
+
+export type Item = RoadSegment | RoadNode | Fixture | Gate;
+
+export type Selection =
+  | { type: "single"; value: SingleItem }
+  | { type: "multi"; value: MultiItems }
+  | NoneSelectionItem;

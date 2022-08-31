@@ -1,10 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import {
-  Fixture as RoadFixture,
-  Gate as FixtureGage,
-  selectionStore
-} from "../stores";
+import { Fixture as RoadFixture, Gate as FixtureGage, selectionManagerStore } from "../stores";
 import styled from "@emotion/styled";
 
 const strokeColor = "#212121";
@@ -27,11 +23,11 @@ interface GateProps {
 
 const Gate = observer(function Gate(props: GateProps) {
   const { gate, fixtureId } = props;
-  const selected = gate.id === selectionStore.gateId;
+  const selected = selectionManagerStore.isSelected(gate.id);
   return (
     <circle
       key={gate.id}
-      data-type="fixture-gate"
+      data-type="fixture_gate"
       id={gate.id}
       data-fixture-id={fixtureId}
       r={10}
@@ -51,7 +47,7 @@ interface FixtureProps {
 
 export const Fixture = observer(function Fixture({ fixture }: FixtureProps) {
   const [isDragging, setIsDragging] = React.useState(false);
-  const selected = fixture.id === selectionStore.fixtureId;
+  const selected = selectionManagerStore.isSelected(fixture.id);
 
   return (
     <g
@@ -70,7 +66,7 @@ export const Fixture = observer(function Fixture({ fixture }: FixtureProps) {
         if (isDragging) {
           fixture.moveBy({
             x: Math.round(evt.movementX),
-            y: Math.round(evt.movementY)
+            y: Math.round(evt.movementY),
           });
         }
       }}
@@ -91,7 +87,7 @@ export const Fixture = observer(function Fixture({ fixture }: FixtureProps) {
               key={gate.id}
               gate={gate}
               fixtureId={fixture.id}
-              // data-type="fixture-gate"
+              // data-type="fixture_gate"
               // id={gate.id}
               // data-fixture-id={fixture.id}
               // r={10}

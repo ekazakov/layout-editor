@@ -1,10 +1,11 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { RoadNode, selectionStore, cursorStore } from "../stores";
+import { RoadNode, selectionManagerStore, cursorStore } from "../stores";
 
 export const Node = observer(function Node({ node }: { node: RoadNode }) {
   const [isDragging, setIsDragging] = React.useState(false);
-  const selected = node.id === selectionStore.nodeId;
+  const selected = selectionManagerStore.isSelected(node.id);
+
   return (
     <g>
       <text

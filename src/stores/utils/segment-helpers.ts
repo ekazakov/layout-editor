@@ -1,22 +1,25 @@
 import { hasCommonPoint, segmentIntersection } from "../../utils/line";
 import { LineSegment, Position, Intersection } from "../../types";
 import { RoadSegment } from "../road-segment";
-import { SelectionStore } from "../selection";
 import * as nh from "./node-helpers";
-import {NodeStore} from "../nodes";
-import {SegmentStore} from "../segments";
-import {FixturesStore} from "../fixtures";
+import { NodeStore } from "../nodes";
+import { SegmentStore } from "../segments";
+import { FixturesStore } from "../fixtures";
+import { SelectionManagerStore } from "../selection/selection-manager";
 
 export function deleteSegment(
   nodes: NodeStore,
   segments: SegmentStore,
   fixtures: FixturesStore,
-  selection: SelectionStore,
+  selection: SelectionManagerStore,
   id: string,
 ) {
-  if (selection.segmentId === id) {
+  const { selected } = selection;
+
+  if (selected.type === "single" && selected.value.id === id) {
     selection.reset();
   }
+
   const segment = segments.get(id);
 
   segments._delete(id);
@@ -101,7 +104,7 @@ export function splitSegmentAt(
   nodes: NodeStore,
   segments: SegmentStore,
   fixtures: FixturesStore,
-  selection: SelectionStore,
+  selection: SelectionManagerStore,
   id: string,
   p: Position,
 ) {
@@ -142,7 +145,7 @@ export function addSegment(
   nodes: NodeStore,
   segments: SegmentStore,
   fixtures: FixturesStore,
-  selection: SelectionStore,
+  selection: SelectionManagerStore,
   intersections: Intersection[],
   startId: string,
   endId: string,

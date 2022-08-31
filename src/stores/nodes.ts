@@ -2,14 +2,14 @@ import { makeAutoObservable } from "mobx";
 import { Position } from "../types";
 import { RoadNode } from "./road-node";
 import * as nh from "./utils/node-helpers";
-import { SelectionStore } from "./selection";
 import { SegmentStore } from "./segments";
 import { FixturesStore } from "./fixtures";
+import { SelectionManagerStore } from "./selection/selection-manager";
 
 export class NodeStore {
   private segments: SegmentStore = null!;
   private fixtures: FixturesStore = null!;
-  private selection: SelectionStore = null!;
+  private selection: SelectionManagerStore = null!;
   private readonly nodes: Map<string, RoadNode> = new Map<string, RoadNode>();
 
   set = (id: string, node: RoadNode) => this.nodes.set(id, node);
@@ -53,7 +53,7 @@ export class NodeStore {
     this.fixtures = fixtures;
   }
 
-  setSelection(selection: SelectionStore) {
+  setSelection(selection: SelectionManagerStore) {
     this.selection = selection;
   }
 }

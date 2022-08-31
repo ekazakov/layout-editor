@@ -1,5 +1,5 @@
 import useTinykeys from "use-tinykeys";
-import { roadsStore, selectionStore, undoManagerStore } from "../stores/index";
+import { roadsStore, selectionManagerStore, undoManagerStore } from "../stores/index";
 
 export function useShortcuts() {
   const undo = (evt: KeyboardEvent) => {
@@ -16,7 +16,7 @@ export function useShortcuts() {
   };
   useTinykeys({
     Escape: () => {
-      selectionStore.reset();
+      selectionManagerStore.reset();
     },
     Delete: () => {
       roadsStore.deleteSelection();
@@ -29,6 +29,6 @@ export function useShortcuts() {
     },
     "$mod+KeyZ": undo,
     "$mod+KeyY": redo,
-    "Shift+KeyZ": redo
+    "Shift+KeyZ": redo,
   });
 }

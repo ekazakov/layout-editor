@@ -3,10 +3,11 @@ import { runInAction } from "mobx";
 import {
   roadsStore,
   cursorStore,
-  selectionStore,
+  selectionManagerStore,
   nodeStore,
   segmentStore,
   fixtureStore,
+  selectionRectStore,
 } from "../stores";
 import { getDistance } from "../utils/get-distance";
 
@@ -34,7 +35,7 @@ export function useMouseEvents() {
               segmentStore.joinNodes(selectedNode.id, element.id);
             }
           }
-          selectionStore.nodeId = element.id;
+          selectionManagerStore.selectSingleItem(element.id, "node");
 
           break;
         }
@@ -51,25 +52,25 @@ export function useMouseEvents() {
               return;
             }
 
-            selectionStore.segmentId = element.id;
+            selectionManagerStore.selectSingleItem(element.id, "segment");
           });
           break;
         }
         case "fixture": {
-          selectionStore.fixtureId = element.id;
+          selectionManagerStore.selectSingleItem(element.id, "fixture");
           break;
         }
-        case "fixture-gate": {
+        case "fixture_gate": {
           runInAction(() => {
             if (selectedNode && cursorStore.metaKey) {
               const newNode = nodeStore.addNode(cursorStore.position);
               segmentStore.addSegment(selectedNode.id, newNode.id);
-              selectionStore.gateId = element.id;
+              selectionManagerStore.selectSingleItem(element.id, "fixture_gate");
               fixtureStore.connectToGate(element.id, newNode);
               return;
             }
 
-            selectionStore.gateId = element.id;
+            selectionManagerStore.selectSingleItem(element.id, "fixture_gate");
           });
           break;
         }
@@ -80,7 +81,7 @@ export function useMouseEvents() {
 
         case "canvas": {
           if (cursorStore.noKeys) {
-            selectionStore.setStart(cursorStore.position);
+            selectionRectStore.setStart(cursorStore.position);
           }
 
           break;
@@ -132,11 +133,12 @@ export function useMouseEvents() {
       const { type } = extractItem(evt);
       cursorStore.update(evt);
 
-      if (selectionStore.start && !selectionStore.end && cursorStore.noKeys) {
-        selectionStore.setEnd(cursorStore.position);
-        roadsStore.updateMultiSelect();
-        if (selectionStore.isEmpty) {
-          selectionStore.reset();
+      if (selectionRectStore.inProgress && cursorStore.noKeys) {
+        selectionRectStore.setEnd(cursorStore.position);
+        selectionManagerStore.selectMultiplyItems(selectionRectStore.rect);
+        if (selectionManagerStore.selected.type !== "multi") {
+          selectionManagerStore.reset();
+          selectionRectStore.reset();
         }
       }
 
@@ -144,7 +146,7 @@ export function useMouseEvents() {
         case "road-node": {
           break;
         }
-        case "fixture-gate": {
+        case "fixture_gate": {
           break;
         }
 
@@ -172,7 +174,7 @@ export function useMouseEvents() {
         case "fixture": {
           break;
         }
-        case "fixture-gate": {
+        case "fixture_gate": {
           break;
         }
 
@@ -180,20 +182,20 @@ export function useMouseEvents() {
           runInAction(() => {
             if (cursorStore.altKey && cursorStore.shiftKey) {
               const newFixture = fixtureStore.addFixture(cursorStore.position);
-              selectionStore.fixtureId = newFixture.id;
+              selectionManagerStore.selectSingleItem(newFixture.id, "fixture");
               return;
             }
 
             if (cursorStore.altKey) {
               const newNode = nodeStore.addNode(cursorStore.position);
-              selectionStore.nodeId = newNode.id;
+              selectionManagerStore.selectSingleItem(newNode.id, "node");
               return;
             }
 
             if (selectedNode && cursorStore.metaKey) {
               const newNode = nodeStore.addNode(cursorStore.position);
               segmentStore.addSegment(selectedNode.id, newNode.id);
-              selectionStore.nodeId = newNode.id;
+              selectionManagerStore.selectSingleItem(newNode.id, "node");
               return;
             }
 
@@ -202,7 +204,7 @@ export function useMouseEvents() {
               const startNode = nodeStore.addNode(selectedGate.position);
               fixtureStore.connectToGate(selectedGate.id, startNode);
               segmentStore.addSegment(startNode.id, newNode.id);
-              selectionStore.nodeId = newNode.id;
+              selectionManagerStore.selectSingleItem(newNode.id, "node");
               return;
             }
           });

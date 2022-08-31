@@ -1,19 +1,17 @@
 import { makeAutoObservable } from "mobx";
-import { Position, RoadsDump } from "../types";
+import { ItemType, Position, RoadsDump } from "../types";
 import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
 import { Fixture } from "./fixture";
-import { SelectionItem, SelectionStore } from "./selection";
-import { isInsideRect } from "../utils/is-inside-rect";
 
 import { CursorStore } from "./cursor";
-import { isRectIntersection } from "../utils/is-rect-intersection";
 import { NodeStore } from "./nodes";
-import {SegmentStore} from "./segments";
-import {FixturesStore} from "./fixtures";
+import { SegmentStore } from "./segments";
+import { FixturesStore } from "./fixtures";
+import { SelectionManagerStore } from "./selection/selection-manager";
 
 export class RoadsStore {
-  private readonly selection: SelectionStore;
+  private readonly selection: SelectionManagerStore;
   private readonly cursor: CursorStore;
   private readonly nodes: NodeStore;
   private readonly fixtures: FixturesStore;
@@ -37,88 +35,54 @@ export class RoadsStore {
     });
   }
 
+  private getSelectedItemId(type: ItemType) {
+    const selected = this.selection.selected;
+    if (selected.type !== "single") {
+      return ""
+    }
+
+    if (selected.value.type === type) {
+      return selected.value.id || "";
+    }
+
+    return "";
+  }
+
   get selectedNode() {
-    return this.nodes.get(this.selection.nodeId || "");
+    return this.nodes.get(this.getSelectedItemId("node"));
   }
 
   get selectedGate() {
-    return this.fixtures.getGate(this.selection.gateId || "");
+    return this.fixtures.getGate(this.getSelectedItemId("node"));
   }
 
   deleteSelection() {
-    if (Array.isArray(this.selection.selected)) {
-      this.selection.selected.forEach((item) => {
-        switch (item.type) {
-          case "fixture":
-            return this.fixtures.deleteFixture(item.id);
-          case "node":
-            return this.nodes.deleteNode(item.id);
-          case "segment":
-            return this.segments.deleteSegment(item.id);
-        }
-      });
-      return false;
-    }
+    console.warn("not implemented yet");
 
-    switch (this.selection.selected.type) {
-      case "fixture":
-        return this.fixtures.deleteFixture(this.selection.fixtureId);
-      case "node":
-        return this.nodes.deleteNode(this.selection.nodeId);
-      case "segment":
-        return this.segments.deleteSegment(this.selection.segmentId);
-      default:
-        return false;
-    }
-  }
-
-  updateMultiSelect() {
-    const selection = new Map<string, SelectionItem>();
-    if (this.selection.selectionRect === undefined) {
-      console.warn("Multi selection is not active");
-      return;
-    }
-    const rect = this.selection.selectionRect;
-    this.nodes.list.forEach((node) => {
-      if (isInsideRect(node.position, rect)) {
-        selection.set(node.id, { id: node.id, type: "node" });
-        node.segmentIds.forEach((segmentId) => {
-          selection.set(segmentId, { id: segmentId, type: "segment" });
-        });
-      }
-    });
-
-    this.fixtures.list.forEach((fixture) => {
-      if (isRectIntersection(fixture.rect, rect)) {
-        selection.set(fixture.id, { id: fixture.id, type: "fixture" });
-      }
-    });
-
-    if (selection.size > 0) {
-      this.selection.updateSelection([...selection.values()]);
-    }
-  }
-
-  moveSelection(delta: Position) {
-    if (Array.isArray(this.selection.selected)) {
-      const items = this.selection.selected;
-      items.forEach((item) => {
-        switch (item.type) {
-          case "fixture":
-            this.fixtures.getFixture(item.id)?.moveBy(delta, false);
-            break;
-          case "node":
-            this.nodes.get(item.id)?.moveBy(delta);
-            break;
-          case "segment":
-            this.segments.get(item.id)?.moveBy(delta, false);
-            break;
-        }
-      });
-      this.selection.moveSelectionBy(delta);
-    } else {
-      console.warn(`Can't call moveBy for single selection`);
-    }
+    // if (Array.isArray(this.selection.selected)) {
+    //   this.selection.selected.forEach((item) => {
+    //     switch (item.type) {
+    //       case "fixture":
+    //         return this.fixtures.deleteFixture(item.id);
+    //       case "node":
+    //         return this.nodes.deleteNode(item.id);
+    //       case "segment":
+    //         return this.segments.deleteSegment(item.id);
+    //     }
+    //   });
+    //   return false;
+    // }
+    //
+    // switch (this.selection.selected.type) {
+    //   case "fixture":
+    //     return this.fixtures.deleteFixture(this.selection.fixtureId);
+    //   case "node":
+    //     return this.nodes.deleteNode(this.selection.nodeId);
+    //   case "segment":
+    //     return this.segments.deleteSegment(this.selection.segmentId);
+    //   default:
+    //     return false;
+    // }
   }
 
   empty() {
@@ -128,7 +92,7 @@ export class RoadsStore {
   }
 
   constructor(
-    selection: SelectionStore,
+    selection: SelectionManagerStore,
     cursor: CursorStore,
     nodes: NodeStore,
     segments: SegmentStore,

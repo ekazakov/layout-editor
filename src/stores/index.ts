@@ -1,12 +1,14 @@
 import { toJS } from "mobx";
 import { RoadsStore } from "./roads";
 import { CursorStore } from "./cursor";
-import { SelectionStore } from "./selection";
+import { SelectionStore } from "./selection-old";
 import { UndoManagerStore } from "./undo-manager";
 import { dump } from "../dumps/dump-1";
 import { NodeStore } from "./nodes";
 import { SegmentStore } from "./segments";
 import { FixturesStore } from "./fixtures";
+import { SelectionManagerStore } from "./selection/selection-manager";
+import { SelectionRect } from "./selection/selection-rect";
 
 export { RoadNode } from "./road-node";
 export { RoadSegment } from "./road-segment";
@@ -14,31 +16,41 @@ export { Fixture, Gate } from "./fixture";
 export { NodeStore } from "./nodes";
 
 export const selectionStore = new SelectionStore();
+export const selectionManagerStore = new SelectionManagerStore();
+export const selectionRectStore = new SelectionRect();
 export const cursorStore = new CursorStore();
 export const nodeStore = new NodeStore();
 export const segmentStore = new SegmentStore();
 export const fixtureStore = new FixturesStore();
 
 export const roadsStore = new RoadsStore(
-  selectionStore,
+  selectionManagerStore,
   cursorStore,
   nodeStore,
   segmentStore,
   fixtureStore,
 );
 
+selectionStore.setNodes(nodeStore);
+selectionStore.setFixtures(fixtureStore);
+selectionStore.setSegments(segmentStore);
+
+selectionManagerStore.setNodes(nodeStore);
+selectionManagerStore.setFixtures(fixtureStore);
+selectionManagerStore.setSegments(segmentStore);
+
 nodeStore.setSegments(segmentStore);
 nodeStore.setFixtures(fixtureStore);
-nodeStore.setSelection(selectionStore);
+nodeStore.setSelection(selectionManagerStore);
 
 segmentStore.setNodes(nodeStore);
 segmentStore.setFixtures(fixtureStore);
 segmentStore.setCursor(cursorStore);
-segmentStore.setSelection(selectionStore);
+segmentStore.setSelection(selectionManagerStore);
 
 fixtureStore.setNodes(nodeStore);
 fixtureStore.setCursor(cursorStore);
-fixtureStore.setSelection(selectionStore);
+fixtureStore.setSelection(selectionManagerStore);
 
 export const undoManagerStore = new UndoManagerStore(
   () => roadsStore.toJSON(),
@@ -61,7 +73,7 @@ window.roadsStore = roadsStore;
 // @ts-ignore
 window.cursorStore = cursorStore;
 // @ts-ignore
-window.selectionStore = selectionStore;
+window.selectionManagerStore = selectionManagerStore;
 // @ts-ignore
 window.undoManagerStore = undoManagerStore;
 // @ts-ignore

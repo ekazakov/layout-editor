@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { selectionStore, cursorStore, roadsStore } from "../stores/index";
+import { selectionRectStore, cursorStore, selectionManagerStore } from "../stores";
 
 const style = {
   fill: "none",
@@ -9,7 +9,7 @@ const style = {
 };
 
 export const SelectionRect = observer(function SelectionRect() {
-  const { start, end, selectionRect } = selectionStore;
+  const { start, end, rect } = selectionRectStore;
   const [isDragging, setIsDragging] = React.useState(false);
   if (start && !end) {
     return (
@@ -21,7 +21,7 @@ export const SelectionRect = observer(function SelectionRect() {
   }
 
   if (start && end) {
-    // console.log("selectionRect:", selectionRect);
+    // console.log("rect:", rect);
     return (
       <rect
         onPointerDown={(evt) => {
@@ -37,17 +37,19 @@ export const SelectionRect = observer(function SelectionRect() {
         }}
         onPointerMove={(evt) => {
           if (isDragging) {
-            roadsStore.moveSelection({
+            const delta = {
               x: Math.round(evt.movementX),
               y: Math.round(evt.movementY),
-            });
+            };
+            selectionRectStore.moveBy(delta);
+            selectionManagerStore.moveMultiSelection(delta);
           }
         }}
         data-type="selection-rect"
-        x={selectionRect?.left}
-        y={selectionRect?.top}
-        width={selectionRect?.width}
-        height={selectionRect?.height}
+        x={rect?.left}
+        y={rect?.top}
+        width={rect?.width}
+        height={rect?.height}
         {...style}
         fill="#fff"
         fillOpacity="0"

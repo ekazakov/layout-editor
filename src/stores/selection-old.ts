@@ -1,8 +1,10 @@
 import { makeAutoObservable } from "mobx";
 import { Position, Rect } from "../types";
 import { NodeStore } from "./nodes";
-import {SegmentStore} from "./segments";
-import {FixturesStore} from "./fixtures";
+import { SegmentStore } from "./segments";
+import { FixturesStore } from "./fixtures";
+import {isInsideRect} from "../utils/is-inside-rect";
+import {isRectIntersection} from "../utils/is-rect-intersection";
 
 type ElementType = "segment" | "node" | "fixture" | "gate";
 
@@ -184,6 +186,63 @@ export class SelectionStore {
 
   get end() {
     return this.selectionEnd;
+  }
+
+  isSelected(id: string) {
+    if (Array.isArray(this.selected)) {
+      return this.selected.some((item) => item.id === id);
+    }
+
+    return this.selected.id === id;
+  }
+
+  updateMultiSelect() {
+    const selection = new Map<string, SelectionItem>();
+    if (this.selectionRect === undefined) {
+      console.warn("Multi selection is not active");
+      return;
+    }
+    const rect = this.selectionRect;
+    this.nodes.list.forEach((node) => {
+      if (isInsideRect(node.position, rect)) {
+        selection.set(node.id, { id: node.id, type: "node" });
+        node.segmentIds.forEach((segmentId) => {
+          selection.set(segmentId, { id: segmentId, type: "segment" });
+        });
+      }
+    });
+
+    this.fixtures.list.forEach((fixture) => {
+      if (isRectIntersection(fixture.rect, rect)) {
+        selection.set(fixture.id, { id: fixture.id, type: "fixture" });
+      }
+    });
+
+    if (selection.size > 0) {
+      this.updateSelection([...selection.values()]);
+    }
+  }
+
+  moveSelection(delta: Position) {
+    if (Array.isArray(this.selected)) {
+      const items = this.selected;
+      items.forEach((item) => {
+        switch (item.type) {
+          case "fixture":
+            this.fixtures.getFixture(item.id)?.moveBy(delta, false);
+            break;
+          case "node":
+            this.nodes.get(item.id)?.moveBy(delta);
+            break;
+          case "segment":
+            this.segments.get(item.id)?.moveBy(delta, false);
+            break;
+        }
+      });
+      this.moveSelectionBy(delta);
+    } else {
+      console.warn(`Can't call moveBy for single selection`);
+    }
   }
 
   moveSelectionBy(delta: Position) {

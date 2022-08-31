@@ -1,13 +1,9 @@
-import { Position } from "../../types";
 import { RoadNode } from "../road-node";
-import { RoadSegment } from "../road-segment";
-import { Fixture, Gate } from "../fixture";
-import { SelectionStore } from "../selection";
 import * as sh from "../utils/segment-helpers";
-import * as fh from "../utils/fixture-helpers";
 import { NodeStore } from "../nodes";
-import {SegmentStore} from "../segments";
-import {FixturesStore} from "../fixtures";
+import { SegmentStore } from "../segments";
+import { FixturesStore } from "../fixtures";
+import { SelectionManagerStore } from "../selection/selection-manager";
 
 export function getNode(nodes: NodeStore, id: string) {
   return nodes.get(id);
@@ -17,7 +13,7 @@ export function deleteNode(
   nodes: NodeStore,
   segments: SegmentStore,
   fixtures: FixturesStore,
-  selection: SelectionStore,
+  selection: SelectionManagerStore,
   nodeId: string,
 ) {
   const node = nodes.get(nodeId);
@@ -32,7 +28,8 @@ export function deleteNode(
     sh.deleteSegment(nodes, segments, fixtures, selection, segmentId);
   }
 
-  if (selection.nodeId === nodeId) {
+  const { selected } = selection;
+  if (selected.type === "single" && selected.value.id === nodeId) {
     selection.reset();
   }
 
@@ -44,12 +41,6 @@ export function deleteNode(
 
   return true;
 }
-
-// export function addNode(nodes: NodeStore, p: Position) {
-//   const node = new RoadNode(p);
-//   nodes.set(node.id, node);
-//   return node;
-// }
 
 export function isConnected(
   nodes: Map<string, RoadNode>,

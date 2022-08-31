@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { RoadSegment, selectionStore } from "../stores";
+import { RoadSegment, selectionManagerStore } from "../stores";
 
 export const NewSegment = observer(function NewSegment(props: any) {
   const { p1, p2 } = props;
@@ -19,13 +19,11 @@ export const NewSegment = observer(function NewSegment(props: any) {
   );
 });
 
-export const Segment = observer(function Segment(props: {
-  segment: RoadSegment;
-}) {
+export const Segment = observer(function Segment(props: { segment: RoadSegment }) {
   const { segment } = props;
   const [isDragging, setIsDragging] = React.useState(false);
 
-  const selected = segment.id === selectionStore.segmentId;
+  const selected = selectionManagerStore.isSelected(segment.id);
   return (
     <g>
       <text
@@ -52,7 +50,7 @@ export const Segment = observer(function Segment(props: {
           if (isDragging) {
             segment.moveBy({
               x: Math.round(evt.movementX),
-              y: Math.round(evt.movementY)
+              y: Math.round(evt.movementY),
             });
           }
         }}

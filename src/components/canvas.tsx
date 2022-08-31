@@ -3,10 +3,10 @@ import { observer } from "mobx-react-lite";
 import {
   roadsStore,
   cursorStore,
-  selectionStore,
   nodeStore,
   segmentStore,
   fixtureStore,
+  selectionRectStore,
 } from "../stores";
 import { useMouseEvents } from "../hooks/useMouseEvents";
 import { useShortcuts } from "../hooks/useShortcuts";
@@ -42,7 +42,7 @@ export const Canvas = observer(function Canvas() {
       onMouseOut={onMouseOut}
       onClick={onClick}
       style={{
-        userSelect: selectionStore.multiSelectInProgress ? "none" : "auto",
+        userSelect: selectionRectStore.inProgress ? "none" : "auto",
       }}
     >
       <g>

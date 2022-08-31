@@ -1,5 +1,4 @@
 import { RoadSegment } from "./road-segment";
-import { SelectionStore } from "./selection";
 import { CursorStore } from "./cursor";
 import { Intersection, LineSegment, Position } from "../types";
 import * as sh from "./utils/segment-helpers";
@@ -7,6 +6,7 @@ import { magnitude, projectionPoint } from "../utils/line";
 import { makeAutoObservable, reaction } from "mobx";
 import { NodeStore } from "./nodes";
 import { FixturesStore } from "./fixtures";
+import { SelectionManagerStore } from "./selection/selection-manager";
 
 function getMinIndex(arr: any[]) {
   let minIndex = 0;
@@ -24,7 +24,7 @@ export class SegmentStore {
   private segments: Map<string, RoadSegment> = new Map<string, RoadSegment>();
   private fixtures: FixturesStore = null!;
   private nodes: NodeStore = null!;
-  private selection: SelectionStore = null!;
+  private selection: SelectionManagerStore = null!;
   private cursor: CursorStore = null!;
   private _intersections: Intersection[] = [];
   private _snapPoints: [Position, string][] = [];
@@ -108,11 +108,16 @@ export class SegmentStore {
     this.fixtures = fixtures;
   }
 
-  setSelection(selection: SelectionStore) {
+  setSelection(selection: SelectionManagerStore) {
     this.selection = selection;
     reaction(
-      () => this.selection.nodeId,
-      (newSelectedNodeId: string) => {
+      () => {
+        if (this.selection.selected.type === "single") {
+          return this.selection.selected.value.id;
+        }
+        return undefined;
+      },
+      (newSelectedNodeId: string | undefined) => {
         if (!newSelectedNodeId) {
           this._intersections = [];
         }

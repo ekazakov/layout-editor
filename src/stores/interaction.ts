@@ -1,7 +1,6 @@
 import { makeAutoObservable, reaction, toJS } from "mobx";
 import { RoadsStore } from "./roads";
 import { CursorStore } from "./cursor";
-import { SelectionStore } from "./selection";
 
 export class InteractionStore {
   // private roads: RoadsStore;
@@ -29,7 +28,7 @@ export class InteractionStore {
     return "done";
   };
 
-  constructor(private roads: RoadsStore, private cursor: CursorStore, selection: SelectionStore) {
+  constructor(private roads: RoadsStore, private cursor: CursorStore) {
     makeAutoObservable(this);
   }
 }
