@@ -77,10 +77,15 @@ export class SelectionManagerStore {
       throw new Error(`Selection rect is not defined`);
     }
 
-    if (this.selected.type !== "multi") {
-      throw Error(`Multi selection is not active`);
-    }
     const items = this.selectFromRect(rect);
+    if (this.selected.type !== "multi") {
+      this.selected = {
+        type: "multi",
+        value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
+      };
+      return;
+    }
+
     this.selected.value.append(items);
   }
 
