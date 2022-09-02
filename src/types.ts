@@ -77,9 +77,16 @@ export type ElementType =
 
 export type ItemType = "segment" | "node" | "fixture" | "fixture_gate";
 
+export type SelectableItemType = "node" | "fixture" | "segment";
+
 export type Item = RoadSegment | RoadNode | Fixture | Gate;
 
 export type Selection =
   | { type: "single"; value: SingleItem }
   | { type: "multi"; value: MultiItems }
   | NoneSelectionItem;
+
+export type SelectionItem = {
+  id: string;
+  type: SelectableItemType;
+};

@@ -37,11 +37,10 @@ export function useMouseEvents() {
           }
 
           if (cursorStore.shiftKey) {
-            const node = nodeStore.get(element.id)!;
-            selectionManagerStore.addItemToSelection(node);
+            selectionManagerStore.addItemToSelection(element.id);
             return;
           }
-          selectionManagerStore.selectSingleItem(element.id, "node");
+          selectionManagerStore.selectSingleItem(element.id);
 
           break;
         }
@@ -59,21 +58,19 @@ export function useMouseEvents() {
             }
 
             if (cursorStore.shiftKey) {
-              const segment = segmentStore.get(element.id)!;
-              selectionManagerStore.addItemToSelection(segment);
+              selectionManagerStore.addItemToSelection(element.id);
               return;
             }
-            selectionManagerStore.selectSingleItem(element.id, "segment");
+            selectionManagerStore.selectSingleItem(element.id);
           });
           break;
         }
         case "fixture": {
           if (cursorStore.shiftKey) {
-            const fixture = fixtureStore.getFixture(element.id)!;
-            selectionManagerStore.addItemToSelection(fixture);
+            selectionManagerStore.addItemToSelection(element.id);
             return;
           }
-          selectionManagerStore.selectSingleItem(element.id, "fixture");
+          selectionManagerStore.selectSingleItem(element.id);
           break;
         }
         case "fixture_gate": {
@@ -81,12 +78,12 @@ export function useMouseEvents() {
             if (selectedNode && cursorStore.metaKey) {
               const newNode = nodeStore.addNode(cursorStore.position);
               segmentStore.addSegment(selectedNode.id, newNode.id);
-              selectionManagerStore.selectSingleItem(element.id, "fixture_gate");
+              selectionManagerStore.selectSingleItem(element.id);
               fixtureStore.connectToGate(element.id, newNode);
               return;
             }
 
-            selectionManagerStore.selectSingleItem(element.id, "fixture_gate");
+            selectionManagerStore.selectSingleItem(element.id);
           });
           break;
         }
@@ -182,6 +179,7 @@ export function useMouseEvents() {
   );
 
   const onMouseOver = React.useCallback((evt: React.MouseEvent) => {}, []);
+
   const onMouseOut = React.useCallback((evt: React.MouseEvent) => {}, []);
 
   const onClick = React.useCallback(
@@ -206,20 +204,20 @@ export function useMouseEvents() {
           runInAction(() => {
             if (cursorStore.altKey && cursorStore.shiftKey) {
               const newFixture = fixtureStore.addFixture(cursorStore.position);
-              selectionManagerStore.selectSingleItem(newFixture.id, "fixture");
+              selectionManagerStore.selectSingleItem(newFixture.id);
               return;
             }
 
             if (cursorStore.altKey) {
               const newNode = nodeStore.addNode(cursorStore.position);
-              selectionManagerStore.selectSingleItem(newNode.id, "node");
+              selectionManagerStore.selectSingleItem(newNode.id);
               return;
             }
 
             if (selectedNode && cursorStore.metaKey) {
               const newNode = nodeStore.addNode(cursorStore.position);
               segmentStore.addSegment(selectedNode.id, newNode.id);
-              selectionManagerStore.selectSingleItem(newNode.id, "node");
+              selectionManagerStore.selectSingleItem(newNode.id);
               return;
             }
 
@@ -228,7 +226,7 @@ export function useMouseEvents() {
               const startNode = nodeStore.addNode(selectedGate.position);
               fixtureStore.connectToGate(selectedGate.id, startNode);
               segmentStore.addSegment(startNode.id, newNode.id);
-              selectionManagerStore.selectSingleItem(newNode.id, "node");
+              selectionManagerStore.selectSingleItem(newNode.id);
               return;
             }
           });

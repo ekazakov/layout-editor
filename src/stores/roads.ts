@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx";
-import { ItemType, Position, RoadsDump } from "../types";
+import { ItemType, Position, RoadsDump, SelectableItemType } from "../types";
 import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
 import { Fixture } from "./fixture";
@@ -43,7 +43,7 @@ export class RoadsStore {
     }
 
     if (selected.value.type === type) {
-      return selected.value.id || "";
+      return selected.value.id;
     }
 
     return "";
@@ -57,6 +57,19 @@ export class RoadsStore {
     return this.fixtures.getGate(this.getSelectedItemId("node"));
   }
 
+  private deleteItem(id: string, type: SelectableItemType) {
+    switch (type) {
+      case "fixture":
+        return this.fixtures.deleteFixture(id);
+      case "node":
+        return this.nodes.deleteNode(id);
+      case "segment":
+        return this.segments.deleteSegment(id);
+      default:
+        return false;
+    }
+  }
+
   deleteSelection() {
     const { selected } = this.selection;
 
@@ -66,29 +79,12 @@ export class RoadsStore {
       }
 
       selected.value.list.forEach((item) => {
-        switch (getItemType(item)) {
-          case "fixture":
-            return this.fixtures.deleteFixture(item.id);
-          case "node":
-            return this.nodes.deleteNode(item.id);
-          case "segment":
-            return this.segments.deleteSegment(item.id);
-        }
+        this.deleteItem(item.id, item.type);
       });
     }
 
     if (selected.type === "single") {
-      const id = selected.value.id || "";
-      switch (selected.value.type) {
-        case "fixture":
-          return this.fixtures.deleteFixture(id);
-        case "node":
-          return this.nodes.deleteNode(id);
-        case "segment":
-          return this.segments.deleteSegment(id);
-        default:
-          return false;
-      }
+      this.deleteItem(selected.value.id, selected.value.type);
     }
   }
 

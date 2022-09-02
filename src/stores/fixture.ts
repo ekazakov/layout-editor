@@ -72,7 +72,7 @@ export class Gate {
 
   constructor(p: Position, id?: string) {
     this._position = p;
-    this.id = id || `fixture_gate_${nanoid(7)}`;
+    this.id = id || `fixture_gate#${nanoid(7)}`;
     makeAutoObservable(this);
   }
 }
@@ -154,7 +154,7 @@ export class Fixture {
 
   private constructor(p: Position, size?: number, id?: string) {
     this._position = p;
-    this.id = id ?? `fixture_${nanoid(7)}`;
+    this.id = id ?? `fixture#${nanoid(7)}`;
     this.size = size ?? 150;
 
     this.gates = new Map([

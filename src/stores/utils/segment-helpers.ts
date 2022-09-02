@@ -16,7 +16,7 @@ export function deleteSegment(
 ) {
   const { selected } = selection;
 
-  if (selected.type === "single" && selected.value.id === id) {
+  if (selected.type === "single" && selected.value.isSelected(id)) {
     selection.reset();
   }
 
@@ -37,26 +37,6 @@ export function deleteSegment(
     }
   }
 }
-
-// export function toggleSegmentSelection(
-//   segments: SegmentStore,
-//   selection: SelectionStore,
-//   id: string,
-// ) {
-//   const segment = segments.get(id);
-//   if (!segment) {
-//     throw new Error(`Segment ${id} doesn't exist`);
-//   }
-//
-//   const { segmentId } = selection;
-//   selection.reset();
-//
-//   if (segmentId === id) {
-//     return;
-//   }
-//
-//   selection.segmentId = id;
-// }
 
 export function addSegmentInternal(
   nodes: NodeStore,
@@ -81,24 +61,6 @@ export function addSegmentInternal(
 
   return segment;
 }
-
-// export function addSegmentToPosition(
-//   nodes: NodeStore,
-//   segments: SegmentStore,
-//   startNodeId: string,
-//   p: Position,
-// ) {
-//   const startNode = nh.getNode(nodes, startNodeId);
-//   if (!startNode) {
-//     throw new Error(`Node with id: ${startNodeId} doesn't exist`);
-//   }
-//   const endNode = nodes.add(p);
-//   const segment = new RoadSegment(startNode, endNode);
-//
-//   endNode.segmentIds.add(segment.id);
-//   startNode.segmentIds.add(segment.id);
-//   segments.set(segment.id, segment);
-// }
 
 export function splitSegmentAt(
   nodes: NodeStore,

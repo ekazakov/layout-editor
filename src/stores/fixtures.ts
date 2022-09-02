@@ -52,7 +52,7 @@ export class FixturesStore {
     if (selected.value.type !== "node") {
       throw new Error();
     }
-    const node = this.nodes.get(selected.value.id || "");
+    const node = this.nodes.get(selected.value.id);
     if (!node) {
       return;
     }

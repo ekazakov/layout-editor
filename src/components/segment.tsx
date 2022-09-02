@@ -35,25 +35,25 @@ export const Segment = observer(function Segment(props: { segment: RoadSegment }
         #{segment.id}
       </text>
       <line
-        onPointerDown={(evt) => {
-          setIsDragging(() => true);
-          const element = evt.target as HTMLElement;
-
-          element.setPointerCapture(evt.pointerId);
-        }}
-        onPointerUp={(evt) => {
-          setIsDragging(() => false);
-          const element = evt.target as HTMLElement;
-          element.releasePointerCapture(evt.pointerId);
-        }}
-        onPointerMove={(evt) => {
-          if (isDragging) {
-            segment.moveBy({
-              x: Math.round(evt.movementX),
-              y: Math.round(evt.movementY),
-            });
-          }
-        }}
+        // onPointerDown={(evt) => {
+        //   setIsDragging(() => true);
+        //   const element = evt.target as HTMLElement;
+        //
+        //   element.setPointerCapture(evt.pointerId);
+        // }}
+        // onPointerUp={(evt) => {
+        //   setIsDragging(() => false);
+        //   const element = evt.target as HTMLElement;
+        //   element.releasePointerCapture(evt.pointerId);
+        // }}
+        // onPointerMove={(evt) => {
+        //   if (isDragging) {
+        //     segment.moveBy({
+        //       x: Math.round(evt.movementX),
+        //       y: Math.round(evt.movementY),
+        //     });
+        //   }
+        // }}
         id={segment.id}
         data-type="road-segment"
         x1={segment.start.x}

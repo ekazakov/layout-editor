@@ -27,20 +27,9 @@ export class RoadSegment {
     };
   }
 
-  moveBy = (delta: Position, moveNodes = true) => {
-    if (!moveNodes) {
-      return;
-    }
-
-    this.tracker(() => {
-      this._p1.moveBy(delta);
-      this._p2.moveBy(delta);
-    });
-  };
-
   constructor(nodeStart: RoadNode, nodeEnd: RoadNode, id?: string) {
     makeAutoObservable(this);
-    this.id = id ?? `segment_${nanoid(7)}`;
+    this.id = id ?? `segment#${nanoid(7)}`;
 
     this._p1 = nodeStart;
     this._p2 = nodeEnd;

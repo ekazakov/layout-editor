@@ -1,31 +1,31 @@
 import { NodeStore } from "../nodes";
 import { FixturesStore } from "../fixtures";
 import { SegmentStore } from "../segments";
-import { Item, Position, Rect } from "../../types";
-import { getItemType } from "./utils/get-item-type";
+import { Item, Position, Rect, SelectableItemType, SelectionItem } from "../../types";
+// import { getItemType } from "./utils/get-item-type";
 import { makeAutoObservable, toJS } from "mobx";
 
 export class MultiItems {
-  private items: Map<string, Item> = new Map();
+  private items: Map<string, SelectionItem> = new Map();
 
   moveSelection(delta: Position) {
-    this.items.forEach((item) => {
-      const type = getItemType(item);
+    this.items.forEach(({ id, type }) => {
       switch (type) {
         case "fixture":
-          this.fixtures.getFixture(item.id)?.moveBy(delta, false);
+          this.fixtures.getFixture(id)?.moveBy(delta);
           break;
-        case "node":
-          this.nodes.get(item.id)?.moveBy(delta);
+        case "node": {
+          const node = this.nodes.get(id);
+          if (node && !node.gateId) {
+            node.moveBy(delta);
+          }
           break;
-        case "segment":
-          this.segments.get(item.id)?.moveBy(delta, false);
-          break;
+        }
       }
     });
   }
 
-  append(newItems: Map<string, Item>) {
+  append(newItems: Map<string, SelectionItem>) {
     newItems.forEach((value, key) => {
       this.items.set(key, value);
     });
@@ -43,11 +43,14 @@ export class MultiItems {
     return this.items.has(id);
   }
 
-  pointList() {
-    return this.list.reduce((result, item) => {
-      switch (getItemType(item)) {
+  get pointList() {
+    return this.list.reduce((result, { id, type }) => {
+      switch (type) {
         case "fixture":
-          const fixture = this.fixtures.getFixture(item.id)!;
+          const fixture = this.fixtures.getFixture(id);
+          if (!fixture) {
+            break;
+          }
           const { top, left, right, bottom } = fixture.rect;
           const points = [
             { x: left, y: top },
@@ -58,8 +61,10 @@ export class MultiItems {
           result.push(...points);
           break;
         case "node":
-          const node = this.nodes.get(item.id)!;
-          result.push(toJS(node.position));
+          const node = this.nodes.get(id);
+          if (node) {
+            result.push(toJS(node.position));
+          }
           break;
       }
 
@@ -68,27 +73,19 @@ export class MultiItems {
   }
 
   get leftLimit() {
-    return this.pointList()
-      .sort((a, b) => a.x - b.x)
-      .at(0)!.x;
+    return this.pointList.sort((a, b) => a.x - b.x).at(0)?.x ?? 0;
   }
 
   get rightLimit() {
-    return this.pointList()
-      .sort((a, b) => b.x - a.x)
-      .at(0)!.x;
+    return this.pointList.sort((a, b) => b.x - a.x).at(0)?.x ?? 0;
   }
 
   get topLimit() {
-    return this.pointList()
-      .sort((a, b) => a.y - b.y)
-      .at(0)!.y;
+    return this.pointList.sort((a, b) => a.y - b.y).at(0)?.y ?? 0;
   }
 
   get bottomLimit() {
-    return this.pointList()
-      .sort((a, b) => b.y - a.y)
-      .at(0)!.y;
+    return this.pointList.sort((a, b) => b.y - a.y).at(0)?.y ?? 0;
   }
 
   get boundingRect(): Rect {
@@ -103,7 +100,7 @@ export class MultiItems {
   }
 
   constructor(
-    items: Map<string, Item>,
+    items: Map<string, SelectionItem>,
     // private selectionRect: SelectionRect,
     private nodes: NodeStore,
     private segments: SegmentStore,

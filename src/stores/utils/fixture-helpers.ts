@@ -38,7 +38,7 @@ export function deleteFixture(
   fixtureId: string,
 ) {
   const { selected } = selection;
-  if (selected.type === "single" && selected.value.id === fixtureId) {
+  if (selected.type === "single" && selected.value.isSelected(fixtureId)) {
     selection.reset();
   }
 

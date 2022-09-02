@@ -1,7 +1,6 @@
 import { toJS } from "mobx";
 import { RoadsStore } from "./roads";
 import { CursorStore } from "./cursor";
-import { SelectionStore } from "./selection-old";
 import { UndoManagerStore } from "./undo-manager";
 import { dump } from "../dumps/dump-1";
 import { NodeStore } from "./nodes";
@@ -15,7 +14,6 @@ export { RoadSegment } from "./road-segment";
 export { Fixture, Gate } from "./fixture";
 export { NodeStore } from "./nodes";
 
-export const selectionStore = new SelectionStore();
 export const selectionManagerStore = new SelectionManagerStore();
 export const selectionRectStore = new SelectionRect();
 export const cursorStore = new CursorStore();
@@ -30,10 +28,6 @@ export const roadsStore = new RoadsStore(
   segmentStore,
   fixtureStore,
 );
-
-selectionStore.setNodes(nodeStore);
-selectionStore.setFixtures(fixtureStore);
-selectionStore.setSegments(segmentStore);
 
 selectionManagerStore.setNodes(nodeStore);
 selectionManagerStore.setFixtures(fixtureStore);

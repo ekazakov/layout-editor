@@ -56,7 +56,7 @@ export class RoadNode {
 
   constructor(p: Position, id?: string) {
     this._position = { x: p.x, y: p.y };
-    this.id = id ?? `node_${nanoid(7)}`;
+    this.id = id ?? `node#${nanoid(7)}`;
     makeAutoObservable(this);
   }
 

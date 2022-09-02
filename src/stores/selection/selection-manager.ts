@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx";
-import { Item, ItemType, Position, Rect, Selection } from "../../types";
+import { Position, Rect, Selection, SelectionItem } from "../../types";
 import { NodeStore } from "../nodes";
 import { SegmentStore } from "../segments";
 import { FixturesStore } from "../fixtures";
@@ -23,28 +23,35 @@ export class SelectionManagerStore {
   private fixtures: FixturesStore = null!;
   private segments: SegmentStore = null!;
 
-  selectSingleItem(id: string, type: ItemType) {
+  selectSingleItem(id: string) {
     this.selected = {
       type: "single",
-      value: new SingleItem(id, type),
+      value: new SingleItem(id),
     };
   }
 
   private selectFromRect(rect: Rect) {
-    const items = new Map<string, Item>();
+    const items = new Map<string, SelectionItem>();
 
     this.nodes.list.forEach((node) => {
       if (isInsideRect(node.position, rect)) {
-        items.set(node.id, node);
+        const { id } = node;
+        items.set(node.id, { id, type: "node" });
         node.segmentIds.forEach((segmentId) => {
-          items.set(segmentId, this.segments.get(segmentId)!);
+          items.set(segmentId, { id: segmentId, type: "segment" });
         });
       }
     });
 
     this.fixtures.list.forEach((fixture) => {
       if (isRectIntersection(fixture.rect, rect)) {
-        items.set(fixture.id, fixture);
+        items.set(fixture.id, { id: fixture.id, type: "fixture" });
+        fixture.gateList.forEach((gate) => {
+          const node = gate.connection;
+          if (node) {
+            items.set(node.id, { id: node.id, type: "node" });
+          }
+        });
       }
     });
 
@@ -89,26 +96,37 @@ export class SelectionManagerStore {
     this.selected.value.append(items);
   }
 
-  // TODO: refactor to pass only id and type
-  addItemToSelection(item: Item) {
+  addItemToSelection(id: string) {
+    console.log("addItemToSelection:", id);
     const selection = this.selected;
-    switch (selection.type) {
-      case "single": {
-        const items = new Map<string, Item>([[item.id, item]]);
-        this.selected = {
-          type: "multi",
-          value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
-        };
-        return;
+
+    if (selection.type === "none") {
+      this.selectSingleItem(id);
+      return;
+    }
+
+    const type = getItemType(id);
+    const rawItems: [string, SelectionItem][] = [[id, { id, type }]];
+    if (type === "segment") {
+      const segment = this.segments.get(id);
+      if (segment) {
+        const startId = segment.start.id;
+        const endId = segment.end.id;
+        rawItems.push([startId, { id: startId, type: "node" }]);
+        rawItems.push([endId, { id: endId, type: "node" }]);
       }
-      case "multi": {
-        const items = new Map<string, Item>([[item.id, item]]);
-        selection.value.append(items);
-        return;
-      }
-      case "none":
-        this.selectSingleItem(item.id, getItemType(item));
-        return;
+    }
+    const items = new Map<string, SelectionItem>(rawItems);
+
+    if (selection.type === "single") {
+      const { id, type } = selection.value;
+      items.set(id, { id, type });
+      this.selected = {
+        type: "multi",
+        value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
+      };
+    } else {
+      selection.value.append(items);
     }
   }
 
@@ -118,7 +136,7 @@ export class SelectionManagerStore {
     }
 
     if (this.selected.type === "single") {
-      return this.selected.value.id === id;
+      return this.selected.value.isSelected(id);
     }
 
     return false;
