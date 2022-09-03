@@ -64,36 +64,86 @@ export class SelectionManagerStore {
     }
   }
 
-  selectMultiplyItems(rect: Rect | undefined) {
+  // selectMultiplyItems(rect: Rect | undefined) {
+  //   if (!rect) {
+  //     throw new Error(`Selection rect is not defined`);
+  //   }
+  //   const items = this.selectFromRect(rect);
+  //   if (items.size === 0) {
+  //     this.reset();
+  //     return;
+  //   }
+  //   this.selected = {
+  //     type: "multi",
+  //     value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
+  //   };
+  // }
+
+  selectionFromAria(rect: Rect | undefined, append = false) {
     if (!rect) {
       throw new Error(`Selection rect is not defined`);
     }
+
     const items = this.selectFromRect(rect);
+
     if (items.size === 0) {
-      this.reset();
-      return;
-    }
-    this.selected = {
-      type: "multi",
-      value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
-    };
-  }
-
-  addRectToSelection(rect: Rect | undefined) {
-    if (!rect) {
-      throw new Error(`Selection rect is not defined`);
-    }
-
-    const items = this.selectFromRect(rect);
-    if (this.selected.type !== "multi") {
-      this.selected = {
-        type: "multi",
-        value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
-      };
+      if (!append) {
+        this.reset();
+      }
       return;
     }
 
-    this.selected.value.append(items);
+    const { type, value } = this.selected;
+    switch (type) {
+      case "none": {
+        if (items.size === 1) {
+          const [id] = [...items.keys()];
+          this.addItemToSelection(id);
+        } else {
+          this.selected = {
+            type: "multi",
+            value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
+          };
+        }
+        return;
+      }
+      case "single": {
+        if (append) {
+          const { id, type } = value;
+          items.set(id, { id, type });
+          this.selected = {
+            type: "multi",
+            value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
+          };
+        } else {
+          if (items.size === 1) {
+            const [id] = [...items.keys()];
+            this.addItemToSelection(id);
+          } else {
+            this.selected = {
+              type: "multi",
+              value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
+            };
+          }
+        }
+        return;
+      }
+      case "multi": {
+        value.append(items);
+        return;
+      }
+    }
+
+    // const items = this.selectFromRect(rect);
+    // if (this.selected.type !== "multi") {
+    //   this.selected = {
+    //     type: "multi",
+    //     value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
+    //   };
+    //   return;
+    // }
+    //
+    // this.selected.value.append(items);
   }
 
   addItemToSelection(id: string) {

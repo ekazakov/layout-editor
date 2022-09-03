@@ -149,7 +149,7 @@ export function useMouseEvents() {
 
         if (selectionRectStore.inProgress && cursorStore.noKeys) {
           selectionRectStore.setEnd(cursorStore.position);
-          selectionManagerStore.selectMultiplyItems(selectionRectStore.rect);
+          selectionManagerStore.selectionFromAria(selectionRectStore.rect);
           selectionRectStore.reset();
           if (selectionManagerStore.selected.type !== "multi") {
             selectionManagerStore.reset();
@@ -158,7 +158,7 @@ export function useMouseEvents() {
 
         if (selectionRectStore.inProgress && cursorStore.shiftKey) {
           selectionRectStore.setEnd(cursorStore.position);
-          selectionManagerStore.addRectToSelection(selectionRectStore.rect);
+          selectionManagerStore.selectionFromAria(selectionRectStore.rect, true);
           selectionRectStore.reset();
         }
 
