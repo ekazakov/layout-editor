@@ -8,14 +8,14 @@
   - [x] When node deleted manually
 - [x] Serialize fixture
 - [x] Make fixture gates selectable
-- [] Context menu
+- [x] Context menu
 - [] Fixture resize
 - [] Improve undo performance
 - [] Undo for fixtures
 - [x] Multi selection
-- [] Fix multi selection movement for nodes connected to gates 
+- [x] Fix multi selection movement for nodes connected to gates 
 - [x] Addition to select
-- [] Remove item from selection
+- [x] Remove item from selection
 - [x] Build road from gate
 - [x] Snap node to gate
 - [x] Snap new segment to road

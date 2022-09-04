@@ -15,6 +15,7 @@ import { Node } from "./node";
 import { Fixture } from "./fixture";
 import { SelectionRect } from "./selection-rect";
 import { BoundingRect } from "./bounding-rect";
+import { Scale } from "./scale";
 
 export const Canvas = observer(function Canvas() {
   const nodes = nodeStore.list;
@@ -46,6 +47,8 @@ export const Canvas = observer(function Canvas() {
         userSelect: selectionRectStore.inProgress ? "none" : "auto",
       }}
     >
+      <Scale direction="horizontal" max={2000} />
+      <Scale direction="vertical" max={2000} />
       <g>
         {selection && cursorStore.metaKey && (
           <NewSegment
