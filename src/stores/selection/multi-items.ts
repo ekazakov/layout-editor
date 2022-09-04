@@ -35,12 +35,12 @@ export class MultiItems {
     return [...this.items.values()];
   }
 
-  reset() {
-    this.items.clear();
-  }
-
   hasItem(id: string) {
     return this.items.has(id);
+  }
+
+  remove(id: string) {
+    return this.items.delete(id);
   }
 
   get pointList() {
@@ -90,12 +90,12 @@ export class MultiItems {
 
   get boundingRect(): Rect {
     return {
-      top: this.topLimit,
-      left: this.leftLimit,
-      right: this.rightLimit,
-      bottom: this.bottomLimit,
-      height: Math.abs(this.bottomLimit - this.topLimit),
-      width: Math.abs(this.rightLimit - this.leftLimit),
+      top: this.topLimit - 10,
+      left: this.leftLimit - 10,
+      right: this.rightLimit + 10,
+      bottom: this.bottomLimit + 10,
+      height: Math.abs(this.bottomLimit - this.topLimit) + 20,
+      width: Math.abs(this.rightLimit - this.leftLimit) + 20git ,
     };
   }
 

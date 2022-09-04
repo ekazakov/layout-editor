@@ -37,7 +37,7 @@ export const BoundingRect = observer(function BoundingRect() {
             selectionManagerStore.moveBy(delta);
           }
         }}
-        data-type="selection-rect"
+        data-type="bounding-rect"
         x={rect?.left}
         y={rect?.top}
         width={rect?.width}

@@ -10,6 +10,7 @@ import {
   selectionRectStore,
 } from "../stores";
 import { getDistance } from "../utils/get-distance";
+import { findHoveredElements } from "../utils/find-hovered-element";
 
 function extractItem(evt: React.MouseEvent) {
   const element = evt.target as HTMLElement;
@@ -85,6 +86,27 @@ export function useMouseEvents() {
 
             selectionManagerStore.selectSingleItem(element.id);
           });
+          break;
+        }
+
+        case "bounding-rect": {
+          // selectionManagerStore.removeItemFromSelection(element.id);
+          // const element = document.elementsFromPoint(cursorStore.x,cursorStore.y);
+          if (cursorStore.shiftKey) {
+            const els = findHoveredElements(cursorStore.position);
+            console.log("els:", els);
+            const item = els.find(
+              (el) => el.dataset.type === "road-node" || el.dataset.type === "fixture",
+            );
+            console.log("item:", item);
+            if (item) {
+              if (selectionManagerStore.isSelected(item.id)) {
+                selectionManagerStore.removeItemFromSelection(item.id);
+              } else {
+                selectionManagerStore.addItemToSelection(item.id);
+              }
+            }
+          }
           break;
         }
 

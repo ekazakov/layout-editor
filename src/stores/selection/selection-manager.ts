@@ -190,6 +190,15 @@ export class SelectionManagerStore {
     }
   }
 
+  removeItemFromSelection(id: string) {
+    const { type, value } = this.selected;
+    if (type !== "multi") {
+      return;
+    }
+
+    value.remove(id);
+  }
+
   isSelected(id: string) {
     if (this.selected.type === "multi") {
       return this.selected.value.hasItem(id);
