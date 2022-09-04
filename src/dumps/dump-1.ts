@@ -33,7 +33,7 @@ export const dump = {
         y: 699,
       },
       segmentIds: ["segment#JiMUgl-"],
-      gateId: "fixture#gate#2bXB2Aa",
+      gateId: "fixture_gate#2bXB2Aa",
     },
     {
       id: "node#C62AQxe",
@@ -50,7 +50,7 @@ export const dump = {
         y: 250,
       },
       segmentIds: ["segment#9-RLIhh"],
-      gateId: "fixture#gate#EN4Zzej",
+      gateId: "fixture_gate#EN4Zzej",
     },
     {
       id: "node#oWw0CMT",
@@ -59,7 +59,7 @@ export const dump = {
         y: 774,
       },
       segmentIds: ["segment#5WT4Y-0"],
-      gateId: "fixture#gate#zJuMDVM",
+      gateId: "fixture_gate#zJuMDVM",
     },
   ],
   segments: [
@@ -99,7 +99,7 @@ export const dump = {
       size: 150,
       gates: [
         {
-          id: "fixture#gate#5wugnGU",
+          id: "fixture_gate#5wugnGU",
           position: {
             x: 100,
             y: 175,
@@ -107,7 +107,7 @@ export const dump = {
           connectionId: null,
         },
         {
-          id: "fixture#gate#fGFsaGO",
+          id: "fixture_gate#fGFsaGO",
           position: {
             x: 250,
             y: 175,
@@ -115,7 +115,7 @@ export const dump = {
           connectionId: null,
         },
         {
-          id: "fixture#gate#lkh_QkH",
+          id: "fixture_gate#lkh_QkH",
           position: {
             x: 175,
             y: 100,
@@ -123,7 +123,7 @@ export const dump = {
           connectionId: null,
         },
         {
-          id: "fixture#gate#EN4Zzej",
+          id: "fixture_gate#EN4Zzej",
           position: {
             x: 175,
             y: 250,
@@ -141,7 +141,7 @@ export const dump = {
       size: 150,
       gates: [
         {
-          id: "fixture#gate#zJuMDVM",
+          id: "fixture_gate#zJuMDVM",
           position: {
             x: 700,
             y: 775,
@@ -149,7 +149,7 @@ export const dump = {
           connectionId: "node#oWw0CMT",
         },
         {
-          id: "fixture#gate#J6NtUDD",
+          id: "fixture_gate#J6NtUDD",
           position: {
             x: 850,
             y: 775,
@@ -157,7 +157,7 @@ export const dump = {
           connectionId: null,
         },
         {
-          id: "fixture#gate#2bXB2Aa",
+          id: "fixture_gate#2bXB2Aa",
           position: {
             x: 775,
             y: 700,
@@ -165,7 +165,7 @@ export const dump = {
           connectionId: "node#YaPfNzr",
         },
         {
-          id: "fixture#gate#P17oNIP",
+          id: "fixture_gate#P17oNIP",
           position: {
             x: 775,
             y: 850,
