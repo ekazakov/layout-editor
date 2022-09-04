@@ -90,8 +90,6 @@ export function useMouseEvents() {
         }
 
         case "bounding-rect": {
-          // selectionManagerStore.removeItemFromSelection(element.id);
-          // const element = document.elementsFromPoint(cursorStore.x,cursorStore.y);
           if (cursorStore.shiftKey) {
             const els = findHoveredElements(cursorStore.position);
             console.log("els:", els);

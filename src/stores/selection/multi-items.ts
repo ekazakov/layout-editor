@@ -95,7 +95,7 @@ export class MultiItems {
       right: this.rightLimit + 10,
       bottom: this.bottomLimit + 10,
       height: Math.abs(this.bottomLimit - this.topLimit) + 20,
-      width: Math.abs(this.rightLimit - this.leftLimit) + 20git ,
+      width: Math.abs(this.rightLimit - this.leftLimit) + 20,
     };
   }
 
