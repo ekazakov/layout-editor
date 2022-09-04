@@ -215,6 +215,18 @@ export class SelectionManagerStore {
     this.selected = NoneSelection;
   }
 
+  get selectedCount() {
+    const { type, value } = this.selected;
+    switch (type) {
+      case "multi":
+        return value.count;
+      case "single":
+        return 1;
+      case "none":
+        return 0;
+    }
+  }
+
   constructor() {
     makeAutoObservable(this);
   }

@@ -99,6 +99,10 @@ export class MultiItems {
     };
   }
 
+  get count() {
+    return this.items.size;
+  }
+
   constructor(
     items: Map<string, SelectionItem>,
     // private selectionRect: SelectionRect,
