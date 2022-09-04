@@ -31,7 +31,7 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
           element.releasePointerCapture(evt.pointerId);
           cursorStore.resetSnapping();
         }}
-        onPointerMove={(evt) => {
+        onPointerMove={() => {
           if (isDragging) {
             node.setPosition(cursorStore.snapPosition);
           }

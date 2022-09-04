@@ -14,7 +14,8 @@
 - [] Undo for fixtures
 - [x] Multi selection
 - [] Fix multi selection movement for nodes connected to gates 
-- [] Addition to select
+- [x] Addition to select
+- [] Remove item from selection
 - [x] Build road from gate
 - [x] Snap node to gate
 - [x] Snap new segment to road

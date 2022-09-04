@@ -58,9 +58,19 @@ export class SelectionManagerStore {
     return items;
   }
 
-  moveMultiSelection(delta: Position) {
-    if (this.selected.type === "multi") {
-      this.selected.value.moveSelection(delta);
+  moveBy(delta: Position) {
+    const { type, value } = this.selected;
+    if (type === "multi") {
+      value.moveSelection(delta);
+    } else if (type === "single") {
+      switch (value.type) {
+        case "node":
+          this.nodes.get(value.id)?.moveBy(delta);
+          break;
+        case "fixture":
+          this.fixtures.getFixture(value.id)?.moveBy(delta);
+          break;
+      }
     }
   }
 

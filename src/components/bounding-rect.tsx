@@ -34,7 +34,7 @@ export const BoundingRect = observer(function BoundingRect() {
               x: Math.round(evt.movementX),
               y: Math.round(evt.movementY),
             };
-            selectionManagerStore.moveMultiSelection(delta);
+            selectionManagerStore.moveBy(delta);
           }
         }}
         data-type="selection-rect"
