@@ -1,6 +1,6 @@
 import { useLayer } from "react-laag";
 import styled from "@emotion/styled";
-import React, { useMemo } from "react";
+import React from "react";
 import { Position } from "../types";
 
 const MenuButton = styled.button`
@@ -28,9 +28,10 @@ const MenuItem = styled.div`
 
 interface ContextMenuProps {
   position: Position;
+  menuItems: Array<{ title: string; action: (...args: any[]) => void }>;
 }
 
-export function ContextMenu({ position }: ContextMenuProps) {
+export function ContextMenu({ position, menuItems }: ContextMenuProps) {
   const [isOpen, setOpen] = React.useState(false);
 
   function close() {
@@ -57,10 +58,19 @@ export function ContextMenu({ position }: ContextMenuProps) {
         <>
           {isOpen && (
             <MenuContainer {...layerProps}>
-              <MenuItem>Delete</MenuItem>
-              <MenuItem>Show Info</MenuItem>
-              <MenuItem>Item 3</MenuItem>
-              <MenuItem>Item 4</MenuItem>
+              {menuItems.map((item) => {
+                return (
+                  <MenuItem
+                    key={item.title}
+                    onClick={(evt) => {
+                      item.action(evt);
+                      close();
+                    }}
+                  >
+                    {item.title}
+                  </MenuItem>
+                );
+              })}
             </MenuContainer>
           )}
         </>,
