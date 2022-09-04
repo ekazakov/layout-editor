@@ -28,11 +28,6 @@ const MenuItem = styled.div`
 
 interface ContextMenuProps {
   position: Position;
-  // renderLayer: any;
-  // layerProps: any;
-  // triggerProps: any;
-  // isOpen: boolean;
-  // setOpen: any;
 }
 
 export function ContextMenu({ position }: ContextMenuProps) {
