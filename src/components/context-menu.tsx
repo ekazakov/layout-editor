@@ -50,7 +50,7 @@ export function ContextMenu({ position, menuItems }: ContextMenuProps) {
   });
 
   return (
-    <foreignObject width={30} height={30} x={position.x + 15} y={position.y}>
+    <foreignObject width={30} height={30} x={position.x} y={position.y}>
       <MenuButton {...triggerProps} onClick={() => setOpen(true)}>
         +
       </MenuButton>
@@ -77,38 +77,4 @@ export function ContextMenu({ position, menuItems }: ContextMenuProps) {
       )}
     </foreignObject>
   );
-}
-
-export function useContextMenu() {
-  // const [isOpen, setOpen] = React.useState(false);
-  //
-  // function close() {
-  //   setOpen(false);
-  // }
-  //
-  // const { renderLayer, triggerProps, layerProps } = useLayer({
-  //   isOpen,
-  //   onOutsideClick: close, // close the menu when the user clicks outside
-  //   onDisappear: close, // close the menu when the menu gets scrolled out of sight
-  //   overflowContainer: false, // keep the menu positioned inside the container
-  //   auto: true, // automatically find the best placement
-  //   placement: "top-end", // we prefer to place the menu "top-end"
-  //   triggerOffset: 1, // keep some distance to the trigger
-  //   containerOffset: 1, // give the menu some room to breath relative to the container
-  // });
-  //
-  // return useMemo(() => {
-  //   return function ContextMenuWrapper(props: any) {
-  //     return (
-  //       <ContextMenu
-  //         position={props.position}
-  //         renderLayer={renderLayer}
-  //         layerProps={layerProps}
-  //         triggerProps={triggerProps}
-  //         isOpen={isOpen}
-  //         setOpen={setOpen}
-  //       />
-  //     );
-  //   };
-  // }, [renderLayer, layerProps, triggerProps]);
 }

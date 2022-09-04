@@ -1,22 +1,8 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { RoadNode, selectionManagerStore, cursorStore, nodeStore } from "../stores";
-import { ContextMenu } from "../hooks/useContextMenu";
-
-import styled from "@emotion/styled";
-
-const InfoPanel = styled.div`
-  border-radius: 5px;
-  background-color: #fff;
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
-  padding: 20px;
-  max-width: 200px;
-  position: relative;
-
-  table {
-    background: none;
-  }
-`;
+import { RoadNode, selectionManagerStore, cursorStore, roadsStore } from "../stores";
+import { ContextMenu } from "./context-menu";
+import { InfoPanel } from "./info-panel";
 
 export const Node = observer(function Node({ node }: { node: RoadNode }) {
   const [isDragging, setIsDragging] = React.useState(false);
@@ -25,7 +11,7 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
   const isSingle = selectionManagerStore.selectedCount === 1;
 
   const menuItems = [
-    { title: "Delete", action: () => nodeStore.deleteNode(node.id) },
+    { title: "Delete", action: () => roadsStore.deleteSelection() },
     {
       title: "Info",
       action: () => {
@@ -33,6 +19,12 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
       },
     },
   ];
+  const infoItems = {
+    id: node.id,
+    segments: node.segmentIds.size,
+    gateId: node.gateId || "—",
+    position: `${node.position.x},${node.position.y}`,
+  };
 
   return (
     <>
@@ -77,34 +69,12 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
         />
         {selected && isSingle && <ContextMenu position={node.position} menuItems={menuItems} />}
         {showInfo && (
-          <foreignObject x={node.position.x + 15} y={node.position.y - 15} width={300} height={200}>
-            <InfoPanel>
-              <code>
-                <table>
-                  <tbody>
-                    <tr>
-                      <td>id</td>
-                      <td>{node.id}</td>
-                    </tr>
-                    <tr>
-                      <td>segments</td>
-                      <td>{node.segmentIds.size}</td>
-                    </tr>
-                    <tr>
-                      <td>position</td>
-                      <td>
-                        {node.position.x},{node.position.y}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>gateId</td>
-                      <td>{node.gateId}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </code>
-            </InfoPanel>
-          </foreignObject>
+          <InfoPanel
+            isOpen={showInfo}
+            onClose={() => setShowInfo(false)}
+            items={infoItems}
+            position={{ x: node.position.x + 15, y: node.position.y - 15 }}
+          />
         )}
       </g>
     </>

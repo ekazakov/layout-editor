@@ -8,8 +8,8 @@ import {
   fixtureStore,
   selectionRectStore,
 } from "../stores";
-import { useMouseEvents } from "../hooks/useMouseEvents";
-import { useShortcuts } from "../hooks/useShortcuts";
+import { useMouseEvents } from "../hooks/use-mouse-events";
+import { useShortcuts } from "../hooks/use-shortcuts";
 import { Segment, NewSegment } from "./segment";
 import { Node } from "./node";
 import { Fixture } from "./fixture";

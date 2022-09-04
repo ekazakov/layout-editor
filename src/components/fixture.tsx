@@ -1,7 +1,14 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { Fixture as RoadFixture, Gate as FixtureGage, selectionManagerStore } from "../stores";
+import {
+  Fixture as RoadFixture,
+  Gate as FixtureGage,
+  roadsStore,
+  selectionManagerStore,
+} from "../stores";
 import styled from "@emotion/styled";
+import { ContextMenu } from "./context-menu";
+import { InfoPanel } from "./info-panel";
 
 const strokeColor = "#212121";
 const StyledRect = styled.rect<{ selected: boolean }>`
@@ -34,7 +41,6 @@ const Gate = observer(function Gate(props: GateProps) {
       cx={gate.x}
       cy={gate.y}
       fill="white"
-      // stroke={strokeColor}
       stroke={selected ? "orange" : strokeColor}
       strokeWidth="2px"
     />
@@ -47,7 +53,37 @@ interface FixtureProps {
 
 export const Fixture = observer(function Fixture({ fixture }: FixtureProps) {
   const [isDragging, setIsDragging] = React.useState(false);
+  const [showInfo, setShowInfo] = React.useState(false);
   const selected = selectionManagerStore.isSelected(fixture.id);
+  const isSingle = selectionManagerStore.selectedCount === 1;
+
+  const menuItems = [
+    { title: "Delete", action: () => roadsStore.deleteSelection() },
+    {
+      title: "Info",
+      action: () => {
+        setShowInfo(true);
+      },
+    },
+    {
+      title: "Rotate 90",
+      action: () => alert("Not yet implemented"),
+    },
+  ];
+  const infoItems = {
+    id: fixture.id,
+    gates: fixture.gateList
+      .map((g) => {
+        return `${g.id}:${g.connection?.id || "—"}`;
+      })
+      .join("\n"),
+    position: `${fixture.position.x},${fixture.position.y}`,
+  };
+
+  const pos = {
+    x: fixture.position.x + fixture.size + 15,
+    y: fixture.position.y - 15,
+  };
 
   return (
     <g
@@ -82,24 +118,18 @@ export const Fixture = observer(function Fixture({ fixture }: FixtureProps) {
       />
       <g>
         {fixture.gateList.map((gate) => {
-          return (
-            <Gate
-              key={gate.id}
-              gate={gate}
-              fixtureId={fixture.id}
-              // data-type="fixture_gate"
-              // id={gate.id}
-              // data-fixture-id={fixture.id}
-              // r={10}
-              // cx={gate.x}
-              // cy={gate.y}
-              // fill="white"
-              // stroke={strokeColor}
-              // strokeWidth="2px"
-            />
-          );
+          return <Gate key={gate.id} gate={gate} fixtureId={fixture.id} />;
         })}
       </g>
+      {selected && isSingle && <ContextMenu position={pos} menuItems={menuItems} />}
+      {showInfo && (
+        <InfoPanel
+          isOpen={showInfo}
+          onClose={() => setShowInfo(false)}
+          items={infoItems}
+          position={pos}
+        />
+      )}
     </g>
   );
 });
