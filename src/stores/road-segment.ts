@@ -1,16 +1,12 @@
 import { makeAutoObservable } from "mobx";
 import { nanoid } from "nanoid";
-import { Position, RoadSegmentDump } from "../types";
 import { RoadNode } from "./road-node";
-import { undoManagerStore } from "./index";
 
 export class RoadSegment {
   public readonly id: string;
 
   private _p1: RoadNode;
   private _p2: RoadNode;
-
-  private tracker = undoManagerStore.createTrackWithDebounce();
 
   get start() {
     return this._p1;

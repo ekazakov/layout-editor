@@ -46,6 +46,8 @@ fixtureStore.setNodes(nodeStore);
 fixtureStore.setCursor(cursorStore);
 fixtureStore.setSelection(selectionManagerStore);
 
+roadsStore.populate(dump);
+
 export const undoManagerStore = new UndoManagerStore(
   () => roadsStore.toJSON(),
   (value) => {
@@ -53,7 +55,6 @@ export const undoManagerStore = new UndoManagerStore(
   },
 );
 
-roadsStore.populate(dump);
 undoManagerStore.trackChanges();
 
 // @ts-ignore

@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { selectionManagerStore } from "../stores";
+import { selectionManagerStore, undoManagerStore } from "../stores";
 import { ContextMenu } from "./context-menu";
 
 const style = {
@@ -37,12 +37,13 @@ export const BoundingRect = observer(function BoundingRect() {
           onPointerDown={(evt) => {
             setIsDragging(() => true);
             const element = evt.target as HTMLElement;
-
+            undoManagerStore.stopTrackingChanges();
             element.setPointerCapture(evt.pointerId);
           }}
           onPointerUp={(evt) => {
             setIsDragging(() => false);
             const element = evt.target as HTMLElement;
+            undoManagerStore.trackUp();
             element.releasePointerCapture(evt.pointerId);
           }}
           onPointerMove={(evt) => {

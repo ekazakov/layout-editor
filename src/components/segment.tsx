@@ -21,7 +21,6 @@ export const NewSegment = observer(function NewSegment(props: any) {
 
 export const Segment = observer(function Segment(props: { segment: RoadSegment }) {
   const { segment } = props;
-  const [isDragging, setIsDragging] = React.useState(false);
 
   const selected = selectionManagerStore.isSelected(segment.id);
   return (
@@ -35,25 +34,6 @@ export const Segment = observer(function Segment(props: { segment: RoadSegment }
         #{segment.id}
       </text>
       <line
-        // onPointerDown={(evt) => {
-        //   setIsDragging(() => true);
-        //   const element = evt.target as HTMLElement;
-        //
-        //   element.setPointerCapture(evt.pointerId);
-        // }}
-        // onPointerUp={(evt) => {
-        //   setIsDragging(() => false);
-        //   const element = evt.target as HTMLElement;
-        //   element.releasePointerCapture(evt.pointerId);
-        // }}
-        // onPointerMove={(evt) => {
-        //   if (isDragging) {
-        //     segment.moveBy({
-        //       x: Math.round(evt.movementX),
-        //       y: Math.round(evt.movementY),
-        //     });
-        //   }
-        // }}
         id={segment.id}
         data-type="road-segment"
         x1={segment.start.x}

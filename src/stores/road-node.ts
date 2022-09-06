@@ -1,7 +1,6 @@
-import { makeAutoObservable, toJS } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { nanoid } from "nanoid";
 import { Position, RoadNodeDump } from "../types";
-import { undoManagerStore } from "./index";
 
 export class RoadNode {
   private _position: Position = { x: 0, y: 0 };
@@ -9,24 +8,24 @@ export class RoadNode {
 
   gateId: string | undefined = undefined;
 
-  private tracker = undoManagerStore.createTrackWithDebounce();
+  // private tracker = undoManagerStore.createTrackWithDebounce();
 
   segmentIds: Set<string> = new Set<string>();
 
   setPosition = (p: Position) => {
-    this.tracker(() => {
-      // console.log("setPosition", p);
-      this._position = {
-        x: p.x,
-        y: p.y
-      };
-    });
+    this._position = {
+      x: p.x,
+      y: p.y,
+    };
+    // this.tracker(() => {
+    // console.log("setPosition", p);
+    // });
   };
 
   moveBy = (delta: Position) => {
     this.setPosition({
       x: this._position.x + delta.x,
-      y: this._position.y + delta.y
+      y: this._position.y + delta.y,
     });
   };
 
@@ -47,10 +46,10 @@ export class RoadNode {
       id: this.id,
       position: {
         x: this.x,
-        y: this.y
+        y: this.y,
       },
       segmentIds: [...this.segmentIds.values()],
-      gateId: this.gateId
+      gateId: this.gateId,
     };
   }
 

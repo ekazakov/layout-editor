@@ -10,39 +10,60 @@ export class UndoManagerStore<T> {
 
   undoStack: T[];
 
-  stopTrackingChanges: () => void = undefined!;
+  private _stopTrackingChanges: (() => void) | undefined = undefined;
 
   undoPointer: number;
 
+  isPaused: boolean = false;
+
+  stopTrackingChanges() {
+    console.log("stop changes tracking");
+    this.isPaused = true;
+    this._stopTrackingChanges?.();
+  }
+
   trackChanges = () => {
-    this.stopTrackingChanges = () => {};
-    // this.stopTrackingChanges = reaction(
-    //   this.readObservable,
-    //   (newValue) => {
-    //     if (this.isDisposed) throw new Error("Undo already disposed");
-    //     // console.log("newValue:", newValue);
-    //     this.undoPointer += 1;
-    //     this.undoStack[this.undoPointer] = newValue;
-    //     this.undoStack.length = this.undoPointer + 1;
-    //   },
-    //   { equals: comparer.structural }
-    // );
+    // this.stopTrackingChanges = () => {};
+    console.log("track changes");
+    this._stopTrackingChanges = reaction(
+      this.readObservable,
+      (newValue) => {
+        if (this.isDisposed) throw new Error("Undo already disposed");
+        console.log("newValue:", newValue, "isPaused:", this.isPaused);
+        this.undoPointer += 1;
+        this.undoStack[this.undoPointer] = newValue;
+        this.undoStack.length = this.undoPointer + 1;
+      },
+      { equals: comparer.structural },
+    );
+  };
+
+  trackUp = () => {
+    console.log("trackUp");
+    if (!this.isPaused) {
+      console.log("already unpaused");
+      return;
+    }
+    this.isPaused = false;
+    this.undoPointer += 1;
+    this.undoStack[this.undoPointer] = this.readObservable();
+    this.undoStack.length = this.undoPointer + 1;
   };
 
   createTrackWithDebounce = (delay = 150) => {
-    const updateUndoStackDebounced = debounce(() => {
-      // this.undoPointer += 1;
-      // this.undoStack[this.undoPointer] = this.readObservable();
-      // this.undoStack.length = this.undoPointer + 1;
-    }, delay);
-
-    return action((callback: () => void) => {
-      this.stopTrackingChanges();
-      // console.log("run tracker");
-      callback();
-      updateUndoStackDebounced();
-      this.trackChanges();
-    });
+    // const updateUndoStackDebounced = debounce(() => {
+    //   // this.undoPointer += 1;
+    //   // this.undoStack[this.undoPointer] = this.readObservable();
+    //   // this.undoStack.length = this.undoPointer + 1;
+    // }, delay);
+    //
+    // return action((callback: () => void) => {
+    //   this.stopTrackingChanges();
+    //   // console.log("run tracker");
+    //   callback();
+    //   updateUndoStackDebounced();
+    //   this.trackChanges();
+    // });
   };
 
   doNotTrack = (notTrackableCallback: () => void) => {
@@ -62,6 +83,7 @@ export class UndoManagerStore<T> {
   undo = () => {
     if (this.isDisposed) throw new Error("Undo already disposed");
 
+    console.log("undo");
     if (this.undoPointer === 0) return;
 
     this.undoPointer -= 1;
@@ -84,9 +106,9 @@ export class UndoManagerStore<T> {
   };
 
   updateTracker = () => {
-    // this.stopTrackingChanges();
-    // this.setObservable(this.undoStack[this.undoPointer]);
-    // this.trackChanges();
+    this.stopTrackingChanges();
+    this.setObservable(this.undoStack[this.undoPointer]);
+    this.trackChanges();
   };
 
   constructor(readObservable: () => T, setObservable: (value: T) => void) {

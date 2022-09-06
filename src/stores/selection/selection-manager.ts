@@ -74,21 +74,6 @@ export class SelectionManagerStore {
     }
   }
 
-  // selectMultiplyItems(rect: Rect | undefined) {
-  //   if (!rect) {
-  //     throw new Error(`Selection rect is not defined`);
-  //   }
-  //   const items = this.selectFromRect(rect);
-  //   if (items.size === 0) {
-  //     this.reset();
-  //     return;
-  //   }
-  //   this.selected = {
-  //     type: "multi",
-  //     value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
-  //   };
-  // }
-
   selectionFromAria(rect: Rect | undefined, append = false) {
     if (!rect) {
       throw new Error(`Selection rect is not defined`);
@@ -156,6 +141,12 @@ export class SelectionManagerStore {
     // this.selected.value.append(items);
   }
 
+  // TODO:
+  // don't add gate to multi selection
+  // don't allow to delete gate
+  // don't create multi selection when Shift+Click on already selected item
+  // move back to single selection when only one element selected
+  // refactor
   addItemToSelection(id: string) {
     console.log("addItemToSelection:", id);
     const selection = this.selected;

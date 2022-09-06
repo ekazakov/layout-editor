@@ -5,6 +5,7 @@ import {
   Gate as FixtureGage,
   roadsStore,
   selectionManagerStore,
+  undoManagerStore,
 } from "../stores";
 import styled from "@emotion/styled";
 import { ContextMenu } from "./context-menu";
@@ -92,11 +93,13 @@ export const Fixture = observer(function Fixture({ fixture }: FixtureProps) {
         const element = evt.target as HTMLElement;
 
         element.setPointerCapture(evt.pointerId);
+        undoManagerStore.stopTrackingChanges();
       }}
       onPointerUp={(evt) => {
         setIsDragging(() => false);
         const element = evt.target as HTMLElement;
         element.releasePointerCapture(evt.pointerId);
+        undoManagerStore.trackUp();
       }}
       onPointerMove={(evt) => {
         if (isDragging) {

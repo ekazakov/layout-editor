@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx";
-import { ItemType, Position, RoadsDump, SelectableItemType } from "../types";
+import { ItemType, RoadsDump, SelectableItemType } from "../types";
 import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
 import { Fixture } from "./fixture";
@@ -9,7 +9,6 @@ import { NodeStore } from "./nodes";
 import { SegmentStore } from "./segments";
 import { FixturesStore } from "./fixtures";
 import { SelectionManagerStore } from "./selection/selection-manager";
-import { getItemType } from "./selection/utils/get-item-type";
 
 export class RoadsStore {
   private readonly selection: SelectionManagerStore;
@@ -91,6 +90,8 @@ export class RoadsStore {
   empty() {
     this.nodes.clear();
     this.segments.clear();
+    this.fixtures.clear();
+
     this.selection.reset();
   }
 

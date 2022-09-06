@@ -1,6 +1,12 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { RoadNode, selectionManagerStore, cursorStore, roadsStore } from "../stores";
+import {
+  RoadNode,
+  selectionManagerStore,
+  cursorStore,
+  roadsStore,
+  undoManagerStore,
+} from "../stores";
 import { ContextMenu } from "./context-menu";
 import { InfoPanel } from "./info-panel";
 
@@ -26,6 +32,11 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
     position: `${node.position.x},${node.position.y}`,
   };
 
+  const pos = {
+    x: node.position.x + 15,
+    y: node.position.y - 15,
+  };
+
   return (
     <>
       <g>
@@ -44,9 +55,11 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
             setIsDragging(() => true);
             const element = evt.target as HTMLElement;
 
+            undoManagerStore.stopTrackingChanges();
             element.setPointerCapture(evt.pointerId);
           }}
           onPointerUp={(evt) => {
+            undoManagerStore.trackUp();
             // console.log("end dragging");
             setIsDragging(() => false);
             const element = evt.target as HTMLElement;
@@ -67,13 +80,13 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
           fill={isDragging ? "orange" : "white"}
           strokeWidth="2px"
         />
-        {selected && isSingle && <ContextMenu position={node.position} menuItems={menuItems} />}
+        {selected && isSingle && <ContextMenu position={pos} menuItems={menuItems} />}
         {showInfo && (
           <InfoPanel
             isOpen={showInfo}
             onClose={() => setShowInfo(false)}
             items={infoItems}
-            position={{ x: node.position.x + 15, y: node.position.y - 15 }}
+            position={pos}
           />
         )}
       </g>

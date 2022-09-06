@@ -10,10 +10,12 @@
 - [x] Make fixture gates selectable
 - [x] Context menu
 - [] Fixture resize
-- [] Improve undo performance
-- [] Undo for fixtures
+- [x] Improve undo performance
+- [x] Undo for fixtures
+- [] Try not to reset selection on undo (we need to remove outdated ids)
 - [x] Multi selection
-- [x] Fix multi selection movement for nodes connected to gates 
+- [] Improve/refactor multi selection
+- [x] Fix multi selection movement for nodes connected to gates
 - [x] Addition to select
 - [x] Remove item from selection
 - [x] Build road from gate
