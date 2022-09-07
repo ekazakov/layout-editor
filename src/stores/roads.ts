@@ -53,7 +53,7 @@ export class RoadsStore {
   }
 
   get selectedGate() {
-    return this.fixtures.getGate(this.getSelectedItemId("node"));
+    return this.fixtures.getGate(this.getSelectedItemId("fixture_gate"));
   }
 
   private deleteItem(id: string, type: SelectableItemType) {

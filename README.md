@@ -22,6 +22,6 @@
 - [x] Snap node to gate
 - [x] Snap new segment to road
 - [x] Split road by new segment
-- [] Connect fixtures gate-to-gate
+- [x] Connect fixtures gate-to-gate
 - [] Movement constraints
 - [] Debug setting

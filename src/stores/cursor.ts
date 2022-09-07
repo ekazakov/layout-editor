@@ -13,6 +13,7 @@ interface State {
 
 export class CursorStore {
   private _position: Position = { x: 0, y: 0 };
+  private _movement: Position = { x: 0, y: 0 };
   private _snapPosition: Position | undefined = undefined;
   altKey = false;
   ctrlKey = false;
@@ -23,6 +24,11 @@ export class CursorStore {
   setPosition(p: Position) {
     this._position.x = p.x;
     this._position.y = p.y;
+  }
+
+  setMovement(p: Position) {
+    this._movement.x = p.x;
+    this._movement.y = p.y;
   }
 
   setState(state: State) {
@@ -45,6 +51,11 @@ export class CursorStore {
     this.setPosition({
       x: Math.round(evt.clientX),
       y: Math.round(evt.clientY),
+    });
+
+    this.setMovement({
+      x: Math.round(evt.movementX),
+      y: Math.round(evt.movementY),
     });
   }
 
@@ -74,6 +85,13 @@ export class CursorStore {
     return {
       x: this._position.x,
       y: this._position.y,
+    };
+  }
+
+  get movement() {
+    return {
+      x: this._movement.x,
+      y: this._movement.y,
     };
   }
 

@@ -1,5 +1,6 @@
 import { makeAutoObservable } from "mobx";
 import { nanoid } from "nanoid";
+import { Position } from "../types";
 import { RoadNode } from "./road-node";
 
 export class RoadSegment {
@@ -22,6 +23,11 @@ export class RoadSegment {
       y: (this._p1.y + this._p2.y) / 2,
     };
   }
+
+  moveBy = (delta: Position) => {
+    this._p1.moveBy(delta);
+    this._p2.moveBy(delta);
+  };
 
   constructor(nodeStart: RoadNode, nodeEnd: RoadNode, id?: string) {
     makeAutoObservable(this);

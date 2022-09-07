@@ -84,6 +84,16 @@ export function useMouseEvents() {
               return;
             }
 
+            if (selectedGate && cursorStore.metaKey && selectedGate.id !== element.id) {
+              const startNode = nodeStore.addNode(selectedGate.position);
+              const endNode = nodeStore.addNode(cursorStore.position);
+              segmentStore.addSegment(startNode.id, endNode.id);
+              fixtureStore.connectToGate(element.id, endNode);
+              fixtureStore.connectToGate(selectedGate.id, startNode);
+              selectionManagerStore.selectSingleItem(endNode.id);
+              return;
+            }
+
             selectionManagerStore.selectSingleItem(element.id);
           });
           break;
@@ -92,11 +102,9 @@ export function useMouseEvents() {
         case "bounding-rect": {
           if (cursorStore.shiftKey) {
             const els = findHoveredElements(cursorStore.position);
-            console.log("els:", els);
             const item = els.find(
               (el) => el.dataset.type === "road-node" || el.dataset.type === "fixture",
             );
-            console.log("item:", item);
             if (item) {
               if (selectionManagerStore.isSelected(item.id)) {
                 selectionManagerStore.removeItemFromSelection(item.id);

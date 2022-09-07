@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { RoadSegment, selectionManagerStore } from "../stores";
+import { cursorStore, RoadSegment, selectionManagerStore, undoManagerStore } from "../stores";
 
 export const NewSegment = observer(function NewSegment(props: any) {
   const { p1, p2 } = props;
@@ -21,8 +21,10 @@ export const NewSegment = observer(function NewSegment(props: any) {
 
 export const Segment = observer(function Segment(props: { segment: RoadSegment }) {
   const { segment } = props;
+  const [isDragging, setIsDragging] = React.useState(false);
 
   const selected = selectionManagerStore.isSelected(segment.id);
+
   return (
     <g>
       <text
@@ -34,6 +36,23 @@ export const Segment = observer(function Segment(props: { segment: RoadSegment }
         #{segment.id}
       </text>
       <line
+        onPointerDown={(evt) => {
+          setIsDragging(() => true);
+          const element = evt.target as HTMLElement;
+          undoManagerStore.stopTrackingChanges();
+          element.setPointerCapture(evt.pointerId);
+        }}
+        onPointerUp={(evt) => {
+          setIsDragging(() => false);
+          const element = evt.target as HTMLElement;
+          element.releasePointerCapture(evt.pointerId);
+        }}
+        onPointerMove={(evt) => {
+          undoManagerStore.trackUp();
+          if (isDragging) {
+            segment.moveBy(cursorStore.movement);
+          }
+        }}
         id={segment.id}
         data-type="road-segment"
         x1={segment.start.x}
