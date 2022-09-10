@@ -1,33 +1,50 @@
 import { NodeStore } from "../nodes";
 import { FixturesStore } from "../fixtures";
 import { SegmentStore } from "../segments";
-import { Item, Position, Rect, SelectableItemType, SelectionItem } from "../../types";
-// import { getItemType } from "./utils/get-item-type";
+import { Position, Rect, SelectionItem } from "../../types";
 import { makeAutoObservable, toJS } from "mobx";
 
-export class MultiItems {
+export class Selection {
   private items: Map<string, SelectionItem> = new Map();
 
   moveSelection(delta: Position) {
-    this.items.forEach(({ id, type }) => {
-      switch (type) {
-        case "fixture":
-          this.fixtures.getFixture(id)?.moveBy(delta);
-          break;
-        case "node": {
-          const node = this.nodes.get(id);
-          if (node && !node.gateId) {
-            node.moveBy(delta);
-          }
-          break;
+    const nodes = new Set(this.list.filter((item) => item.type === "node").map((n) => n.id));
+    const segments = this.list.filter((item) => item.type === "segment");
+    const fixtures = this.list.filter((item) => item.type === "fixture");
+
+    segments.forEach(({ id }) => {
+      const segment = this.segments.get(id);
+      if (segment) {
+        nodes.add(segment.start.id);
+        nodes.add(segment.end.id);
+      }
+    });
+
+    fixtures.forEach(({ id }) => {
+      const fixture = this.fixtures.getFixture(id);
+      if (fixture) {
+        fixture?.moveBy(delta);
+      }
+    });
+
+    nodes.forEach((nodeId) => {
+      const node = this.nodes.get(nodeId);
+      if (node) {
+        if (node.fixtureId) {
+          return;
         }
+        node.moveBy(delta);
       }
     });
   }
 
-  append(newItems: Map<string, SelectionItem>) {
-    newItems.forEach((value, key) => {
-      this.items.set(key, value);
+  addItem(item: SelectionItem) {
+    this.items.set(item.id, item);
+  }
+
+  appendItems(newItems: Map<string, SelectionItem>) {
+    newItems.forEach((item) => {
+      this.addItem(item);
     });
   }
 
@@ -43,10 +60,14 @@ export class MultiItems {
     return this.items.delete(id);
   }
 
+  reset() {
+    this.items.clear();
+  }
+
   get pointList() {
     return this.list.reduce((result, { id, type }) => {
       switch (type) {
-        case "fixture":
+        case "fixture": {
           const fixture = this.fixtures.getFixture(id);
           if (!fixture) {
             break;
@@ -60,12 +81,23 @@ export class MultiItems {
           ];
           result.push(...points);
           break;
-        case "node":
+        }
+        case "node": {
           const node = this.nodes.get(id);
           if (node) {
             result.push(toJS(node.position));
           }
           break;
+        }
+        case "segment": {
+          const segment = this.segments.get(id);
+          if (segment) {
+            const { start, end } = segment;
+            result.push(toJS(start.position));
+            result.push(toJS(end.position));
+          }
+          break;
+        }
       }
 
       return result;
@@ -104,13 +136,10 @@ export class MultiItems {
   }
 
   constructor(
-    items: Map<string, SelectionItem>,
-    // private selectionRect: SelectionRect,
     private nodes: NodeStore,
     private segments: SegmentStore,
     private fixtures: FixturesStore,
   ) {
-    this.items = items;
     makeAutoObservable(this);
   }
 }

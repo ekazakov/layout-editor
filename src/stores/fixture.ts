@@ -1,13 +1,17 @@
-import { makeAutoObservable, toJS } from "mobx";
+import { IReactionDisposer, makeAutoObservable, reaction, toJS } from "mobx";
 import { nanoid } from "nanoid";
 import { RoadNode } from "./road-node";
 import { Position, FixtureDump, GateDump, Rect } from "../types";
 import { NodeStore } from "./nodes";
+import { getDistance } from "../utils/get-distance";
+import { cursorStore } from "./index";
 
 export class Gate {
   private _connection: RoadNode | undefined = undefined;
   public readonly id: string;
+  public readonly fixtureId: string;
   private _position: Position;
+  private disposeReaction: IReactionDisposer | undefined;
 
   get title() {
     return this.id.replace("fixture_gate", "g");
@@ -21,15 +25,12 @@ export class Gate {
     this._position = p;
   };
 
-  moveBy = (delta: Position, moveNodes = true) => {
+  moveBy = (delta: Position) => {
     this.setPosition({
       x: this._position.x + delta.x,
       y: this._position.y + delta.y,
     });
 
-    if (!moveNodes) {
-      return;
-    }
     this.connection?.moveBy(delta);
   };
 
@@ -44,14 +45,29 @@ export class Gate {
   connect(node: RoadNode) {
     this._connection = node;
     node.gateId = this.id;
+    node.fixtureId = this.fixtureId;
+
+    node.setPosition(this._position);
+
+    // TODO: support multiply connected nodes
+    this.disposeReaction = reaction(
+      () => this._connection?.position,
+      (p) => {
+        if (p && getDistance(this._position, p) > 30) {
+          this.disconnect();
+        }
+      },
+    );
   }
 
   disconnect() {
+    this.disposeReaction?.();
     if (!this._connection) {
       return;
     }
     console.log("disconnect gate:", this.id, "from node:", this._connection.id);
     this._connection.gateId = undefined;
+    this._connection.fixtureId = undefined;
     this._connection = undefined;
   }
 
@@ -70,8 +86,9 @@ export class Gate {
     };
   }
 
-  constructor(p: Position, id?: string) {
+  constructor(p: Position, fixtureId: string, id?: string) {
     this._position = p;
+    this.fixtureId = fixtureId;
     this.id = id || `fixture_gate#${nanoid(7)}`;
     makeAutoObservable(this);
   }
@@ -92,14 +109,14 @@ export class Fixture {
     return this.gates.get(id);
   }
 
-  moveBy = (delta: Position, moveNodes = true) => {
+  moveBy = (delta: Position) => {
     this._position = {
       x: this._position.x + delta.x,
       y: this._position.y + delta.y,
     };
 
     this.gates.forEach((gate) => {
-      gate.moveBy(delta, moveNodes);
+      gate.moveBy(delta);
     });
   };
 
@@ -127,10 +144,10 @@ export class Fixture {
   }
 
   private createGates() {
-    const g1 = new Gate({ x: this.x, y: this.y + this.size / 2 });
-    const g2 = new Gate({ x: this.x + this.size, y: this.y + this.size / 2 });
-    const g3 = new Gate({ x: this.x + this.size / 2, y: this.y });
-    const g4 = new Gate({ x: this.x + this.size / 2, y: this.y + this.size });
+    const g1 = new Gate({ x: this.x, y: this.y + this.size / 2 }, this.id);
+    const g2 = new Gate({ x: this.x + this.size, y: this.y + this.size / 2 }, this.id);
+    const g3 = new Gate({ x: this.x + this.size / 2, y: this.y }, this.id);
+    const g4 = new Gate({ x: this.x + this.size / 2, y: this.y + this.size }, this.id);
 
     this.gates.set(g1.id, g1);
     this.gates.set(g2.id, g2);
@@ -140,7 +157,7 @@ export class Fixture {
 
   private populateGates(gates: GateDump[], nodes: NodeStore) {
     gates.forEach((dump) => {
-      const gate = new Gate(dump.position, dump.id);
+      const gate = new Gate(dump.position, this.id, dump.id);
       if (dump.connectionId) {
         const node = nodes.get(dump.connectionId);
         if (!node) {

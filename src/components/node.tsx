@@ -18,6 +18,8 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
 
   const menuItems = [
     { title: "Delete", action: () => roadsStore.deleteSelection() },
+    // TODO: add segment disjoin
+    { title: "Disjoin", action: () => alert("not implemented yet") },
     {
       title: "Info",
       action: () => {
@@ -51,7 +53,6 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
 
         <circle
           onPointerDown={(evt) => {
-            // console.log("start dragging");
             setIsDragging(() => true);
             const element = evt.target as HTMLElement;
 
@@ -60,7 +61,6 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
           }}
           onPointerUp={(evt) => {
             undoManagerStore.trackUp();
-            // console.log("end dragging");
             setIsDragging(() => false);
             const element = evt.target as HTMLElement;
             element.releasePointerCapture(evt.pointerId);

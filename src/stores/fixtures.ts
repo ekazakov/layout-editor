@@ -45,14 +45,14 @@ export class FixturesStore {
   connectToGate = (gateId: string, node: RoadNode) => fh.connectToGate(this.list, gateId, node);
 
   updateSnapGates() {
-    const { selected } = this.selection;
-    if (selected.type !== "single") {
+    if (!this.selection.isSingle) {
+      throw new Error(``);
+    }
+    const nodeId = this.selection.getSingleSelection("node");
+    if (!nodeId) {
       throw new Error();
     }
-    if (selected.value.type !== "node") {
-      throw new Error();
-    }
-    const node = this.nodes.get(selected.value.id);
+    const node = this.nodes.get(nodeId);
     if (!node) {
       return;
     }

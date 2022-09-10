@@ -1,33 +1,24 @@
 import { makeAutoObservable } from "mobx";
-import { Position, Rect, Selection, SelectionItem } from "../../types";
+import { ItemType, Position, Rect, SelectionItem } from "../../types";
 import { NodeStore } from "../nodes";
 import { SegmentStore } from "../segments";
 import { FixturesStore } from "../fixtures";
 import { isInsideRect } from "../../utils/is-inside-rect";
 import { isRectIntersection } from "../../utils/is-rect-intersection";
 import { getItemType } from "./utils/get-item-type";
-import { SingleItem } from "./single-item";
-import { MultiItems } from "./multi-items";
-
-export type NoneSelectionItem = Readonly<{ type: "none"; value: { id: undefined } }>;
-
-export const NoneSelection: NoneSelectionItem = {
-  type: "none",
-  value: { id: undefined },
-};
+import { Selection } from "./selection";
+import { isLineRectIntersection } from "../../utils/is-line-rect-intersection";
 
 export class SelectionManagerStore {
-  selected: Selection = NoneSelection;
-
   private nodes: NodeStore = null!;
   private fixtures: FixturesStore = null!;
   private segments: SegmentStore = null!;
 
+  private selection: Selection = null!;
+
   selectSingleItem(id: string) {
-    this.selected = {
-      type: "single",
-      value: new SingleItem(id),
-    };
+    this.selection.reset();
+    this.selection.addItem({ id, type: getItemType(id) });
   }
 
   private selectFromRect(rect: Rect) {
@@ -37,9 +28,12 @@ export class SelectionManagerStore {
       if (isInsideRect(node.position, rect)) {
         const { id } = node;
         items.set(node.id, { id, type: "node" });
-        node.segmentIds.forEach((segmentId) => {
-          items.set(segmentId, { id: segmentId, type: "segment" });
-        });
+      }
+    });
+
+    this.segments.list.forEach((segment) => {
+      if (isLineRectIntersection(segment, rect)) {
+        items.set(segment.id, { id: segment.id, type: "segment" });
       }
     });
 
@@ -59,19 +53,7 @@ export class SelectionManagerStore {
   }
 
   moveBy(delta: Position) {
-    const { type, value } = this.selected;
-    if (type === "multi") {
-      value.moveSelection(delta);
-    } else if (type === "single") {
-      switch (value.type) {
-        case "node":
-          this.nodes.get(value.id)?.moveBy(delta);
-          break;
-        case "fixture":
-          this.fixtures.getFixture(value.id)?.moveBy(delta);
-          break;
-      }
-    }
+    this.selection.moveSelection(delta);
   }
 
   selectionFromAria(rect: Rect | undefined, append = false) {
@@ -79,158 +61,86 @@ export class SelectionManagerStore {
       throw new Error(`Selection rect is not defined`);
     }
 
+    if (!append) {
+      this.reset();
+    }
+
     const items = this.selectFromRect(rect);
-
-    if (items.size === 0) {
-      if (!append) {
-        this.reset();
-      }
-      return;
-    }
-
-    const { type, value } = this.selected;
-    switch (type) {
-      case "none": {
-        if (items.size === 1) {
-          const [id] = [...items.keys()];
-          this.addItemToSelection(id);
-        } else {
-          this.selected = {
-            type: "multi",
-            value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
-          };
-        }
-        return;
-      }
-      case "single": {
-        if (append) {
-          const { id, type } = value;
-          items.set(id, { id, type });
-          this.selected = {
-            type: "multi",
-            value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
-          };
-        } else {
-          if (items.size === 1) {
-            const [id] = [...items.keys()];
-            this.addItemToSelection(id);
-          } else {
-            this.selected = {
-              type: "multi",
-              value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
-            };
-          }
-        }
-        return;
-      }
-      case "multi": {
-        value.append(items);
-        return;
-      }
-    }
-
-    // const items = this.selectFromRect(rect);
-    // if (this.selected.type !== "multi") {
-    //   this.selected = {
-    //     type: "multi",
-    //     value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
-    //   };
-    //   return;
-    // }
-    //
-    // this.selected.value.append(items);
+    this.selection.appendItems(items);
   }
 
-  // TODO:
-  // don't add gate to multi selection
-  // don't allow to delete gate
-  // don't create multi selection when Shift+Click on already selected item
-  // move back to single selection when only one element selected
-  // refactor
   addItemToSelection(id: string) {
-    console.log("addItemToSelection:", id);
-    const selection = this.selected;
+    const item = { id, type: getItemType(id) };
 
-    if (selection.type === "none") {
-      this.selectSingleItem(id);
+    if (item.type === "fixture_gate") {
       return;
     }
 
-    const type = getItemType(id);
-    const rawItems: [string, SelectionItem][] = [[id, { id, type }]];
-    if (type === "segment") {
-      const segment = this.segments.get(id);
-      if (segment) {
-        const startId = segment.start.id;
-        const endId = segment.end.id;
-        rawItems.push([startId, { id: startId, type: "node" }]);
-        rawItems.push([endId, { id: endId, type: "node" }]);
-      }
-    }
-    const items = new Map<string, SelectionItem>(rawItems);
-
-    if (selection.type === "single") {
-      const { id, type } = selection.value;
-      items.set(id, { id, type });
-      this.selected = {
-        type: "multi",
-        value: new MultiItems(items, this.nodes, this.segments, this.fixtures),
-      };
-    } else {
-      selection.value.append(items);
-    }
+    this.selection.addItem(item);
   }
 
   removeItemFromSelection(id: string) {
-    const { type, value } = this.selected;
-    if (type !== "multi") {
+    if (!this.isMulti) {
       return;
     }
 
-    value.remove(id);
+    this.selection.remove(id);
   }
 
   isSelected(id: string) {
-    if (this.selected.type === "multi") {
-      return this.selected.value.hasItem(id);
-    }
-
-    if (this.selected.type === "single") {
-      return this.selected.value.isSelected(id);
-    }
-
-    return false;
+    return this.selection.hasItem(id);
   }
 
   reset() {
-    this.selected = NoneSelection;
+    this.selection.reset();
   }
 
   get selectedCount() {
-    const { type, value } = this.selected;
-    switch (type) {
-      case "multi":
-        return value.count;
-      case "single":
-        return 1;
-      case "none":
-        return 0;
+    return this.selection.count;
+  }
+
+  get isSingle() {
+    return this.selectedCount === 1;
+  }
+
+  get isEmpty() {
+    return this.selectedCount === 0;
+  }
+
+  get isMulti() {
+    return this.selectedCount > 1;
+  }
+
+  get list() {
+    return this.selection.list;
+  }
+
+  get boundingRect() {
+    return this.selection.boundingRect;
+  }
+
+  getSingleSelection(type: ItemType) {
+    if (!this.isSingle) {
+      return "";
     }
+
+    const item = this.selection.list?.at(0);
+
+    if (!item?.type || type !== item.type) {
+      return "";
+    }
+
+    return item.id;
   }
 
   constructor() {
     makeAutoObservable(this);
   }
 
-  setNodes(nodes: NodeStore) {
+  init(nodes: NodeStore, segments: SegmentStore, fixtures: FixturesStore) {
     this.nodes = nodes;
-  }
-
-  setFixtures(fixtures: FixturesStore) {
     this.fixtures = fixtures;
-  }
-
-  setSegments(segments: SegmentStore) {
     this.segments = segments;
+    this.selection = new Selection(nodes, segments, fixtures);
   }
 }

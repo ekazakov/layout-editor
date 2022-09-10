@@ -25,8 +25,12 @@ export class RoadSegment {
   }
 
   moveBy = (delta: Position) => {
-    this._p1.moveBy(delta);
-    this._p2.moveBy(delta);
+    if (!this._p1.fixtureId) {
+      this._p1.moveBy(delta);
+    }
+    if (!this._p2.fixtureId) {
+      this._p2.moveBy(delta);
+    }
   };
 
   constructor(nodeStart: RoadNode, nodeEnd: RoadNode, id?: string) {

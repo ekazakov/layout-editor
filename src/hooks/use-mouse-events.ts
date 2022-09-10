@@ -102,9 +102,8 @@ export function useMouseEvents() {
         case "bounding-rect": {
           if (cursorStore.shiftKey) {
             const els = findHoveredElements(cursorStore.position);
-            const item = els.find(
-              (el) => el.dataset.type === "road-node" || el.dataset.type === "fixture",
-            );
+            const types = ["road-node", "road-segment", "fixture"];
+            const item = els.find(({ dataset: { type } }) => types.includes(type ?? ""));
             if (item) {
               if (selectionManagerStore.isSelected(item.id)) {
                 selectionManagerStore.removeItemFromSelection(item.id);
@@ -159,7 +158,6 @@ export function useMouseEvents() {
           const gate = fixtureStore.getGate(selectedNode.gateId);
 
           if (gate && getDistance(gate, cursorStore) > 30) {
-            gate.disconnect();
             cursorStore.resetSnapping();
           }
           return;
@@ -179,9 +177,6 @@ export function useMouseEvents() {
           selectionRectStore.setEnd(cursorStore.position);
           selectionManagerStore.selectionFromAria(selectionRectStore.rect);
           selectionRectStore.reset();
-          if (selectionManagerStore.selected.type !== "multi") {
-            selectionManagerStore.reset();
-          }
         }
 
         if (selectionRectStore.inProgress && cursorStore.shiftKey) {

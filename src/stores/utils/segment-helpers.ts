@@ -14,9 +14,7 @@ export function deleteSegment(
   selection: SelectionManagerStore,
   id: string,
 ) {
-  const { selected } = selection;
-
-  if (selected.type === "single" && selected.value.isSelected(id)) {
+  if (selection.isSingle && selection.isSelected(id)) {
     selection.reset();
   }
 

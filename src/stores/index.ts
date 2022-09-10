@@ -29,9 +29,7 @@ export const roadsStore = new RoadsStore(
   fixtureStore,
 );
 
-selectionManagerStore.setNodes(nodeStore);
-selectionManagerStore.setFixtures(fixtureStore);
-selectionManagerStore.setSegments(segmentStore);
+selectionManagerStore.init(nodeStore, segmentStore, fixtureStore);
 
 nodeStore.setSegments(segmentStore);
 nodeStore.setFixtures(fixtureStore);

@@ -6,9 +6,10 @@ export class RoadNode {
   private _position: Position = { x: 0, y: 0 };
   public readonly id: string;
 
+  // TODO: make private
   gateId: string | undefined = undefined;
 
-  // private tracker = undoManagerStore.createTrackWithDebounce();
+  fixtureId: string | undefined = undefined;
 
   segmentIds: Set<string> = new Set<string>();
 
@@ -17,9 +18,6 @@ export class RoadNode {
       x: p.x,
       y: p.y,
     };
-    // this.tracker(() => {
-    // console.log("setPosition", p);
-    // });
   };
 
   moveBy = (delta: Position) => {

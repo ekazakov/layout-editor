@@ -112,10 +112,7 @@ export class SegmentStore {
     this.selection = selection;
     reaction(
       () => {
-        if (this.selection.selected.type === "single") {
-          return this.selection.selected.value.id;
-        }
-        return undefined;
+        return this.selection.getSingleSelection("node");
       },
       (newSelectedNodeId: string | undefined) => {
         if (!newSelectedNodeId) {

@@ -14,7 +14,7 @@
 - [x] Undo for fixtures
 - [] Try not to reset selection on undo (we need to remove outdated ids)
 - [x] Multi selection
-- [] Improve/refactor multi selection
+- [x] Improve/refactor multi selection
 - [x] Fix multi selection movement for nodes connected to gates
 - [x] Addition to select
 - [x] Remove item from selection

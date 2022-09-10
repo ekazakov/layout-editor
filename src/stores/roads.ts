@@ -36,16 +36,7 @@ export class RoadsStore {
   }
 
   private getSelectedItemId(type: ItemType) {
-    const selected = this.selection.selected;
-    if (selected.type !== "single") {
-      return "";
-    }
-
-    if (selected.value.type === type) {
-      return selected.value.id;
-    }
-
-    return "";
+    return this.selection.getSingleSelection(type);
   }
 
   get selectedNode() {
@@ -70,21 +61,9 @@ export class RoadsStore {
   }
 
   deleteSelection() {
-    const { selected } = this.selection;
-
-    if (selected.type === "multi") {
-      if (selected.value.list.length === 0) {
-        return false;
-      }
-
-      selected.value.list.forEach((item) => {
-        this.deleteItem(item.id, item.type);
-      });
-    }
-
-    if (selected.type === "single") {
-      this.deleteItem(selected.value.id, selected.value.type);
-    }
+    this.selection.list.forEach((item) => {
+      this.deleteItem(item.id, item.type);
+    });
   }
 
   empty() {

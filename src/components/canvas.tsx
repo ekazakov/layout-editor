@@ -7,6 +7,7 @@ import {
   segmentStore,
   fixtureStore,
   selectionRectStore,
+  selectionManagerStore,
 } from "../stores";
 import { useMouseEvents } from "../hooks/use-mouse-events";
 import { useShortcuts } from "../hooks/use-shortcuts";
@@ -44,7 +45,8 @@ export const Canvas = observer(function Canvas() {
       onMouseOut={onMouseOut}
       onClick={onClick}
       style={{
-        userSelect: selectionRectStore.inProgress ? "none" : "auto",
+        userSelect:
+          selectionRectStore.inProgress || selectionManagerStore.isMulti ? "none" : "auto",
       }}
     >
       <Scale direction="horizontal" max={2000} />

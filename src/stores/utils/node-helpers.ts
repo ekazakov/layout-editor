@@ -28,8 +28,7 @@ export function deleteNode(
     sh.deleteSegment(nodes, segments, fixtures, selection, segmentId);
   }
 
-  const { selected } = selection;
-  if (selected.type === "single" && selected.value.id === nodeId) {
+  if (selection.isSingle && selection.isSelected(nodeId)) {
     selection.reset();
   }
 

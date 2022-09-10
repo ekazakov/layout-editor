@@ -1,7 +1,4 @@
 import { Fixture, Gate, RoadNode, RoadSegment } from "./stores";
-import { SingleItem } from "./stores/selection/single-item";
-import { MultiItems } from "./stores/selection/multi-items";
-import { NoneSelectionItem } from "./stores/selection/selection-manager";
 
 export interface Position {
   x: number;
@@ -77,14 +74,9 @@ export type ElementType =
 
 export type ItemType = "segment" | "node" | "fixture" | "fixture_gate";
 
-export type SelectableItemType = "node" | "fixture" | "segment";
+export type SelectableItemType = "node" | "fixture" | "segment" | "fixture_gate";
 
 export type Item = RoadSegment | RoadNode | Fixture | Gate;
-
-export type Selection =
-  | { type: "single"; value: SingleItem }
-  | { type: "multi"; value: MultiItems }
-  | NoneSelectionItem;
 
 export type SelectionItem = {
   id: string;

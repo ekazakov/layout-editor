@@ -10,11 +10,10 @@ const style = {
 };
 
 export const BoundingRect = observer(function BoundingRect() {
-  const { selected } = selectionManagerStore;
   const [isDragging, setIsDragging] = React.useState(false);
 
-  if (selected.type === "multi") {
-    const { boundingRect: rect } = selected.value;
+  if (selectionManagerStore.isMulti) {
+    const rect = selectionManagerStore.boundingRect;
     const pos = { x: rect.right + 15, y: rect.top };
     const menuItems = [
       {
