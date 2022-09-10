@@ -18,15 +18,15 @@ export const BoundingRect = observer(function BoundingRect() {
     const menuItems = [
       {
         title: "Only nodes",
-        action: () => console.log("Only nodes"),
+        action: () => selectionManagerStore.selectOnlyNodes(),
       },
       {
         title: "Only segments",
-        action: () => console.log("Only segments"),
+        action: () => selectionManagerStore.selectOnlySegments(),
       },
       {
         title: "Only fixtures",
-        action: () => console.log("Only fixtures"),
+        action: () => selectionManagerStore.selectOnlyFixtures(),
       },
     ];
 

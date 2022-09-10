@@ -3,16 +3,15 @@ import { FixturesStore } from "../fixtures";
 import { SegmentStore } from "../segments";
 import { Position, Rect, SelectionItem } from "../../types";
 import { makeAutoObservable, toJS } from "mobx";
+import { getItemType } from "./utils/get-item-type";
 
 export class Selection {
   private items: Map<string, SelectionItem> = new Map();
 
   moveSelection(delta: Position) {
-    const nodes = new Set(this.list.filter((item) => item.type === "node").map((n) => n.id));
-    const segments = this.list.filter((item) => item.type === "segment");
-    const fixtures = this.list.filter((item) => item.type === "fixture");
+    const nodes = new Set(this.selectedNodes.map((node) => node.id));
 
-    segments.forEach(({ id }) => {
+    this.selectedSegments.forEach(({ id }) => {
       const segment = this.segments.get(id);
       if (segment) {
         nodes.add(segment.start.id);
@@ -20,15 +19,15 @@ export class Selection {
       }
     });
 
-    fixtures.forEach(({ id }) => {
+    this.selectedFixtures.forEach(({ id }) => {
       const fixture = this.fixtures.getFixture(id);
       if (fixture) {
         fixture?.moveBy(delta);
       }
     });
 
-    nodes.forEach((nodeId) => {
-      const node = this.nodes.get(nodeId);
+    nodes.forEach((id) => {
+      const node = this.nodes.get(id);
       if (node) {
         if (node.fixtureId) {
           return;
@@ -38,11 +37,11 @@ export class Selection {
     });
   }
 
-  addItem(item: SelectionItem) {
-    this.items.set(item.id, item);
+  addItem(id: string) {
+    this.items.set(id, { id, type: getItemType(id) });
   }
 
-  appendItems(newItems: Map<string, SelectionItem>) {
+  appendItems(newItems: Set<string> | string[]) {
     newItems.forEach((item) => {
       this.addItem(item);
     });
@@ -50,6 +49,18 @@ export class Selection {
 
   get list() {
     return [...this.items.values()];
+  }
+
+  get selectedNodes(): ReadonlyArray<SelectionItem> {
+    return this.list.filter((item) => item.type === "node");
+  }
+
+  get selectedSegments(): ReadonlyArray<SelectionItem> {
+    return this.list.filter((item) => item.type === "segment");
+  }
+
+  get selectedFixtures(): ReadonlyArray<SelectionItem> {
+    return this.list.filter((item) => item.type === "fixture");
   }
 
   hasItem(id: string) {
@@ -64,7 +75,7 @@ export class Selection {
     this.items.clear();
   }
 
-  get pointList() {
+  private get pointList() {
     return this.list.reduce((result, { id, type }) => {
       switch (type) {
         case "fixture": {
@@ -104,19 +115,19 @@ export class Selection {
     }, [] as Position[]);
   }
 
-  get leftLimit() {
+  private get leftLimit() {
     return this.pointList.sort((a, b) => a.x - b.x).at(0)?.x ?? 0;
   }
 
-  get rightLimit() {
+  private get rightLimit() {
     return this.pointList.sort((a, b) => b.x - a.x).at(0)?.x ?? 0;
   }
 
-  get topLimit() {
+  private get topLimit() {
     return this.pointList.sort((a, b) => a.y - b.y).at(0)?.y ?? 0;
   }
 
-  get bottomLimit() {
+  private get bottomLimit() {
     return this.pointList.sort((a, b) => b.y - a.y).at(0)?.y ?? 0;
   }
 

@@ -1,5 +1,5 @@
 import { makeAutoObservable } from "mobx";
-import { ItemType, Position, Rect, SelectionItem } from "../../types";
+import { ItemType, Position, Rect } from "../../types";
 import { NodeStore } from "../nodes";
 import { SegmentStore } from "../segments";
 import { FixturesStore } from "../fixtures";
@@ -18,32 +18,31 @@ export class SelectionManagerStore {
 
   selectSingleItem(id: string) {
     this.selection.reset();
-    this.selection.addItem({ id, type: getItemType(id) });
+    this.selection.addItem(id);
   }
 
   private selectFromRect(rect: Rect) {
-    const items = new Map<string, SelectionItem>();
+    const items = new Set<string>();
 
     this.nodes.list.forEach((node) => {
       if (isInsideRect(node.position, rect)) {
-        const { id } = node;
-        items.set(node.id, { id, type: "node" });
+        items.add(node.id);
       }
     });
 
     this.segments.list.forEach((segment) => {
       if (isLineRectIntersection(segment, rect)) {
-        items.set(segment.id, { id: segment.id, type: "segment" });
+        items.add(segment.id);
       }
     });
 
     this.fixtures.list.forEach((fixture) => {
       if (isRectIntersection(fixture.rect, rect)) {
-        items.set(fixture.id, { id: fixture.id, type: "fixture" });
+        items.add(fixture.id);
         fixture.gateList.forEach((gate) => {
           const node = gate.connection;
           if (node) {
-            items.set(node.id, { id: node.id, type: "node" });
+            items.add(node.id);
           }
         });
       }
@@ -70,13 +69,12 @@ export class SelectionManagerStore {
   }
 
   addItemToSelection(id: string) {
-    const item = { id, type: getItemType(id) };
-
-    if (item.type === "fixture_gate") {
+    const type = getItemType(id);
+    if (type === "fixture_gate") {
       return;
     }
 
-    this.selection.addItem(item);
+    this.selection.addItem(id);
   }
 
   removeItemFromSelection(id: string) {
@@ -131,6 +129,24 @@ export class SelectionManagerStore {
     }
 
     return item.id;
+  }
+
+  selectOnlyNodes() {
+    const nodes = this.selection.selectedNodes;
+    this.selection.reset();
+    this.selection.appendItems(nodes.map((n) => n.id));
+  }
+
+  selectOnlySegments() {
+    const segments = this.selection.selectedSegments;
+    this.selection.reset();
+    this.selection.appendItems(segments.map((s) => s.id));
+  }
+
+  selectOnlyFixtures() {
+    const fixtures = this.selection.selectedFixtures;
+    this.selection.reset();
+    this.selection.appendItems(fixtures.map((f) => f.id));
   }
 
   constructor() {

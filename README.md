@@ -23,5 +23,6 @@
 - [x] Snap new segment to road
 - [x] Split road by new segment
 - [x] Connect fixtures gate-to-gate
+- [] Discover probable issues with links to deleted nodes/segments/fixtures/gates
 - [] Movement constraints
 - [] Debug setting
