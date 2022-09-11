@@ -8,7 +8,7 @@ import { SegmentStore } from "./segments";
 import { FixturesStore } from "./fixtures";
 import { SelectionManagerStore } from "./selection/selection-manager";
 import { SelectionRect } from "./selection/selection-rect";
-
+import { GlobalSettings } from "./global-settings";
 export { RoadNode } from "./road-node";
 export { RoadSegment } from "./road-segment";
 export { Fixture, Gate } from "./fixture";
@@ -53,6 +53,7 @@ export const undoManagerStore = new UndoManagerStore(
   },
 );
 
+export const globalSettingsStore = new GlobalSettings();
 undoManagerStore.trackChanges();
 
 // @ts-ignore
@@ -69,6 +70,8 @@ window.cursorStore = cursorStore;
 window.selectionManagerStore = selectionManagerStore;
 // @ts-ignore
 window.undoManagerStore = undoManagerStore;
+// @ts-ignore
+window.globalSettingsStore = globalSettingsStore;
 // @ts-ignore
 window.toJS = toJS;
 export { SegmentStore } from "./segments";

@@ -1,8 +1,10 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
 import {
+  cursorStore,
   Fixture as RoadFixture,
   Gate as FixtureGage,
+  globalSettingsStore,
   roadsStore,
   selectionManagerStore,
   undoManagerStore,
@@ -101,15 +103,22 @@ export const Fixture = observer(function Fixture({ fixture }: FixtureProps) {
         element.releasePointerCapture(evt.pointerId);
         undoManagerStore.trackUp();
       }}
-      onPointerMove={(evt) => {
+      onPointerMove={() => {
         if (isDragging) {
-          fixture.moveBy({
-            x: Math.round(evt.movementX),
-            y: Math.round(evt.movementY),
-          });
+          fixture.moveBy(cursorStore.movement);
         }
       }}
     >
+      {globalSettingsStore.showFixturesIds && (
+        <text
+          x={fixture.position.x + fixture.size + 10}
+          y={fixture.position.y}
+          textAnchor="start"
+          style={{ fontSize: 12, pointerEvents: "none" }}
+        >
+          #{fixture.id} ({fixture.gateList.filter((g) => g.connection).length})
+        </text>
+      )}
       <StyledRect
         selected={selected}
         id={fixture.id}

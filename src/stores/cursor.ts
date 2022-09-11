@@ -49,8 +49,8 @@ export class CursorStore {
     });
 
     this.setPosition({
-      x: Math.round(evt.clientX),
-      y: Math.round(evt.clientY),
+      x: Math.round(evt.pageX),
+      y: Math.round(evt.pageY),
     });
 
     this.setMovement({

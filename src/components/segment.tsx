@@ -1,6 +1,12 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { cursorStore, RoadSegment, selectionManagerStore, undoManagerStore } from "../stores";
+import {
+  cursorStore,
+  globalSettingsStore,
+  RoadSegment,
+  selectionManagerStore,
+  undoManagerStore,
+} from "../stores";
 
 export const NewSegment = observer(function NewSegment(props: any) {
   const { p1, p2 } = props;
@@ -27,14 +33,16 @@ export const Segment = observer(function Segment(props: { segment: RoadSegment }
 
   return (
     <g>
-      <text
-        x={segment.middle.x + 15}
-        y={segment.middle.y - 15}
-        textAnchor="start"
-        style={{ fontSize: 12, pointerEvents: "none", color: "red" }}
-      >
-        #{segment.id}
-      </text>
+      {globalSettingsStore.showSegmentsIds && (
+        <text
+          x={segment.middle.x + 15}
+          y={segment.middle.y - 15}
+          textAnchor="start"
+          style={{ fontSize: 12, pointerEvents: "none", color: "red" }}
+        >
+          #{segment.id}
+        </text>
+      )}
       <line
         onPointerDown={(evt) => {
           setIsDragging(() => true);
@@ -47,7 +55,7 @@ export const Segment = observer(function Segment(props: { segment: RoadSegment }
           const element = evt.target as HTMLElement;
           element.releasePointerCapture(evt.pointerId);
         }}
-        onPointerMove={(evt) => {
+        onPointerMove={() => {
           undoManagerStore.trackUp();
           if (isDragging) {
             segment.moveBy(cursorStore.movement);

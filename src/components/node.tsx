@@ -6,6 +6,7 @@ import {
   cursorStore,
   roadsStore,
   undoManagerStore,
+  globalSettingsStore,
 } from "../stores";
 import { ContextMenu } from "./context-menu";
 import { InfoPanel } from "./info-panel";
@@ -42,14 +43,16 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
   return (
     <>
       <g>
-        {/*  <text
-          x={node.position.x + 15}
-          y={node.position.y - 15}
-          textAnchor="start"
-          style={{ fontSize: 12, pointerEvents: "none" }}
-        >
-          #{node.id} ({node.segmentIds.size})
-        </text>*/}
+        {globalSettingsStore.showNodesIds && (
+          <text
+            x={node.position.x + 15}
+            y={node.position.y - 15}
+            textAnchor="start"
+            style={{ fontSize: 12, pointerEvents: "none" }}
+          >
+            #{node.id} ({node.segmentIds.size})
+          </text>
+        )}
 
         <circle
           onPointerDown={(evt) => {
