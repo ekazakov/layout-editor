@@ -81,6 +81,10 @@ export class CursorStore {
     };
   }
 
+  get isSnapped() {
+    return this._snapPosition !== undefined;
+  }
+
   get position() {
     return {
       x: this._position.x,

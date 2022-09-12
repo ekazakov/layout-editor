@@ -13,10 +13,14 @@ export default function App() {
     },
     showSegmentsIds: {
       label: "Segments IDs",
-      value: false,
+      value: true,
     },
     showFixturesIds: {
       label: "Fixtures IDs",
+      value: false,
+    },
+    showSnappingProjections: {
+      label: "Show Snapping Projections",
       value: false,
     },
   });
@@ -28,7 +32,7 @@ export default function App() {
   return (
     <div className="App">
       <Help />
-      <Leva flat={true} />
+      <Leva flat={true} oneLineLabels={true} />
       <Canvas />
     </div>
   );

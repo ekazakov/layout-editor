@@ -14,13 +14,15 @@ export class NodeStore {
 
   set = (id: string, node: RoadNode) => this.nodes.set(id, node);
 
-  add = (p: Position) => {
+  private add = (p: Position) => {
     const node = new RoadNode(p);
     this.nodes.set(node.id, node);
     return node;
   };
 
-  addNode = (p: Position) => this.add(p);
+  createNoe = (p: Position) => this.add(p);
+
+  addNode = (node: RoadNode) => this.nodes.set(node.id, node);
 
   get = (id: string): RoadNode | undefined => this.nodes.get(id);
 

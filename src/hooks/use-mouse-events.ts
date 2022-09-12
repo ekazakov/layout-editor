@@ -29,33 +29,13 @@ export function useMouseEvents() {
       const { element, type } = extractItem(evt);
       cursorStore.update(evt);
 
-      switch (type) {
-        case "road-node": {
-          if (selectedNode && cursorStore.metaKey) {
-            if (!nodeStore.isConnected(selectedNode.id, element.id)) {
-              segmentStore.joinNodes(selectedNode.id, element.id);
-            }
-          }
-
-          if (cursorStore.shiftKey) {
-            selectionManagerStore.addItemToSelection(element.id);
-            return;
-          }
-          selectionManagerStore.selectSingleItem(element.id);
-
-          break;
-        }
-        case "road-segment": {
-          runInAction(() => {
-            if (!selectedNode && cursorStore.altKey) {
-              segmentStore.splitSegmentAt(element.id, cursorStore);
-              return;
-            }
-
+      runInAction(() => {
+        switch (type) {
+          case "road-node": {
             if (selectedNode && cursorStore.metaKey) {
-              const node = segmentStore.splitSegmentAt(element.id, cursorStore);
-              segmentStore.joinNodes(selectedNode.id, node.id);
-              return;
+              if (!nodeStore.isConnected(selectedNode.id, element.id)) {
+                segmentStore.addSegment(selectedNode.id, element.id);
+              }
             }
 
             if (cursorStore.shiftKey) {
@@ -63,70 +43,97 @@ export function useMouseEvents() {
               return;
             }
             selectionManagerStore.selectSingleItem(element.id);
-          });
-          break;
-        }
-        case "fixture": {
-          if (cursorStore.shiftKey) {
-            selectionManagerStore.addItemToSelection(element.id);
-            return;
+
+            break;
           }
-          selectionManagerStore.selectSingleItem(element.id);
-          break;
-        }
-        case "fixture_gate": {
-          runInAction(() => {
-            if (selectedNode && cursorStore.metaKey) {
-              const newNode = nodeStore.addNode(cursorStore.position);
-              segmentStore.addSegment(selectedNode.id, newNode.id);
+          case "road-segment": {
+            runInAction(() => {
+              if (!selectedNode && cursorStore.altKey) {
+                segmentStore.splitSegmentAt(element.id, cursorStore);
+                return;
+              }
+
+              if (selectedNode && cursorStore.metaKey) {
+                const node = segmentStore.splitSegmentAt(element.id, cursorStore);
+                const line = {
+                  start: selectedNode,
+                  end: node,
+                };
+                segmentStore.updateIntersectionsWithRoad(line);
+                segmentStore.addSegment(selectedNode.id, node.id);
+                return;
+              }
+
+              if (cursorStore.shiftKey) {
+                selectionManagerStore.addItemToSelection(element.id);
+                return;
+              }
               selectionManagerStore.selectSingleItem(element.id);
-              fixtureStore.connectToGate(element.id, newNode);
+            });
+            break;
+          }
+          case "fixture": {
+            if (cursorStore.shiftKey) {
+              selectionManagerStore.addItemToSelection(element.id);
               return;
             }
-
-            if (selectedGate && cursorStore.metaKey && selectedGate.id !== element.id) {
-              const startNode = nodeStore.addNode(selectedGate.position);
-              const endNode = nodeStore.addNode(cursorStore.position);
-              segmentStore.addSegment(startNode.id, endNode.id);
-              fixtureStore.connectToGate(element.id, endNode);
-              fixtureStore.connectToGate(selectedGate.id, startNode);
-              selectionManagerStore.selectSingleItem(endNode.id);
-              return;
-            }
-
             selectionManagerStore.selectSingleItem(element.id);
-          });
-          break;
-        }
+            break;
+          }
+          case "fixture_gate": {
+            runInAction(() => {
+              if (selectedNode && cursorStore.metaKey) {
+                const newNode = nodeStore.createNoe(cursorStore.position);
+                segmentStore.addSegment(selectedNode.id, newNode.id);
+                selectionManagerStore.selectSingleItem(element.id);
+                fixtureStore.connectToGate(element.id, newNode);
+                return;
+              }
 
-        case "bounding-rect": {
-          if (cursorStore.shiftKey) {
-            const els = findHoveredElements(cursorStore.position);
-            const types = ["road-node", "road-segment", "fixture"];
-            const item = els.find(({ dataset: { type } }) => types.includes(type ?? ""));
-            if (item) {
-              if (selectionManagerStore.isSelected(item.id)) {
-                selectionManagerStore.removeItemFromSelection(item.id);
-              } else {
-                selectionManagerStore.addItemToSelection(item.id);
+              if (selectedGate && cursorStore.metaKey && selectedGate.id !== element.id) {
+                const startNode = nodeStore.createNoe(selectedGate.position);
+                const endNode = nodeStore.createNoe(cursorStore.position);
+                segmentStore.addSegment(startNode.id, endNode.id);
+                fixtureStore.connectToGate(element.id, endNode);
+                fixtureStore.connectToGate(selectedGate.id, startNode);
+                selectionManagerStore.selectSingleItem(endNode.id);
+                return;
+              }
+
+              selectionManagerStore.selectSingleItem(element.id);
+            });
+            break;
+          }
+
+          case "bounding-rect": {
+            if (cursorStore.shiftKey) {
+              const els = findHoveredElements(cursorStore.position);
+              const types = ["road-node", "road-segment", "fixture"];
+              const item = els.find(({ dataset: { type } }) => types.includes(type ?? ""));
+              if (item) {
+                if (selectionManagerStore.isSelected(item.id)) {
+                  selectionManagerStore.removeItemFromSelection(item.id);
+                } else {
+                  selectionManagerStore.addItemToSelection(item.id);
+                }
               }
             }
-          }
-          break;
-        }
-
-        case "selection-rect": {
-          break;
-        }
-
-        case "canvas": {
-          if (cursorStore.noKeys || cursorStore.shiftKey) {
-            selectionRectStore.setStart(cursorStore.position);
+            break;
           }
 
-          break;
+          case "selection-rect": {
+            break;
+          }
+
+          case "canvas": {
+            if (cursorStore.noKeys || cursorStore.shiftKey) {
+              selectionRectStore.setStart(cursorStore.position);
+            }
+
+            break;
+          }
         }
-      }
+      });
     },
     [selectedNode, selectedGate],
   );
@@ -170,7 +177,6 @@ export function useMouseEvents() {
   const onMouseUp = React.useCallback(
     (evt: React.MouseEvent) => {
       runInAction(() => {
-        const { type } = extractItem(evt);
         cursorStore.update(evt);
 
         if (selectionRectStore.inProgress && cursorStore.noKeys) {
@@ -183,18 +189,6 @@ export function useMouseEvents() {
           selectionRectStore.setEnd(cursorStore.position);
           selectionManagerStore.selectionFromAria(selectionRectStore.rect, true);
           selectionRectStore.reset();
-        }
-
-        switch (type) {
-          case "road-node": {
-            break;
-          }
-          case "fixture_gate": {
-            break;
-          }
-
-          default:
-            break;
         }
       });
     },
@@ -232,21 +226,21 @@ export function useMouseEvents() {
             }
 
             if (cursorStore.altKey) {
-              const newNode = nodeStore.addNode(cursorStore.position);
+              const newNode = nodeStore.createNoe(cursorStore.position);
               selectionManagerStore.selectSingleItem(newNode.id);
               return;
             }
 
             if (selectedNode && cursorStore.metaKey) {
-              const newNode = nodeStore.addNode(cursorStore.position);
+              const newNode = nodeStore.createNoe(cursorStore.position);
               segmentStore.addSegment(selectedNode.id, newNode.id);
               selectionManagerStore.selectSingleItem(newNode.id);
               return;
             }
 
             if (selectedGate && cursorStore.metaKey) {
-              const newNode = nodeStore.addNode(cursorStore.position);
-              const startNode = nodeStore.addNode(selectedGate.position);
+              const newNode = nodeStore.createNoe(cursorStore.position);
+              const startNode = nodeStore.createNoe(selectedGate.position);
               fixtureStore.connectToGate(selectedGate.id, startNode);
               segmentStore.addSegment(startNode.id, newNode.id);
               selectionManagerStore.selectSingleItem(newNode.id);

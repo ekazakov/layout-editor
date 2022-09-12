@@ -29,9 +29,6 @@ export class SegmentStore {
   private _intersections: Intersection[] = [];
   private _snapPoints: [Position, string][] = [];
 
-  private _addSegment = (startNodeId: string, endNodeId: string) =>
-    sh.addSegmentInternal(this.nodes, this, startNodeId, endNodeId);
-
   set = (id: string, segment: RoadSegment) => this.segments.set(id, segment);
 
   get intersections() {
@@ -52,10 +49,7 @@ export class SegmentStore {
       startId,
       endId,
     );
-  }
-
-  joinNodes(startNodeId: string, endNodeId: string) {
-    this._addSegment(startNodeId, endNodeId);
+    this._intersections = [];
   }
 
   _delete = (id: string) => this.segments.delete(id);

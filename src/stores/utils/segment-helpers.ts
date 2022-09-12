@@ -6,6 +6,8 @@ import { NodeStore } from "../nodes";
 import { SegmentStore } from "../segments";
 import { FixturesStore } from "../fixtures";
 import { SelectionManagerStore } from "../selection/selection-manager";
+import { getDistance } from "../../utils/get-distance";
+import { RoadNode } from "../road-node";
 
 export function deleteSegment(
   nodes: NodeStore,
@@ -14,6 +16,7 @@ export function deleteSegment(
   selection: SelectionManagerStore,
   id: string,
 ) {
+  // TODO: track deletion with reaction on segments store change
   if (selection.isSingle && selection.isSelected(id)) {
     selection.reset();
   }
@@ -74,7 +77,7 @@ export function splitSegmentAt(
     throw new Error(`Segment ${id} doesn't exist`);
   }
 
-  const newNode = nodes.add(p);
+  const newNode = nodes.createNoe(p);
   addSegmentInternal(nodes, segments, segment.start.id, newNode.id);
   addSegmentInternal(nodes, segments, newNode.id, segment.end.id);
   deleteSegment(nodes, segments, fixtures, selection, id);
@@ -115,6 +118,11 @@ export function addSegment(
     return;
   }
   const nodesToJoin = [endId];
+  const endNode = nodes.get(endId);
+
+  if (!endNode) {
+    throw new Error(`Node ${endId} doesn't exists`);
+  }
 
   for (const int of intersections) {
     const segment = segments.get(int.segmentId);
@@ -122,8 +130,14 @@ export function addSegment(
       throw new Error(`Segment ${int.segmentId} doesn't exist`);
     }
 
-    const newNode = nodes.add(int.point);
+    const newNode = new RoadNode(int.point); //nodes.add(int.point);
+
+    if (getDistance(newNode, endNode) <= 1) {
+      continue;
+    }
+    nodes.addNode(newNode);
     nodesToJoin.push(newNode.id);
+
     addSegmentInternal(nodes, segments, segment.start.id, newNode.id);
     addSegmentInternal(nodes, segments, newNode.id, segment.end.id);
 

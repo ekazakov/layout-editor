@@ -8,6 +8,7 @@ import {
   fixtureStore,
   selectionRectStore,
   selectionManagerStore,
+  globalSettingsStore,
 } from "../stores";
 import { useMouseEvents } from "../hooks/use-mouse-events";
 import { useShortcuts } from "../hooks/use-shortcuts";
@@ -75,19 +76,28 @@ export const Canvas = observer(function Canvas() {
 
       {cursorStore.metaKey && (
         <g>
-          {intersections.map(({ segmentId, point }) => (
-            <circle
-              style={{ pointerEvents: "none" }}
-              key={segmentId}
-              r={10}
-              cx={point.x}
-              cy={point.y}
-              stroke="blue"
-              strokeWidth="2px"
-              strokeDasharray="4"
-              fill="white"
-              opacity="0.8"
-            />
+          {intersections.map(({ segmentId, point }, index) => (
+            <g key={segmentId}>
+              <text
+                x={point.x + 10}
+                y={point.y + 5}
+                textAnchor="start"
+                style={{ fontSize: 12, pointerEvents: "none", fill: "cyan" }}
+              >
+                #{index}
+              </text>
+              <circle
+                style={{ pointerEvents: "none" }}
+                r={10}
+                cx={point.x}
+                cy={point.y}
+                stroke="blue"
+                strokeWidth="2px"
+                strokeDasharray="4"
+                fill="white"
+                opacity="0.8"
+              />
+            </g>
           ))}
         </g>
       )}
@@ -96,7 +106,7 @@ export const Canvas = observer(function Canvas() {
           return <Node key={node.id} node={node} />;
         })}
       </g>
-      {cursorStore.metaKey && snapPoints && (
+      {globalSettingsStore.showSnappingProjections && cursorStore.metaKey && snapPoints && (
         <g>
           {snapPoints.map(([point], index) => {
             return (
@@ -111,6 +121,18 @@ export const Canvas = observer(function Canvas() {
               />
             );
           })}
+        </g>
+      )}
+      {cursorStore.metaKey && cursorStore.isSnapped && (
+        <g>
+          <circle
+            style={{ pointerEvents: "none" }}
+            r={5}
+            cx={cursorStore.snapPosition.x}
+            cy={cursorStore.snapPosition.y}
+            fill="red"
+            opacity="0.4"
+          />
         </g>
       )}
       <SelectionRect />

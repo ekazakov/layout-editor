@@ -2,7 +2,7 @@ import { toJS } from "mobx";
 import { RoadsStore } from "./roads";
 import { CursorStore } from "./cursor";
 import { UndoManagerStore } from "./undo-manager";
-import { dump } from "../dumps/dump-1";
+import { dump } from "../dumps/dump-3";
 import { NodeStore } from "./nodes";
 import { SegmentStore } from "./segments";
 import { FixturesStore } from "./fixtures";
