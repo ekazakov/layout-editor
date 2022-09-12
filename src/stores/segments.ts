@@ -7,6 +7,7 @@ import { makeAutoObservable, reaction } from "mobx";
 import { NodeStore } from "./nodes";
 import { FixturesStore } from "./fixtures";
 import { SelectionManagerStore } from "./selection/selection-manager";
+import { segmentStore } from "./index";
 
 function getMinIndex(arr: any[]) {
   let minIndex = 0;
@@ -40,6 +41,11 @@ export class SegmentStore {
   }
 
   addSegment(startId: string, endId: string) {
+    const line = {
+      start: this.nodes.get(startId)!,
+      end: this.nodes.get(endId)!,
+    };
+    this.updateIntersectionsWithRoad(line);
     sh.addSegment(
       this.nodes,
       this,

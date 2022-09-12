@@ -101,6 +101,14 @@ export function updateIntersectionsWithRoad(segments: Map<string, RoadSegment>, 
     intersections.push({ segmentId: segment.id, point });
   });
 
+  intersections.sort(({ point: p1 }, { point: p2 }) => {
+    if (p1.x === p2.x) {
+      return p1.y - p2.y;
+    }
+
+    return p1.x - p2.x;
+  });
+
   return intersections;
 }
 
@@ -130,7 +138,7 @@ export function addSegment(
       throw new Error(`Segment ${int.segmentId} doesn't exist`);
     }
 
-    const newNode = new RoadNode(int.point); //nodes.add(int.point);
+    const newNode = new RoadNode(int.point);
 
     if (getDistance(newNode, endNode) <= 1) {
       continue;

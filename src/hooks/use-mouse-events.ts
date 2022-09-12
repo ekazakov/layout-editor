@@ -55,11 +55,6 @@ export function useMouseEvents() {
 
               if (selectedNode && cursorStore.metaKey) {
                 const node = segmentStore.splitSegmentAt(element.id, cursorStore);
-                const line = {
-                  start: selectedNode,
-                  end: node,
-                };
-                segmentStore.updateIntersectionsWithRoad(line);
                 segmentStore.addSegment(selectedNode.id, node.id);
                 return;
               }
