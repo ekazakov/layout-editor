@@ -84,6 +84,37 @@ export function splitSegmentAt(
   return newNode;
 }
 
+function ascComparator(int1: Intersection, int2: Intersection) {
+  const { point: p1 } = int1;
+  const { point: p2 } = int2;
+
+  if (p1.x === p2.x) {
+    return p1.y - p2.y;
+  }
+
+  return p1.x - p2.x;
+}
+
+function descComparator(int1: Intersection, int2: Intersection) {
+  const { point: p1 } = int1;
+  const { point: p2 } = int2;
+
+  if (p1.x === p2.x) {
+    return p2.y - p1.y;
+  }
+
+  return p2.x - p1.x;
+}
+
+function isDesc(line: LineSegment) {
+  const { start: s, end: e } = line;
+  if (s.x === e.x) {
+    return s.y > e.y;
+  }
+
+  return s.x > e.x;
+}
+
 export function updateIntersectionsWithRoad(segments: Map<string, RoadSegment>, line: LineSegment) {
   const intersections: Intersection[] = [];
 
@@ -101,13 +132,9 @@ export function updateIntersectionsWithRoad(segments: Map<string, RoadSegment>, 
     intersections.push({ segmentId: segment.id, point });
   });
 
-  intersections.sort(({ point: p1 }, { point: p2 }) => {
-    if (p1.x === p2.x) {
-      return p1.y - p2.y;
-    }
+  const comparator = isDesc(line) ? descComparator : ascComparator;
 
-    return p1.x - p2.x;
-  });
+  intersections.sort(comparator);
 
   return intersections;
 }
@@ -125,7 +152,7 @@ export function addSegment(
     console.log(`Trying to connect node ${startId} to itself`);
     return;
   }
-  const nodesToJoin = [endId];
+  const nodesToJoin = [startId];
   const endNode = nodes.get(endId);
 
   if (!endNode) {
@@ -152,7 +179,7 @@ export function addSegment(
     deleteSegment(nodes, segments, fixtures, selection, int.segmentId);
   }
 
-  nodesToJoin.push(startId);
+  nodesToJoin.push(endId);
 
   for (let i = 0; i < nodesToJoin.length - 1; i++) {
     addSegmentInternal(nodes, segments, nodesToJoin[i], nodesToJoin[i + 1]);
