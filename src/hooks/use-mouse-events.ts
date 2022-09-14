@@ -10,7 +10,7 @@ import {
   selectionRectStore,
 } from "../stores";
 import { getDistance } from "../utils/get-distance";
-import { findHoveredElements } from "../utils/find-hovered-element";
+import { findHoveredElements, matchElementTypeAtPosition } from "../utils/find-hovered-element";
 
 function extractItem(evt: React.MouseEvent) {
   const element = evt.target as HTMLElement;
@@ -223,6 +223,16 @@ export function useMouseEvents() {
             if (cursorStore.altKey) {
               const newNode = nodeStore.createNoe(cursorStore.position);
               selectionManagerStore.selectSingleItem(newNode.id);
+              return;
+            }
+
+            if (selectedNode && cursorStore.metaKey && cursorStore.isSnapped) {
+              console.log("Segment snapped");
+              const element = matchElementTypeAtPosition(cursorStore.snapPosition, "road-segment");
+              if (element?.id) {
+                const node = segmentStore.splitSegmentAt(element.id, cursorStore.snapPosition);
+                segmentStore.addSegment(selectedNode.id, node.id);
+              }
               return;
             }
 

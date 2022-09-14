@@ -1,5 +1,7 @@
 import styled from "@emotion/styled";
 import { useState } from "react";
+import { observer } from "mobx-react-lite";
+import { globalSettingsStore as gs } from "../stores";
 
 const HelpContainer = styled.div`
   position: fixed;
@@ -23,6 +25,10 @@ const HelpPreview = styled.div`
   }
 `;
 
+const Label = styled.label`
+  display: block;
+`;
+
 const HelpExpanded = styled.div`
   background: #fff;
   width: 300px;
@@ -38,7 +44,7 @@ const CloseButton = styled.button`
   right: 10px;
 `;
 
-export function Help() {
+export const Help = observer(function Help() {
   const [expanded, setExpanded] = useState(false);
 
   if (!expanded) {
@@ -61,7 +67,41 @@ export function Help() {
           <p>Add item to selection: Shift+Click</p>
           <p>Build segment: Select node and press Cmd</p>
         </div>
+        <div>
+          <Label>
+            <span>Nodes IDs:</span>
+            <input
+              type="checkbox"
+              onChange={({ target }) => (gs.showNodesIds = target.checked)}
+              checked={gs.showNodesIds}
+            />
+          </Label>
+          <Label>
+            <span>Segments IDs:</span>
+            <input
+              type="checkbox"
+              onChange={({ target }) => (gs.showSegmentsIds = target.checked)}
+              checked={gs.showSegmentsIds}
+            />
+          </Label>
+          <Label>
+            <span>Fixtures IDs:</span>
+            <input
+              type="checkbox"
+              onChange={({ target }) => (gs.showFixturesIds = target.checked)}
+              checked={gs.showFixturesIds}
+            />
+          </Label>
+          <Label>
+            <span>Snapping Projections:</span>
+            <input
+              type="checkbox"
+              onChange={({ target }) => (gs.showSnappingProjections = target.checked)}
+              checked={gs.showSnappingProjections}
+            />
+          </Label>
+        </div>
       </HelpExpanded>
     </HelpContainer>
   );
-}
+});
