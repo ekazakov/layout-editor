@@ -12,6 +12,7 @@ import {
 import styled from "@emotion/styled";
 import { ContextMenu } from "./context-menu";
 import { InfoPanel } from "./info-panel";
+import { toJS } from "mobx";
 
 const strokeColor = "#212121";
 const StyledRect = styled.rect<{ selected: boolean }>`
@@ -101,7 +102,7 @@ export const Fixture = observer(function Fixture({ fixture }: FixtureProps) {
         setIsDragging(() => false);
         const element = evt.target as HTMLElement;
         element.releasePointerCapture(evt.pointerId);
-        undoManagerStore.trackUp();
+        undoManagerStore.updateUndoStack();
       }}
       onPointerMove={() => {
         if (isDragging) {

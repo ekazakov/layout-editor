@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { computed, makeAutoObservable } from "mobx";
 import { Position } from "../types";
 import { cursorStore } from "./index";
 import React from "react";
@@ -116,6 +116,10 @@ export class CursorStore {
   }
 
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, {
+      snapPosition: computed({ keepAlive: true }),
+      position: computed({ keepAlive: true }),
+      movement: computed({ keepAlive: true }),
+    });
   }
 }

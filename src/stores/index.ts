@@ -1,4 +1,4 @@
-import { toJS } from "mobx";
+import { toJS, getDependencyTree, getObserverTree } from "mobx";
 import { RoadsStore } from "./roads";
 import { CursorStore } from "./cursor";
 import { UndoManagerStore } from "./undo-manager";
@@ -47,7 +47,7 @@ fixtureStore.setSelection(selectionManagerStore);
 roadsStore.populate(dump);
 
 export const undoManagerStore = new UndoManagerStore(
-  () => roadsStore.toJSON(),
+  () => roadsStore.toJSON,
   (value) => {
     roadsStore.populate(value);
   },
@@ -74,5 +74,10 @@ window.undoManagerStore = undoManagerStore;
 window.globalSettingsStore = globalSettingsStore;
 // @ts-ignore
 window.toJS = toJS;
+
+// @ts-ignore
+window.getDependencyTree = getDependencyTree;
+// @ts-ignore
+window.getObserverTree = getObserverTree;
 export { SegmentStore } from "./segments";
 export { FixturesStore } from "./fixtures";

@@ -42,7 +42,7 @@ export const BoundingRect = observer(function BoundingRect() {
           onPointerUp={(evt) => {
             setIsDragging(() => false);
             const element = evt.target as HTMLElement;
-            undoManagerStore.trackUp();
+            undoManagerStore.updateUndoStack();
             element.releasePointerCapture(evt.pointerId);
           }}
           onPointerMove={(evt) => {

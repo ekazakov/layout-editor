@@ -8,7 +8,7 @@ import {
   undoManagerStore,
 } from "../stores";
 
-export const NewSegment = observer(function NewSegment(props: any) {
+export const NewSegment = function NewSegment(props: any) {
   const { p1, p2 } = props;
 
   return (
@@ -23,7 +23,7 @@ export const NewSegment = observer(function NewSegment(props: any) {
       stroke="#333"
     />
   );
-});
+};
 
 export const Segment = observer(function Segment(props: { segment: RoadSegment }) {
   const { segment } = props;
@@ -56,7 +56,7 @@ export const Segment = observer(function Segment(props: { segment: RoadSegment }
           element.releasePointerCapture(evt.pointerId);
         }}
         onPointerMove={() => {
-          undoManagerStore.trackUp();
+          undoManagerStore.updateUndoStack();
           if (isDragging) {
             segment.moveBy(cursorStore.movement);
           }

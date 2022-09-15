@@ -63,7 +63,7 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
             element.setPointerCapture(evt.pointerId);
           }}
           onPointerUp={(evt) => {
-            undoManagerStore.trackUp();
+            undoManagerStore.updateUndoStack();
             setIsDragging(() => false);
             const element = evt.target as HTMLElement;
             element.releasePointerCapture(evt.pointerId);

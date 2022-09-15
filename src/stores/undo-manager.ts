@@ -1,8 +1,6 @@
 import { comparer, reaction, makeAutoObservable } from "mobx";
 
 export class UndoManagerStore<T> {
-  isDisposed: boolean = false;
-
   readObservable: () => T;
 
   setObservable: (value: T) => void;
@@ -24,16 +22,15 @@ export class UndoManagerStore<T> {
     this._stopTrackingChanges = reaction(
       this.readObservable,
       (newValue) => {
-        if (this.isDisposed) throw new Error("Undo already disposed");
         this.undoPointer += 1;
         this.undoStack[this.undoPointer] = newValue;
         this.undoStack.length = this.undoPointer + 1;
       },
-      { equals: comparer.structural },
+      { equals: comparer.structural, name: "ChangesTracking" },
     );
   };
 
-  trackUp = () => {
+  updateUndoStack = () => {
     if (!this.isPaused) {
       return;
     }
@@ -50,8 +47,6 @@ export class UndoManagerStore<T> {
   };
 
   undo = () => {
-    if (this.isDisposed) throw new Error("Undo already disposed");
-
     // console.log("undo");
     if (this.undoPointer === 0) return;
 
@@ -61,19 +56,11 @@ export class UndoManagerStore<T> {
   };
 
   redo = () => {
-    if (this.isDisposed) throw new Error("Undo already disposed");
-
     if (this.undoPointer >= this.undoStack.length - 1) return;
     this.undoPointer += 1;
 
     this.updateTracker();
   };
-
-  dispose = () => {
-    this.stopTrackingChanges();
-    this.isDisposed = true;
-  };
-
   updateTracker = () => {
     this.stopTrackingChanges();
     this.setObservable(this.undoStack[this.undoPointer]);

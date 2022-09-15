@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { computed, makeAutoObservable } from "mobx";
 import { ItemType, RoadsDump, SelectableItemType } from "../types";
 import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
@@ -74,6 +74,14 @@ export class RoadsStore {
     this.selection.reset();
   }
 
+  get toJSON() {
+    return {
+      nodes: this.nodes.list.map((value) => value.toJSON()),
+      segments: this.segments.list.map((value) => value.toJSON()),
+      fixtures: this.fixtures.list.map((value) => value.toJSON()),
+    } as RoadsDump;
+  }
+
   constructor(
     selection: SelectionManagerStore,
     cursor: CursorStore,
@@ -81,19 +89,17 @@ export class RoadsStore {
     segments: SegmentStore,
     fixtures: FixturesStore,
   ) {
-    makeAutoObservable(this);
+    makeAutoObservable(this, {
+      toJSON: computed({ keepAlive: true }),
+    });
     this.selection = selection;
     this.cursor = cursor;
     this.nodes = nodes;
     this.segments = segments;
     this.fixtures = fixtures;
-  }
 
-  toJSON() {
-    return {
-      nodes: this.nodes.list.map((value) => value.toJSON()),
-      segments: this.segments.list.map((value) => value.toJSON()),
-      fixtures: this.fixtures.list.map((value) => value.toJSON()),
-    } as RoadsDump;
+    // reaction(() => this.cursor.isLeftButtonPressed && this.cursor.position, () => {
+    //   this.selectedNode?.setPosition(this.cursor.snapPosition);
+    // })
   }
 }

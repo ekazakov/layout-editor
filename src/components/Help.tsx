@@ -44,7 +44,7 @@ const CloseButton = styled.button`
   right: 10px;
 `;
 
-export const Help = observer(function Help() {
+export const Help = function Help() {
   const [expanded, setExpanded] = useState(false);
 
   if (!expanded) {
@@ -104,4 +104,4 @@ export const Help = observer(function Help() {
       </HelpExpanded>
     </HelpContainer>
   );
-});
+};
