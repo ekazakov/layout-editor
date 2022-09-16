@@ -1,10 +1,10 @@
-import { makeAutoObservable, reaction, when } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { SelectionManagerStore } from "./selection/selection-manager";
 import { CursorStore } from "./cursor";
 import { NodeStore } from "./nodes";
 import { Position } from "../types";
 import { UndoManagerStore } from "./undo-manager";
-import { cursorStore, dndStore, undoManagerStore } from "./index";
+import { cursorStore } from "./index";
 
 function subtract(p1: Position, p2: Position) {
   return {
@@ -15,7 +15,6 @@ function subtract(p1: Position, p2: Position) {
 
 export class DndStore {
   private start: Position | undefined = undefined;
-  private end: Position | undefined = undefined;
   private isDragging: boolean = false;
 
   startDrag = () => {
