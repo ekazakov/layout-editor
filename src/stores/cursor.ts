@@ -13,8 +13,10 @@ interface State {
 
 export class CursorStore {
   private _position: Position = { x: 0, y: 0 };
+  private _prevPosition: Position = { x: 0, y: 0 };
   private _movement: Position = { x: 0, y: 0 };
   private _snapPosition: Position | undefined = undefined;
+
   altKey = false;
   ctrlKey = false;
   shiftKey = false;
@@ -22,6 +24,11 @@ export class CursorStore {
   buttons = 0;
 
   setPosition(p: Position) {
+    this._prevPosition = {
+      x: this.position.x,
+      y: this.position.y,
+    };
+
     this._position.x = p.x;
     this._position.y = p.y;
   }
@@ -120,6 +127,8 @@ export class CursorStore {
       snapPosition: computed({ keepAlive: true }),
       position: computed({ keepAlive: true }),
       movement: computed({ keepAlive: true }),
+      isLeftButtonPressed: computed({ keepAlive: true }),
+      noKeys: computed({ keepAlive: true }),
     });
   }
 }

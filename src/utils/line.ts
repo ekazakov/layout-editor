@@ -4,7 +4,7 @@ import type { Position, LineSegment } from "../types";
 // http://paulbourke.net/geometry/pointlineplane/javascript.txt
 export function segmentIntersection(
   segmentA: LineSegment,
-  segmentB: LineSegment
+  segmentB: LineSegment,
 ): Position | undefined {
   const { start: p1, end: p2 } = segmentA;
   const { start: p3, end: p4 } = segmentB;
@@ -13,20 +13,15 @@ export function segmentIntersection(
     return undefined;
   }
 
-  const denominator =
-    (p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y);
+  const denominator = (p4.y - p3.y) * (p2.x - p1.x) - (p4.x - p3.x) * (p2.y - p1.y);
 
   // Lines are parallel
   if (denominator === 0) {
     return undefined;
   }
 
-  let ua =
-    ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x)) /
-    denominator;
-  let ub =
-    ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y) * (p1.x - p3.x)) /
-    denominator;
+  let ua = ((p4.x - p3.x) * (p1.y - p3.y) - (p4.y - p3.y) * (p1.x - p3.x)) / denominator;
+  let ub = ((p2.x - p1.x) * (p1.y - p3.y) - (p2.y - p1.y) * (p1.x - p3.x)) / denominator;
 
   // is the intersection along the segments
   if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
@@ -44,11 +39,7 @@ export function magnitude(p1: Position, p2: Position) {
   return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
 }
 
-export function isEqualPosition(
-  p1: Position,
-  p2: Position
-  // precision: number = Infinity
-) {
+export function isEqualPosition(p1: Position, p2: Position) {
   return p1.x === p2.x && p1.y === p2.y;
 }
 
@@ -84,13 +75,7 @@ final double xDelta = p2.getX() - p1.getX();
 export function projectionPoint(p: Position, line: LineSegment) {
   const dx = line.end.x - line.start.x;
   const dy = line.end.y - line.start.y;
-
-  // if ((dx == 0) && (dy == 0)) {
-  //   throw new Error("p1 and p2 cannot be the same point");
-
-  const u =
-    ((p.x - line.start.x) * dx + (p.y - line.start.y) * dy) /
-    (dx ** 2 + dy ** 2);
+  const u = ((p.x - line.start.x) * dx + (p.y - line.start.y) * dy) / (dx ** 2 + dy ** 2);
 
   if (u < 0) {
     return { x: line.start.x, y: line.start.y };

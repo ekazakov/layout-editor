@@ -97,9 +97,5 @@ export class RoadsStore {
     this.nodes = nodes;
     this.segments = segments;
     this.fixtures = fixtures;
-
-    // reaction(() => this.cursor.isLeftButtonPressed && this.cursor.position, () => {
-    //   this.selectedNode?.setPosition(this.cursor.snapPosition);
-    // })
   }
 }

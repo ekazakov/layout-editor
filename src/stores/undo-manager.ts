@@ -1,6 +1,6 @@
 import { comparer, reaction, makeAutoObservable } from "mobx";
 
-export class UndoManagerStore<T> {
+export class UndoManagerStore<T = any> {
   readObservable: () => T;
 
   setObservable: (value: T) => void;
@@ -19,6 +19,7 @@ export class UndoManagerStore<T> {
   }
 
   trackChanges = () => {
+    this._stopTrackingChanges?.();
     this._stopTrackingChanges = reaction(
       this.readObservable,
       (newValue) => {
@@ -40,14 +41,7 @@ export class UndoManagerStore<T> {
     this.undoStack.length = this.undoPointer + 1;
   };
 
-  doNotTrack = (notTrackableCallback: () => void) => {
-    // this.stopTrackingChanges();
-    // notTrackableCallback();
-    // this.trackChanges();
-  };
-
   undo = () => {
-    // console.log("undo");
     if (this.undoPointer === 0) return;
 
     this.undoPointer -= 1;
@@ -61,6 +55,7 @@ export class UndoManagerStore<T> {
 
     this.updateTracker();
   };
+
   updateTracker = () => {
     this.stopTrackingChanges();
     this.setObservable(this.undoStack[this.undoPointer]);

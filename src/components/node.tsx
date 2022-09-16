@@ -1,22 +1,15 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import {
-  RoadNode,
-  selectionManagerStore,
-  cursorStore,
-  roadsStore,
-  undoManagerStore,
-  globalSettingsStore,
-} from "../stores";
+import { RoadNode, selectionManagerStore, roadsStore, globalSettingsStore } from "../stores";
 import { ContextMenu } from "./context-menu";
 import { InfoPanel } from "./info-panel";
+import { useDndHandlers } from "../hooks/use-dnd-handlers";
 
 export const Node = observer(function Node({ node }: { node: RoadNode }) {
-  const [isDragging, setIsDragging] = React.useState(false);
   const [showInfo, setShowInfo] = React.useState(false);
   const selected = selectionManagerStore.isSelected(node.id);
   const isSingle = selectionManagerStore.selectedCount === 1;
-
+  const dndProps = useDndHandlers();
   const menuItems = [
     { title: "Delete", action: () => roadsStore.deleteSelection() },
     // TODO: add segment disjoin
@@ -55,32 +48,14 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
         )}
 
         <circle
-          onPointerDown={(evt) => {
-            setIsDragging(() => true);
-            const element = evt.target as HTMLElement;
-
-            undoManagerStore.stopTrackingChanges();
-            element.setPointerCapture(evt.pointerId);
-          }}
-          onPointerUp={(evt) => {
-            undoManagerStore.updateUndoStack();
-            setIsDragging(() => false);
-            const element = evt.target as HTMLElement;
-            element.releasePointerCapture(evt.pointerId);
-            cursorStore.resetSnapping();
-          }}
-          onPointerMove={() => {
-            if (isDragging) {
-              node.setPosition(cursorStore.snapPosition);
-            }
-          }}
+          {...dndProps}
           id={node.id}
           data-type="road-node"
           r={10}
           cx={node.position.x}
           cy={node.position.y}
           stroke={selected ? "orange" : "blue"}
-          fill={isDragging ? "orange" : "white"}
+          fill={"white"}
           strokeWidth="2px"
         />
         {selected && isSingle && <ContextMenu position={pos} menuItems={menuItems} />}

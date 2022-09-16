@@ -174,12 +174,7 @@ export class Fixture {
     this.id = id ?? `fixture#${nanoid(7)}`;
     this.size = size ?? 150;
 
-    this.gates = new Map([
-      // [g1.id, g1],
-      // [g2.id, g2],
-      // [g3.id, g3],
-      // [g4.id, g4]
-    ]);
+    this.gates = new Map();
 
     makeAutoObservable(this);
   }

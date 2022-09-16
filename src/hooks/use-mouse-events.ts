@@ -135,7 +135,6 @@ export function useMouseEvents() {
 
   const onMouseMove = React.useCallback(
     (evt: React.MouseEvent) => {
-      // const { element, type } = extractItem(evt);
       runInAction(() => {
         cursorStore.update(evt);
 

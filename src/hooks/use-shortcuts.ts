@@ -6,13 +6,11 @@ export function useShortcuts() {
     evt.stopPropagation();
     evt.preventDefault();
     undoManagerStore.undo();
-    // console.log("undo");
   };
   const redo = (evt: KeyboardEvent) => {
     evt.preventDefault();
     evt.stopPropagation();
     undoManagerStore.redo();
-    // console.log("redo");
   };
   useTinykeys({
     Escape: () => {

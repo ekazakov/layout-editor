@@ -9,6 +9,7 @@ import { FixturesStore } from "./fixtures";
 import { SelectionManagerStore } from "./selection/selection-manager";
 import { SelectionRect } from "./selection/selection-rect";
 import { GlobalSettings } from "./global-settings";
+import { DndStore } from "./dnd-store";
 export { RoadNode } from "./road-node";
 export { RoadSegment } from "./road-segment";
 export { Fixture, Gate } from "./fixture";
@@ -51,6 +52,13 @@ export const undoManagerStore = new UndoManagerStore(
   (value) => {
     roadsStore.populate(value);
   },
+);
+
+export const dndStore = new DndStore(
+  selectionManagerStore,
+  cursorStore,
+  undoManagerStore,
+  nodeStore,
 );
 
 export const globalSettingsStore = new GlobalSettings();

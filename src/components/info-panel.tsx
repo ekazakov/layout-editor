@@ -57,21 +57,3 @@ export function InfoPanel({ position, items, isOpen, onClose }: InfoPanelProps) 
   );
 }
 
-//      <tr>
-//                 <td>id</td>
-//                 <td>{node.id}</td>
-//               </tr>
-//               <tr>
-//                 <td>segments</td>
-//                 <td>{node.segmentIds.size}</td>
-//               </tr>
-//               <tr>
-//                 <td>position</td>
-//                 <td>
-//                   {node.position.x},{node.position.y}
-//                 </td>
-//               </tr>
-//               <tr>
-//                 <td>gateId</td>
-//                 <td>{node.gateId}</td>
-//               </tr>

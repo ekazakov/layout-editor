@@ -1,7 +1,8 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { selectionManagerStore, undoManagerStore } from "../stores";
+import { selectionManagerStore } from "../stores";
 import { ContextMenu } from "./context-menu";
+import { useDndHandlers } from "../hooks/use-dnd-handlers";
 
 const style = {
   fill: "none",
@@ -10,7 +11,7 @@ const style = {
 };
 
 export const BoundingRect = observer(function BoundingRect() {
-  const [isDragging, setIsDragging] = React.useState(false);
+  const dndProps = useDndHandlers();
 
   if (selectionManagerStore.isMulti) {
     const rect = selectionManagerStore.boundingRect;
@@ -33,27 +34,7 @@ export const BoundingRect = observer(function BoundingRect() {
     return (
       <>
         <rect
-          onPointerDown={(evt) => {
-            setIsDragging(() => true);
-            const element = evt.target as HTMLElement;
-            undoManagerStore.stopTrackingChanges();
-            element.setPointerCapture(evt.pointerId);
-          }}
-          onPointerUp={(evt) => {
-            setIsDragging(() => false);
-            const element = evt.target as HTMLElement;
-            undoManagerStore.updateUndoStack();
-            element.releasePointerCapture(evt.pointerId);
-          }}
-          onPointerMove={(evt) => {
-            if (isDragging) {
-              const delta = {
-                x: Math.round(evt.movementX),
-                y: Math.round(evt.movementY),
-              };
-              selectionManagerStore.moveBy(delta);
-            }
-          }}
+          {...dndProps}
           data-type="bounding-rect"
           x={rect?.left}
           y={rect?.top}

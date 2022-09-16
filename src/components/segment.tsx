@@ -1,12 +1,7 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import {
-  cursorStore,
-  globalSettingsStore,
-  RoadSegment,
-  selectionManagerStore,
-  undoManagerStore,
-} from "../stores";
+import { globalSettingsStore, RoadSegment, selectionManagerStore } from "../stores";
+import { useDndHandlers } from "../hooks/use-dnd-handlers";
 
 export const NewSegment = function NewSegment(props: any) {
   const { p1, p2 } = props;
@@ -27,8 +22,7 @@ export const NewSegment = function NewSegment(props: any) {
 
 export const Segment = observer(function Segment(props: { segment: RoadSegment }) {
   const { segment } = props;
-  const [isDragging, setIsDragging] = React.useState(false);
-
+  const dndProps = useDndHandlers();
   const selected = selectionManagerStore.isSelected(segment.id);
 
   return (
@@ -44,23 +38,7 @@ export const Segment = observer(function Segment(props: { segment: RoadSegment }
         </text>
       )}
       <line
-        onPointerDown={(evt) => {
-          setIsDragging(() => true);
-          const element = evt.target as HTMLElement;
-          undoManagerStore.stopTrackingChanges();
-          element.setPointerCapture(evt.pointerId);
-        }}
-        onPointerUp={(evt) => {
-          setIsDragging(() => false);
-          const element = evt.target as HTMLElement;
-          element.releasePointerCapture(evt.pointerId);
-        }}
-        onPointerMove={() => {
-          undoManagerStore.updateUndoStack();
-          if (isDragging) {
-            segment.moveBy(cursorStore.movement);
-          }
-        }}
+        {...dndProps}
         id={segment.id}
         data-type="road-segment"
         x1={segment.start.x}

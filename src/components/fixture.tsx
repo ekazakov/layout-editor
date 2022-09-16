@@ -1,18 +1,17 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
 import {
-  cursorStore,
+  dndStore,
   Fixture as RoadFixture,
   Gate as FixtureGage,
   globalSettingsStore,
   roadsStore,
   selectionManagerStore,
-  undoManagerStore,
 } from "../stores";
 import styled from "@emotion/styled";
 import { ContextMenu } from "./context-menu";
 import { InfoPanel } from "./info-panel";
-import { toJS } from "mobx";
+import { useDndHandlers } from "../hooks/use-dnd-handlers";
 
 const strokeColor = "#212121";
 const StyledRect = styled.rect<{ selected: boolean }>`
@@ -56,10 +55,10 @@ interface FixtureProps {
 }
 
 export const Fixture = observer(function Fixture({ fixture }: FixtureProps) {
-  const [isDragging, setIsDragging] = React.useState(false);
   const [showInfo, setShowInfo] = React.useState(false);
   const selected = selectionManagerStore.isSelected(fixture.id);
   const isSingle = selectionManagerStore.selectedCount === 1;
+  const dndProps = useDndHandlers();
 
   const menuItems = [
     { title: "Delete", action: () => roadsStore.deleteSelection() },
@@ -90,26 +89,7 @@ export const Fixture = observer(function Fixture({ fixture }: FixtureProps) {
   };
 
   return (
-    <g
-      onPointerDown={(evt) => {
-        setIsDragging(() => true);
-        const element = evt.target as HTMLElement;
-
-        element.setPointerCapture(evt.pointerId);
-        undoManagerStore.stopTrackingChanges();
-      }}
-      onPointerUp={(evt) => {
-        setIsDragging(() => false);
-        const element = evt.target as HTMLElement;
-        element.releasePointerCapture(evt.pointerId);
-        undoManagerStore.updateUndoStack();
-      }}
-      onPointerMove={() => {
-        if (isDragging) {
-          fixture.moveBy(cursorStore.movement);
-        }
-      }}
-    >
+    <g {...dndProps}>
       {globalSettingsStore.showFixturesIds && (
         <text
           x={fixture.position.x + fixture.size + 10}
