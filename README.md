@@ -12,6 +12,7 @@
 - [] Fixture resize
 - [x] Improve undo performance
 - [x] Undo for fixtures
+- [] Store selection in undo stack
 - [] Try not to reset selection on undo (we need to remove outdated ids)
 - [x] Multi selection
 - [x] Improve/refactor multi selection
@@ -25,4 +26,4 @@
 - [x] Connect fixtures gate-to-gate
 - [] Discover probable issues with links to deleted nodes/segments/fixtures/gates
 - [] Movement constraints
-- [] Debug setting
+- [x] Debug setting
