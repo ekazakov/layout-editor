@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { globalSettingsStore, RoadSegment, selectionManagerStore } from "../stores";
+import { globalSettingsStore, RoadSegment, selectionStore } from "../stores";
 import { useDndHandlers } from "../hooks/use-dnd-handlers";
 
 export const NewSegment = function NewSegment(props: any) {
@@ -23,7 +23,7 @@ export const NewSegment = function NewSegment(props: any) {
 export const Segment = observer(function Segment(props: { segment: RoadSegment }) {
   const { segment } = props;
   const dndProps = useDndHandlers();
-  const selected = selectionManagerStore.isSelected(segment.id);
+  const selected = selectionStore.isSelected(segment.id);
 
   return (
     <g>

@@ -1,5 +1,5 @@
 import useTinykeys from "use-tinykeys";
-import { roadsStore, selectionManagerStore, undoManagerStore } from "../stores/index";
+import { roadsStore, selectionStore, undoManagerStore } from "../stores/index";
 
 export function useShortcuts() {
   const undo = (evt: KeyboardEvent) => {
@@ -14,7 +14,7 @@ export function useShortcuts() {
   };
   useTinykeys({
     Escape: () => {
-      selectionManagerStore.reset();
+      selectionStore.reset();
     },
     Delete: () => {
       roadsStore.deleteSelection();
@@ -30,35 +30,35 @@ export function useShortcuts() {
     "Shift+KeyZ": redo,
     ArrowLeft: (evt) => {
       evt.preventDefault();
-      selectionManagerStore.moveBy({ x: -1, y: 0 });
+      selectionStore.moveBy({ x: -1, y: 0 });
     },
     ArrowRight: (evt) => {
       evt.preventDefault();
-      selectionManagerStore.moveBy({ x: 1, y: 0 });
+      selectionStore.moveBy({ x: 1, y: 0 });
     },
     ArrowUp: (evt) => {
       evt.preventDefault();
-      selectionManagerStore.moveBy({ x: 0, y: -1 });
+      selectionStore.moveBy({ x: 0, y: -1 });
     },
     ArrowDown: (evt) => {
       evt.preventDefault();
-      selectionManagerStore.moveBy({ x: 0, y: 1 });
+      selectionStore.moveBy({ x: 0, y: 1 });
     },
     "Shift+ArrowLeft": (evt) => {
       evt.preventDefault();
-      selectionManagerStore.moveBy({ x: -10, y: 0 });
+      selectionStore.moveBy({ x: -10, y: 0 });
     },
     "Shift+ArrowRight": (evt) => {
       evt.preventDefault();
-      selectionManagerStore.moveBy({ x: 10, y: 0 });
+      selectionStore.moveBy({ x: 10, y: 0 });
     },
     "Shift+ArrowUp": (evt) => {
       evt.preventDefault();
-      selectionManagerStore.moveBy({ x: 0, y: -10 });
+      selectionStore.moveBy({ x: 0, y: -10 });
     },
     "Shift+ArrowDown": (evt) => {
       evt.preventDefault();
-      selectionManagerStore.moveBy({ x: 0, y: 10 });
+      selectionStore.moveBy({ x: 0, y: 10 });
     },
   });
 }

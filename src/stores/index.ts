@@ -10,12 +10,13 @@ import { SelectionManagerStore } from "./selection/selection-manager";
 import { SelectionRect } from "./selection/selection-rect";
 import { GlobalSettings } from "./global-settings";
 import { DndStore } from "./dnd-store";
+import { RoadBuilder } from "./road-builder";
 export { RoadNode } from "./road-node";
 export { RoadSegment } from "./road-segment";
 export { Fixture, Gate } from "./fixture";
 export { NodeStore } from "./nodes";
 
-export const selectionManagerStore = new SelectionManagerStore();
+export const selectionStore = new SelectionManagerStore();
 export const selectionRectStore = new SelectionRect();
 export const cursorStore = new CursorStore();
 export const nodeStore = new NodeStore();
@@ -23,27 +24,27 @@ export const segmentStore = new SegmentStore();
 export const fixtureStore = new FixturesStore();
 
 export const roadsStore = new RoadsStore(
-  selectionManagerStore,
+  selectionStore,
   cursorStore,
   nodeStore,
   segmentStore,
   fixtureStore,
 );
 
-selectionManagerStore.init(nodeStore, segmentStore, fixtureStore);
+selectionStore.init(nodeStore, segmentStore, fixtureStore);
 
 nodeStore.setSegments(segmentStore);
 nodeStore.setFixtures(fixtureStore);
-nodeStore.setSelection(selectionManagerStore);
+nodeStore.setSelection(selectionStore);
 
 segmentStore.setNodes(nodeStore);
 segmentStore.setFixtures(fixtureStore);
 segmentStore.setCursor(cursorStore);
-segmentStore.setSelection(selectionManagerStore);
+segmentStore.setSelection(selectionStore);
 
 fixtureStore.setNodes(nodeStore);
 fixtureStore.setCursor(cursorStore);
-fixtureStore.setSelection(selectionManagerStore);
+fixtureStore.setSelection(selectionStore);
 
 roadsStore.populate(dump);
 
@@ -54,13 +55,15 @@ export const undoManagerStore = new UndoManagerStore(
   },
 );
 
-export const dndStore = new DndStore(
-  selectionManagerStore,
-  cursorStore,
-  undoManagerStore,
-  nodeStore,
-);
+export const dndStore = new DndStore(selectionStore, cursorStore, undoManagerStore, nodeStore);
 
+export const roadBuilder = new RoadBuilder(
+  selectionStore,
+  cursorStore,
+  nodeStore,
+  segmentStore,
+  fixtureStore,
+);
 export const globalSettingsStore = new GlobalSettings();
 undoManagerStore.trackChanges();
 
@@ -75,7 +78,7 @@ window.roadsStore = roadsStore;
 // @ts-ignore
 window.cursorStore = cursorStore;
 // @ts-ignore
-window.selectionManagerStore = selectionManagerStore;
+window.selectionManagerStore = selectionStore;
 // @ts-ignore
 window.undoManagerStore = undoManagerStore;
 // @ts-ignore

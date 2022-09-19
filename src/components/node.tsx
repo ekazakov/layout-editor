@@ -1,14 +1,14 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { RoadNode, selectionManagerStore, roadsStore, globalSettingsStore } from "../stores";
+import { RoadNode, selectionStore, roadsStore, globalSettingsStore } from "../stores";
 import { ContextMenu } from "./context-menu";
 import { InfoPanel } from "./info-panel";
 import { useDndHandlers } from "../hooks/use-dnd-handlers";
 
 export const Node = observer(function Node({ node }: { node: RoadNode }) {
   const [showInfo, setShowInfo] = React.useState(false);
-  const selected = selectionManagerStore.isSelected(node.id);
-  const isSingle = selectionManagerStore.selectedCount === 1;
+  const selected = selectionStore.isSelected(node.id);
+  const isSingle = selectionStore.selectedCount === 1;
   const dndProps = useDndHandlers();
   const menuItems = [
     { title: "Delete", action: () => roadsStore.deleteSelection() },

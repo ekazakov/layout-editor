@@ -6,7 +6,7 @@ import {
   Gate as FixtureGage,
   globalSettingsStore,
   roadsStore,
-  selectionManagerStore,
+  selectionStore,
 } from "../stores";
 import styled from "@emotion/styled";
 import { ContextMenu } from "./context-menu";
@@ -33,7 +33,7 @@ interface GateProps {
 
 const Gate = observer(function Gate(props: GateProps) {
   const { gate, fixtureId } = props;
-  const selected = selectionManagerStore.isSelected(gate.id);
+  const selected = selectionStore.isSelected(gate.id);
   return (
     <circle
       key={gate.id}
@@ -56,8 +56,8 @@ interface FixtureProps {
 
 export const Fixture = observer(function Fixture({ fixture }: FixtureProps) {
   const [showInfo, setShowInfo] = React.useState(false);
-  const selected = selectionManagerStore.isSelected(fixture.id);
-  const isSingle = selectionManagerStore.selectedCount === 1;
+  const selected = selectionStore.isSelected(fixture.id);
+  const isSingle = selectionStore.selectedCount === 1;
   const dndProps = useDndHandlers();
 
   const menuItems = [

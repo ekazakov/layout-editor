@@ -8,6 +8,7 @@ import { FixturesStore } from "../fixtures";
 import { SelectionManagerStore } from "../selection/selection-manager";
 import { getDistance } from "../../utils/get-distance";
 import { RoadNode } from "../road-node";
+import { toJS } from "mobx";
 
 export function deleteSegment(
   nodes: NodeStore,

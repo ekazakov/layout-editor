@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { selectionManagerStore } from "../stores";
+import { selectionStore } from "../stores";
 import { ContextMenu } from "./context-menu";
 import { useDndHandlers } from "../hooks/use-dnd-handlers";
 
@@ -13,21 +13,21 @@ const style = {
 export const BoundingRect = observer(function BoundingRect() {
   const dndProps = useDndHandlers();
 
-  if (selectionManagerStore.isMulti) {
-    const rect = selectionManagerStore.boundingRect;
+  if (selectionStore.isMulti) {
+    const rect = selectionStore.boundingRect;
     const pos = { x: rect.right + 15, y: rect.top };
     const menuItems = [
       {
         title: "Only nodes",
-        action: () => selectionManagerStore.selectOnlyNodes(),
+        action: () => selectionStore.selectOnlyNodes(),
       },
       {
         title: "Only segments",
-        action: () => selectionManagerStore.selectOnlySegments(),
+        action: () => selectionStore.selectOnlySegments(),
       },
       {
         title: "Only fixtures",
-        action: () => selectionManagerStore.selectOnlyFixtures(),
+        action: () => selectionStore.selectOnlyFixtures(),
       },
     ];
 
