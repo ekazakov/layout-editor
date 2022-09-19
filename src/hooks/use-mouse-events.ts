@@ -49,12 +49,12 @@ export function useMouseEvents() {
           case "road-segment": {
             runInAction(() => {
               if (!selectedNode && cursorStore.altKey) {
-                segmentStore.splitSegmentAt(element.id, cursorStore);
+                segmentStore.splitSegmentAt(element.id, cursorStore.position);
                 return;
               }
 
               if (selectedNode && cursorStore.metaKey) {
-                const node = segmentStore.splitSegmentAt(element.id, cursorStore);
+                const node = segmentStore.splitSegmentAt(element.id, cursorStore.position);
                 segmentStore.addSegment(selectedNode.id, node.id);
                 return;
               }
@@ -226,7 +226,7 @@ export function useMouseEvents() {
             }
 
             if (selectedNode && cursorStore.metaKey && cursorStore.isSnapped) {
-              console.log("Segment snapped");
+              // console.log("Segment snapped");
               const element = matchElementTypeAtPosition(cursorStore.snapPosition, "road-segment");
               if (element?.id) {
                 const node = segmentStore.splitSegmentAt(element.id, cursorStore.snapPosition);

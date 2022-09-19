@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { useState } from "react";
 import { observer } from "mobx-react-lite";
-import { globalSettingsStore as gs } from "../stores";
+import {globalSettingsStore as gs, undoManagerStore} from "../stores";
 
 const HelpContainer = styled.div`
   position: fixed;
@@ -44,7 +44,7 @@ const CloseButton = styled.button`
   right: 10px;
 `;
 
-export const Help = function Help() {
+export const Help = observer(function Help() {
   const [expanded, setExpanded] = useState(false);
 
   if (!expanded) {
@@ -66,6 +66,9 @@ export const Help = function Help() {
           <p>Multiselect: MouseDown and drag</p>
           <p>Add item to selection: Shift+Click</p>
           <p>Build segment: Select node and press Cmd</p>
+        </div>
+        <div>
+          <p>Undo stack: {undoManagerStore.pointer}/{undoManagerStore.size}</p>
         </div>
         <div>
           <Label>
@@ -104,4 +107,4 @@ export const Help = function Help() {
       </HelpExpanded>
     </HelpContainer>
   );
-};
+});

@@ -5,11 +5,11 @@ export class UndoManagerStore<T = any> {
 
   setObservable: (value: T) => void;
 
-  undoStack: T[];
+  private readonly undoStack: T[];
 
   private _stopTrackingChanges: (() => void) | undefined = undefined;
 
-  undoPointer: number;
+  private undoPointer: number;
 
   isPaused: boolean = false;
 
@@ -61,6 +61,14 @@ export class UndoManagerStore<T = any> {
     this.setObservable(this.undoStack[this.undoPointer]);
     this.trackChanges();
   };
+
+  get pointer() {
+    return this.undoPointer + 1;
+  }
+
+  get size() {
+    return this.undoStack.length;
+  }
 
   constructor(readObservable: () => T, setObservable: (value: T) => void) {
     this.readObservable = readObservable;
