@@ -10,6 +10,7 @@
 - [x] Make fixture gates selectable
 - [x] Context menu
 - [] Fixture resize
+- [] Build segment from gate to existing node
 - [x] Improve undo performance
 - [x] Undo for fixtures
 - [] Store selection in undo stack

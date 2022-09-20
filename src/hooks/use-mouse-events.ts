@@ -1,16 +1,6 @@
 import React from "react";
 import { runInAction } from "mobx";
-import {
-  roadBuilder,
-  cursorStore,
-  selectionStore,
-  nodeStore,
-  segmentStore,
-  fixtureStore,
-  selectionRectStore,
-} from "../stores";
-import { getDistance } from "../utils/get-distance";
-import { findHoveredElements, matchElementTypeAtPosition } from "../utils/find-hovered-element";
+import { roadBuilder, cursorStore } from "../stores";
 
 function extractItem(evt: React.MouseEvent) {
   const element = evt.target as HTMLElement;
@@ -26,14 +16,14 @@ export function useMouseEvents() {
 
   const onMouseDown = React.useCallback(
     (evt: React.MouseEvent) => {
-      const { element, type } = extractItem(evt);
+      const { type } = extractItem(evt);
       cursorStore.update(evt);
 
       runInAction(() => {
         switch (type) {
           case "road-node": {
             roadBuilder.matchAction([
-              roadBuilder.addSegment,
+              roadBuilder.connectNodes,
               roadBuilder.addItemToSelection,
               roadBuilder.selectItem,
             ]);
@@ -58,15 +48,12 @@ export function useMouseEvents() {
               roadBuilder.connectFixtureToFixture,
               roadBuilder.selectItem,
             ]);
-
             break;
           }
-
           case "bounding-rect": {
             roadBuilder.matchAction([roadBuilder.toggleItemInSelection]);
             break;
           }
-
           case "canvas": {
             roadBuilder.matchAction([roadBuilder.startMultiSelection]);
             break;
@@ -82,36 +69,10 @@ export function useMouseEvents() {
       runInAction(() => {
         cursorStore.update(evt);
 
-        //  roadBuilder.matchAction([
-        //    roadBuilder.updateSegmentIntersectionsAndSnaps,
-        //    roadBuilder.updateGateSnaps,
-        //  ]);
-        const selectedItem = selectedNode || selectedGate;
-        if (selectedItem && cursorStore.metaKey) {
-          const line = {
-            start: selectedItem,
-            end: cursorStore.position,
-          };
-          segmentStore.updateIntersectionsWithRoad(line);
-          segmentStore.updateSnapPoints(cursorStore.position);
-          return;
-        }
-
-        if (selectedNode && !selectedNode.gateId && cursorStore.isLeftButtonPressed) {
-          fixtureStore.updateSnapGates();
-
-          return;
-        }
-
-        // TODO: move to reaction?
-        if (selectedNode?.gateId && cursorStore.isLeftButtonPressed) {
-          const gate = fixtureStore.getGate(selectedNode.gateId);
-
-          if (gate && getDistance(gate, cursorStore) > 30) {
-            cursorStore.resetSnapping();
-          }
-          return;
-        }
+        roadBuilder.matchAction([
+          roadBuilder.updateSegmentIntersectionsAndSnaps,
+          roadBuilder.updateGateSnaps,
+        ]);
       });
     },
     [selectedNode, selectedGate],
@@ -121,15 +82,7 @@ export function useMouseEvents() {
     (evt: React.MouseEvent) => {
       runInAction(() => {
         cursorStore.update(evt);
-
-        //  roadBuilder.matchAction([
-        //    roadBuilder.finishMultiSelection,
-        //  ]);
-        if (selectionRectStore.inProgress) {
-          selectionRectStore.setEnd(cursorStore.position);
-          selectionStore.selectionFromAria(selectionRectStore.rect, cursorStore.shiftKey);
-          selectionRectStore.reset();
-        }
+        roadBuilder.matchAction([roadBuilder.finishMultiSelection]);
       });
     },
     [selectedNode],
@@ -141,70 +94,22 @@ export function useMouseEvents() {
 
   const onClick = React.useCallback(
     (evt: React.MouseEvent) => {
-      const { type } = extractItem(evt);
+      runInAction(() => {
+        const { type } = extractItem(evt);
 
-      switch (type) {
-        case "road-node": {
-          break;
+        switch (type) {
+          case "canvas": {
+            roadBuilder.matchAction([
+              roadBuilder.addFixture,
+              roadBuilder.addNode,
+              roadBuilder.connectNodeToSegmentWithSnapping,
+              roadBuilder.addSegment,
+              roadBuilder.addSegmentFromGate,
+            ]);
+            break;
+          }
         }
-        case "road-segment": {
-          break;
-        }
-        case "fixture": {
-          break;
-        }
-        case "fixture_gate": {
-          break;
-        }
-
-        case "canvas": {
-          runInAction(() => {
-            //  roadBuilder.matchAction([
-            //    roadBuilder.addFixture,
-            //    roadBuilder.addNode,
-            //    roadBuilder.connectNodeToSegmentWithSnapping,
-            //    roadBuilder.addSegment,
-            //    roadBuilder.addSegmentFromGate,
-            //  ]);
-            if (cursorStore.altKey && cursorStore.shiftKey) {
-              const newFixture = fixtureStore.addFixture(cursorStore.position);
-              selectionStore.selectSingleItem(newFixture.id);
-              return;
-            }
-
-            if (cursorStore.altKey) {
-              const newNode = nodeStore.createNoe(cursorStore.position);
-              selectionStore.selectSingleItem(newNode.id);
-              return;
-            }
-
-            if (selectedNode && cursorStore.metaKey && cursorStore.isSnapped) {
-              const element = matchElementTypeAtPosition(cursorStore.snapPosition, "road-segment");
-              if (element?.id) {
-                const node = segmentStore.splitSegmentAt(element.id, cursorStore.snapPosition);
-                segmentStore.addSegment(selectedNode.id, node.id);
-              }
-              return;
-            }
-
-            if (selectedNode && cursorStore.metaKey) {
-              const newNode = nodeStore.createNoe(cursorStore.position);
-              segmentStore.addSegment(selectedNode.id, newNode.id);
-              selectionStore.selectSingleItem(newNode.id);
-              return;
-            }
-
-            if (selectedGate && cursorStore.metaKey) {
-              const newNode = nodeStore.createNoe(cursorStore.position);
-              const startNode = nodeStore.createNoe(selectedGate.position);
-              fixtureStore.connectToGate(selectedGate.id, startNode);
-              segmentStore.addSegment(startNode.id, newNode.id);
-              selectionStore.selectSingleItem(newNode.id);
-              return;
-            }
-          });
-        }
-      }
+      });
     },
     [selectedNode, selectedGate],
   );

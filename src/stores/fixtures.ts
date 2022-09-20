@@ -58,6 +58,10 @@ export class FixturesStore {
     }
 
     if (node.gateId) {
+      const gate = this.getGate(node.gateId);
+      if (gate && magnitude(gate, this.cursor.position) >= 30) {
+        this.cursor.resetSnapping();
+      }
       return;
     }
 

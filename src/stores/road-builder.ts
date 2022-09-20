@@ -1,5 +1,5 @@
-import { action, computed, makeAutoObservable } from "mobx";
-import { ItemType, Position, RoadsDump, SelectableItemType } from "../types";
+import { computed, makeAutoObservable } from "mobx";
+import { ItemType, RoadsDump, SelectableItemType } from "../types";
 import { SelectionManagerStore } from "./selection/selection-manager";
 import { CursorStore } from "./cursor";
 import { NodeStore } from "./nodes";
@@ -8,8 +8,7 @@ import { FixturesStore } from "./fixtures";
 import { RoadNode } from "./road-node";
 import { RoadSegment } from "./road-segment";
 import { Fixture } from "./fixture";
-// import {this.cursor, this.fixtures, this.nodes, this.segments, selectionRectStore, this.selection} from "./index";
-import { findHoveredElements } from "../utils/find-hovered-element";
+import { findHoveredElements, matchElementTypeAtPosition } from "../utils/find-hovered-element";
 import { SelectionRect } from "./selection/selection-rect";
 
 type ActionFn = () => boolean;
@@ -25,15 +24,26 @@ export class RoadBuilder {
     return element.id;
   }
 
-  addSegment() {
-    const id = this.getCurrentElementId();
+  connectNodes() {
+    const nodeId = this.getCurrentElementId();
 
     if (
       this.selectedNode &&
       this.cursor.metaKey &&
-      !this.nodes.isConnected(this.selectedNode.id, id)
+      !this.nodes.isConnected(this.selectedNode.id, nodeId)
     ) {
-      this.segments.addSegment(this.selectedNode.id, id);
+      this.segments.addSegment(this.selectedNode.id, nodeId);
+      return true;
+    }
+
+    return false;
+  }
+
+  addSegment() {
+    if (this.selectedNode && this.cursor.metaKey) {
+      const newNode = this.nodes.createNoe(this.cursor.position);
+      this.segments.addSegment(this.selectedNode.id, newNode.id);
+      this.selection.selectSingleItem(newNode.id);
       return true;
     }
 
@@ -131,7 +141,83 @@ export class RoadBuilder {
     return false;
   }
 
-  
+  updateSegmentIntersectionsAndSnaps() {
+    const selectedItem = this.selectedNode || this.selectedGate;
+    if (selectedItem && this.cursor.metaKey) {
+      const line = {
+        start: selectedItem,
+        end: this.cursor.position,
+      };
+      this.segments.updateIntersectionsWithRoad(line);
+      this.segments.updateSnapPoints(this.cursor.position);
+      return true;
+    }
+
+    return false;
+  }
+
+  updateGateSnaps() {
+    if (this.selectedNode && this.cursor.isLeftButtonPressed) {
+      this.fixtures.updateSnapGates();
+      return true;
+    }
+    return false;
+  }
+
+  finishMultiSelection() {
+    if (this.selectionRect.inProgress) {
+      this.selectionRect.setEnd(this.cursor.position);
+      this.selection.selectionFromAria(this.selectionRect.rect, this.cursor.shiftKey);
+      this.selectionRect.reset();
+      return true;
+    }
+
+    return false;
+  }
+
+  addFixture() {
+    if (this.cursor.altKey && this.cursor.shiftKey) {
+      const newFixture = this.fixtures.addFixture(this.cursor.position);
+      this.selection.selectSingleItem(newFixture.id);
+      return true;
+    }
+    return false;
+  }
+
+  addNode() {
+    if (this.cursor.altKey) {
+      const newNode = this.nodes.createNoe(this.cursor.position);
+      this.selection.selectSingleItem(newNode.id);
+      return true;
+    }
+    return false;
+  }
+
+  connectNodeToSegmentWithSnapping() {
+    if (this.selectedNode && this.cursor.metaKey && this.cursor.isSnapped) {
+      const element = matchElementTypeAtPosition(this.cursor.snapPosition, "road-segment");
+      if (element?.id) {
+        const node = this.segments.splitSegmentAt(element.id, this.cursor.snapPosition);
+        this.segments.addSegment(this.selectedNode.id, node.id);
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  addSegmentFromGate() {
+    if (this.selectedGate && this.cursor.metaKey) {
+      const newNode = this.nodes.createNoe(this.cursor.position);
+      const startNode = this.nodes.createNoe(this.selectedGate.position);
+      this.fixtures.connectToGate(this.selectedGate.id, startNode);
+      this.segments.addSegment(startNode.id, newNode.id);
+      this.selection.selectSingleItem(newNode.id);
+      return true;
+    }
+
+    return false;
+  }
 
   matchAction(actions: ActionFn[]) {
     for (let i = 0; i < actions.length; i++) {
