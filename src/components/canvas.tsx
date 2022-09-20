@@ -1,7 +1,7 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
 import {
-  roadsStore,
+  roadBuilder,
   cursorStore,
   nodeStore,
   segmentStore,
@@ -24,7 +24,7 @@ export const Canvas = observer(function Canvas() {
   const segments = segmentStore.list;
   const fixtures = fixtureStore.list;
 
-  const { selectedNode, selectedGate } = roadsStore;
+  const { selectedNode, selectedGate } = roadBuilder;
   const { intersections, snapPoints } = segmentStore;
 
   const { onMouseDown, onMouseMove, onMouseUp, onMouseOver, onMouseOut, onClick } =

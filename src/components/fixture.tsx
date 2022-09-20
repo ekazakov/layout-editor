@@ -1,11 +1,10 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
 import {
-  dndStore,
   Fixture as RoadFixture,
   Gate as FixtureGage,
   globalSettingsStore,
-  roadsStore,
+  roadBuilder,
   selectionStore,
 } from "../stores";
 import styled from "@emotion/styled";
@@ -61,7 +60,7 @@ export const Fixture = observer(function Fixture({ fixture }: FixtureProps) {
   const dndProps = useDndHandlers();
 
   const menuItems = [
-    { title: "Delete", action: () => roadsStore.deleteSelection() },
+    { title: "Delete", action: () => roadBuilder.deleteSelection() },
     {
       title: "Info",
       action: () => {

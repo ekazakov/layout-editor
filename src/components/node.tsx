@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react-lite";
-import { RoadNode, selectionStore, roadsStore, globalSettingsStore } from "../stores";
+import { RoadNode, selectionStore, roadBuilder, globalSettingsStore } from "../stores";
 import { ContextMenu } from "./context-menu";
 import { InfoPanel } from "./info-panel";
 import { useDndHandlers } from "../hooks/use-dnd-handlers";
@@ -11,7 +11,7 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
   const isSingle = selectionStore.selectedCount === 1;
   const dndProps = useDndHandlers();
   const menuItems = [
-    { title: "Delete", action: () => roadsStore.deleteSelection() },
+    { title: "Delete", action: () => roadBuilder.deleteSelection() },
     // TODO: add segment disjoin
     { title: "Disjoin", action: () => alert("not implemented yet") },
     {

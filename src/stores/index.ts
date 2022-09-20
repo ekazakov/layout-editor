@@ -1,5 +1,4 @@
 import { toJS, getDependencyTree, getObserverTree } from "mobx";
-import { RoadsStore } from "./roads";
 import { CursorStore } from "./cursor";
 import { UndoManagerStore } from "./undo-manager";
 import { dump } from "../dumps/dump-3";
@@ -23,14 +22,6 @@ export const nodeStore = new NodeStore();
 export const segmentStore = new SegmentStore();
 export const fixtureStore = new FixturesStore();
 
-export const roadsStore = new RoadsStore(
-  selectionStore,
-  cursorStore,
-  nodeStore,
-  segmentStore,
-  fixtureStore,
-);
-
 selectionStore.init(nodeStore, segmentStore, fixtureStore);
 
 nodeStore.setSegments(segmentStore);
@@ -46,24 +37,25 @@ fixtureStore.setNodes(nodeStore);
 fixtureStore.setCursor(cursorStore);
 fixtureStore.setSelection(selectionStore);
 
-roadsStore.populate(dump);
-
-export const undoManagerStore = new UndoManagerStore(
-  () => roadsStore.toJSON,
-  (value) => {
-    roadsStore.populate(value);
-  },
-);
-
-export const dndStore = new DndStore(selectionStore, cursorStore, undoManagerStore, nodeStore);
-
 export const roadBuilder = new RoadBuilder(
   selectionStore,
   cursorStore,
   nodeStore,
   segmentStore,
   fixtureStore,
+  selectionRectStore,
 );
+roadBuilder.populate(dump);
+
+export const undoManagerStore = new UndoManagerStore(
+  () => roadBuilder.toJSON,
+  (value) => {
+    roadBuilder.populate(value);
+  },
+);
+
+export const dndStore = new DndStore(selectionStore, cursorStore, undoManagerStore, nodeStore);
+
 export const globalSettingsStore = new GlobalSettings();
 undoManagerStore.trackChanges();
 
@@ -74,7 +66,7 @@ window.segmentStore = segmentStore;
 // @ts-ignore
 window.fixtureStore = fixtureStore;
 // @ts-ignore
-window.roadsStore = roadsStore;
+window.roadBuilder = roadBuilder;
 // @ts-ignore
 window.cursorStore = cursorStore;
 // @ts-ignore

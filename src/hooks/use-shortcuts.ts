@@ -1,5 +1,5 @@
 import useTinykeys from "use-tinykeys";
-import { roadsStore, selectionStore, undoManagerStore } from "../stores/index";
+import { roadBuilder, selectionStore, undoManagerStore } from "../stores";
 
 export function useShortcuts() {
   const undo = (evt: KeyboardEvent) => {
@@ -17,13 +17,13 @@ export function useShortcuts() {
       selectionStore.reset();
     },
     Delete: () => {
-      roadsStore.deleteSelection();
+      roadBuilder.deleteSelection();
     },
     Backspace: () => {
-      roadsStore.deleteSelection();
+      roadBuilder.deleteSelection();
     },
     "$mod+K": () => {
-      roadsStore.empty();
+      roadBuilder.empty();
     },
     "$mod+KeyZ": undo,
     "$mod+KeyY": redo,
