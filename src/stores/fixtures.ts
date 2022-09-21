@@ -6,7 +6,6 @@ import { magnitude } from "../utils/line";
 import { NodeStore } from "./nodes";
 import { Position } from "../types";
 import { makeAutoObservable } from "mobx";
-import { SelectionManagerStore } from "./selection/selection-manager";
 
 function getMinIndex(arr: any[]) {
   let minIndex = 0;
@@ -23,7 +22,6 @@ function getMinIndex(arr: any[]) {
 export class FixturesStore {
   private fixtures: Map<string, Fixture> = new Map<string, Fixture>();
   private nodes: NodeStore = null!;
-  private selection: SelectionManagerStore = null!;
   private cursor: CursorStore = null!;
 
   addFixture = (p: Position) => {
@@ -36,7 +34,9 @@ export class FixturesStore {
 
   getFixture = (id: string) => this.fixtures.get(id);
 
-  deleteFixture = (fixtureId: string) => fh.deleteFixture(this.fixtures, this.selection, fixtureId);
+  has = (id: string) => this.fixtures.has(id);
+
+  deleteFixture = (fixtureId: string) => fh.deleteFixture(this.fixtures, fixtureId);
 
   getGate(id: string) {
     return this.list.find((fixture) => fixture.getGate(id))?.getGate(id);
@@ -44,11 +44,7 @@ export class FixturesStore {
 
   connectToGate = (gateId: string, node: RoadNode) => fh.connectToGate(this.list, gateId, node);
 
-  updateSnapGates() {
-    if (!this.selection.isSingle) {
-      throw new Error(``);
-    }
-    const nodeId = this.selection.getSingleSelection("node");
+  updateSnapGates(nodeId: string) {
     if (!nodeId) {
       throw new Error();
     }
@@ -85,6 +81,10 @@ export class FixturesStore {
     return [...this.fixtures.values()];
   }
 
+  get count() {
+    return this.fixtures.size;
+  }
+
   get gates() {
     return this.list.flatMap((fixture) => fixture.gateList);
   }
@@ -93,9 +93,6 @@ export class FixturesStore {
     this.fixtures.clear();
   }
 
-  setSelection(selection: SelectionManagerStore) {
-    this.selection = selection;
-  }
 
   setCursor(cursor: CursorStore) {
     this.cursor = cursor;

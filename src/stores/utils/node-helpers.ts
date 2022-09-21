@@ -3,7 +3,6 @@ import * as sh from "../utils/segment-helpers";
 import { NodeStore } from "../nodes";
 import { SegmentStore } from "../segments";
 import { FixturesStore } from "../fixtures";
-import { SelectionManagerStore } from "../selection/selection-manager";
 
 export function getNode(nodes: NodeStore, id: string) {
   return nodes.get(id);
@@ -13,7 +12,6 @@ export function deleteNode(
   nodes: NodeStore,
   segments: SegmentStore,
   fixtures: FixturesStore,
-  selection: SelectionManagerStore,
   nodeId: string,
 ) {
   const node = nodes.get(nodeId);
@@ -25,12 +23,9 @@ export function deleteNode(
   const { gateId, segmentIds } = node;
 
   for (const segmentId of segmentIds) {
-    sh.deleteSegment(nodes, segments, fixtures, selection, segmentId);
+    sh.deleteSegment(nodes, segments, fixtures, segmentId);
   }
 
-  if (selection.isSingle && selection.isSelected(nodeId)) {
-    selection.reset();
-  }
 
   if (gateId) {
     const gate = fixtures.getGate(gateId);

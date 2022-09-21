@@ -7,7 +7,6 @@ import { makeAutoObservable, reaction } from "mobx";
 import { NodeStore } from "./nodes";
 import { FixturesStore } from "./fixtures";
 import { SelectionManagerStore } from "./selection/selection-manager";
-import { segmentStore } from "./index";
 
 function getMinIndex(arr: any[]) {
   let minIndex = 0;
@@ -50,7 +49,6 @@ export class SegmentStore {
       this.nodes,
       this,
       this.fixtures,
-      this.selection,
       this._intersections,
       startId,
       endId,
@@ -60,8 +58,7 @@ export class SegmentStore {
 
   _delete = (id: string) => this.segments.delete(id);
 
-  deleteSegment = (id: string) =>
-    sh.deleteSegment(this.nodes, this, this.fixtures, this.selection, id);
+  deleteSegment = (id: string) => sh.deleteSegment(this.nodes, this, this.fixtures, id);
 
   updateSnapPoints(p: Position) {
     this._snapPoints = [];
@@ -88,12 +85,18 @@ export class SegmentStore {
   }
 
   splitSegmentAt = (id: string, p: Position) =>
-    sh.splitSegmentAt(this.nodes, this, this.fixtures, this.selection, id, p);
+    sh.splitSegmentAt(this.nodes, this, this.fixtures, id, p);
 
   get = (id: string) => this.segments.get(id);
 
+  has = (id: string) => this.segments.has(id);
+
   get list() {
     return [...this.segments.values()];
+  }
+
+  get count() {
+    return this.segments.size;
   }
 
   clear() {
@@ -110,6 +113,8 @@ export class SegmentStore {
 
   setSelection(selection: SelectionManagerStore) {
     this.selection = selection;
+
+    // TODO: extract work with intersections to separate store
     reaction(
       () => {
         return this.selection.getSingleSelection("node");

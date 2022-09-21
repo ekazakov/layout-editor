@@ -2,7 +2,7 @@ import { NodeStore } from "../nodes";
 import { FixturesStore } from "../fixtures";
 import { SegmentStore } from "../segments";
 import { Position, Rect, SelectionItem } from "../../types";
-import { makeAutoObservable, toJS } from "mobx";
+import { makeAutoObservable,  toJS } from "mobx";
 import { getItemType } from "./utils/get-item-type";
 
 export class Selection {

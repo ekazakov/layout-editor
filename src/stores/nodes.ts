@@ -4,12 +4,11 @@ import { RoadNode } from "./road-node";
 import * as nh from "./utils/node-helpers";
 import { SegmentStore } from "./segments";
 import { FixturesStore } from "./fixtures";
-import { SelectionManagerStore } from "./selection/selection-manager";
 
 export class NodeStore {
   private segments: SegmentStore = null!;
   private fixtures: FixturesStore = null!;
-  private selection: SelectionManagerStore = null!;
+  // private selection: SelectionManagerStore = null!;
   private readonly nodes: Map<string, RoadNode> = new Map<string, RoadNode>();
 
   set = (id: string, node: RoadNode) => this.nodes.set(id, node);
@@ -30,13 +29,16 @@ export class NodeStore {
 
   _delete = (id: string) => this.nodes.delete(id);
 
-  deleteNode = (id: string) =>
-    nh.deleteNode(this, this.segments, this.fixtures, this.selection, id);
+  deleteNode = (id: string) => nh.deleteNode(this, this.segments, this.fixtures, id);
 
   isConnected = (aId: string, bId: string) => nh.isConnected(this.nodes, this.segments, aId, bId);
 
   constructor() {
     makeAutoObservable(this);
+  }
+
+  get count() {
+    return this.nodes.size;
   }
 
   get list() {
@@ -55,7 +57,7 @@ export class NodeStore {
     this.fixtures = fixtures;
   }
 
-  setSelection(selection: SelectionManagerStore) {
-    this.selection = selection;
-  }
+  // setSelection(selection: SelectionManagerStore) {
+  //   this.selection = selection;
+  // }
 }

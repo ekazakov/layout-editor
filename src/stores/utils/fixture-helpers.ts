@@ -16,15 +16,7 @@ export function connectToGate(fixtureList: Fixture[], gateId: string, node: Road
   gate.connect(node);
 }
 
-export function deleteFixture(
-  fixtures: Map<string, Fixture>,
-  selection: SelectionManagerStore,
-  fixtureId: string,
-) {
-  if (selection.isSingle && selection.isSelected(fixtureId)) {
-    selection.reset();
-  }
-
+export function deleteFixture(fixtures: Map<string, Fixture>, fixtureId: string) {
   const fixture = fixtures.get(fixtureId);
   if (fixture) {
     fixture.gateList.forEach((gate) => gate.disconnect());

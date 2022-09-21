@@ -26,7 +26,6 @@ selectionStore.init(nodeStore, segmentStore, fixtureStore);
 
 nodeStore.setSegments(segmentStore);
 nodeStore.setFixtures(fixtureStore);
-nodeStore.setSelection(selectionStore);
 
 segmentStore.setNodes(nodeStore);
 segmentStore.setFixtures(fixtureStore);
@@ -35,7 +34,6 @@ segmentStore.setSelection(selectionStore);
 
 fixtureStore.setNodes(nodeStore);
 fixtureStore.setCursor(cursorStore);
-fixtureStore.setSelection(selectionStore);
 
 export const roadBuilder = new RoadBuilder(
   selectionStore,

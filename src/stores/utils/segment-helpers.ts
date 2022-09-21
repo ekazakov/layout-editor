@@ -5,23 +5,15 @@ import * as nh from "./node-helpers";
 import { NodeStore } from "../nodes";
 import { SegmentStore } from "../segments";
 import { FixturesStore } from "../fixtures";
-import { SelectionManagerStore } from "../selection/selection-manager";
 import { getDistance } from "../../utils/get-distance";
 import { RoadNode } from "../road-node";
-import { toJS } from "mobx";
 
 export function deleteSegment(
   nodes: NodeStore,
   segments: SegmentStore,
   fixtures: FixturesStore,
-  selection: SelectionManagerStore,
   id: string,
 ) {
-  // TODO: track deletion with reaction on segments store change
-  if (selection.isSingle && selection.isSelected(id)) {
-    selection.reset();
-  }
-
   const segment = segments.get(id);
 
   segments._delete(id);
@@ -30,12 +22,12 @@ export function deleteSegment(
 
     nodeStart?.segmentIds.delete(id);
     if (nodeStart?.segmentIds.size === 0) {
-      nh.deleteNode(nodes, segments, fixtures, selection, nodeStart.id);
+      nh.deleteNode(nodes, segments, fixtures, nodeStart.id);
     }
     const nodeEnd = nodes.get(segment.end.id);
     nodeEnd?.segmentIds.delete(id);
     if (nodeEnd?.segmentIds.size === 0) {
-      nh.deleteNode(nodes, segments, fixtures, selection, nodeEnd.id);
+      nh.deleteNode(nodes, segments, fixtures, nodeEnd.id);
     }
   }
 }
@@ -68,7 +60,6 @@ export function splitSegmentAt(
   nodes: NodeStore,
   segments: SegmentStore,
   fixtures: FixturesStore,
-  selection: SelectionManagerStore,
   id: string,
   p: Position,
 ) {
@@ -81,7 +72,7 @@ export function splitSegmentAt(
   const newNode = nodes.createNoe(p);
   addSegmentInternal(nodes, segments, segment.start.id, newNode.id);
   addSegmentInternal(nodes, segments, newNode.id, segment.end.id);
-  deleteSegment(nodes, segments, fixtures, selection, id);
+  deleteSegment(nodes, segments, fixtures, id);
   return newNode;
 }
 
@@ -144,7 +135,6 @@ export function addSegment(
   nodes: NodeStore,
   segments: SegmentStore,
   fixtures: FixturesStore,
-  selection: SelectionManagerStore,
   intersections: Intersection[],
   startId: string,
   endId: string,
@@ -177,7 +167,7 @@ export function addSegment(
     addSegmentInternal(nodes, segments, segment.start.id, newNode.id);
     addSegmentInternal(nodes, segments, newNode.id, segment.end.id);
 
-    deleteSegment(nodes, segments, fixtures, selection, int.segmentId);
+    deleteSegment(nodes, segments, fixtures, int.segmentId);
   }
 
   nodesToJoin.push(endId);

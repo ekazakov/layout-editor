@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { computed, makeAutoObservable, reaction } from "mobx";
 import { ItemType, Position, Rect } from "../../types";
 import { NodeStore } from "../nodes";
 import { SegmentStore } from "../segments";
@@ -150,7 +150,68 @@ export class SelectionManagerStore {
   }
 
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, {
+      isEmpty: computed({ keepAlive: true }),
+    });
+  }
+
+  private resetIfEmpty() {
+    const item = this.selection.list.at(0);
+    if (this.isSingle && item) {
+      switch (item.type) {
+        case "fixture":
+          if (!this.fixtures.has(item.id)) {
+            this.reset();
+          }
+          break;
+        case "node":
+          if (!this.nodes.has(item.id)) {
+            this.reset();
+          }
+          break;
+        case "segment":
+          if (!this.segments.has(item.id)) {
+            this.reset();
+          }
+          break;
+      }
+    }
+  }
+
+  private subscribeOnNodeDeletion() {
+    reaction(
+      () => this.nodes.count,
+      (newCount, oldCount) => {
+        if (newCount < oldCount) {
+          this.resetIfEmpty();
+        }
+      },
+      { name: "DeleteNodeReaction" },
+    );
+  }
+
+  private subscribeOnSegmentDeletion() {
+    reaction(
+      () => this.segments.count,
+      (newCount, oldCount) => {
+        if (newCount < oldCount) {
+          this.resetIfEmpty();
+        }
+      },
+      { name: "DeleteSegmentReaction" },
+    );
+  }
+
+  private subscribeOnFixtureDeletion() {
+    reaction(
+      () => this.fixtures.count,
+      (newCount, oldCount) => {
+        if (newCount < oldCount) {
+          this.resetIfEmpty();
+        }
+      },
+      { name: "DeleteFixtureReaction" },
+    );
   }
 
   init(nodes: NodeStore, segments: SegmentStore, fixtures: FixturesStore) {
@@ -158,5 +219,10 @@ export class SelectionManagerStore {
     this.fixtures = fixtures;
     this.segments = segments;
     this.selection = new Selection(nodes, segments, fixtures);
+
+    // TODO: as alternative we can add reaction to every id in selection, and react on it
+    this.subscribeOnNodeDeletion();
+    this.subscribeOnFixtureDeletion();
+    this.subscribeOnSegmentDeletion();
   }
 }

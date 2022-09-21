@@ -12,8 +12,6 @@ export const Node = observer(function Node({ node }: { node: RoadNode }) {
   const dndProps = useDndHandlers();
   const menuItems = [
     { title: "Delete", action: () => roadBuilder.deleteSelection() },
-    // TODO: add segment disjoin
-    { title: "Disjoin", action: () => alert("not implemented yet") },
     {
       title: "Info",
       action: () => {

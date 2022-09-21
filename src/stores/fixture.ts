@@ -4,7 +4,6 @@ import { RoadNode } from "./road-node";
 import { Position, FixtureDump, GateDump, Rect } from "../types";
 import { NodeStore } from "./nodes";
 import { getDistance } from "../utils/get-distance";
-import { cursorStore } from "./index";
 
 export class Gate {
   private _connection: RoadNode | undefined = undefined;

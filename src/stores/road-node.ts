@@ -6,12 +6,11 @@ export class RoadNode {
   private _position: Position = { x: 0, y: 0 };
   public readonly id: string;
 
-  // TODO: make private
-  gateId: string | undefined = undefined;
+  private _gateId: string | undefined = undefined;
 
-  fixtureId: string | undefined = undefined;
+  private _fixtureId: string | undefined = undefined;
 
-  segmentIds: Set<string> = new Set<string>();
+  private _segmentIds: Set<string> = new Set<string>();
 
   setPosition = (p: Position) => {
     this._position = {
@@ -39,6 +38,26 @@ export class RoadNode {
     return this._position.y;
   }
 
+  get gateId() {
+    return this._gateId;
+  }
+
+  set gateId(gateId) {
+    this._gateId = gateId;
+  }
+
+  get fixtureId() {
+    return this._fixtureId;
+  }
+
+  set fixtureId(fixtureId) {
+    this._fixtureId = fixtureId;
+  }
+
+  get segmentIds() {
+    return this._segmentIds;
+  }
+
   get toJSON() {
     return {
       id: this.id,
@@ -46,8 +65,8 @@ export class RoadNode {
         x: this.x,
         y: this.y,
       },
-      segmentIds: [...this.segmentIds.values()],
-      gateId: this.gateId,
+      segmentIds: [...this._segmentIds.values()],
+      gateId: this._gateId,
     };
   }
 
@@ -59,8 +78,7 @@ export class RoadNode {
 
   static populate(dump: RoadNodeDump) {
     const node = new RoadNode(dump.position, dump.id);
-    node.segmentIds = new Set(dump.segmentIds);
+    node._segmentIds = new Set(dump.segmentIds);
     return node;
   }
-
 }

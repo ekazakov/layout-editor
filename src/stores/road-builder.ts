@@ -160,7 +160,7 @@ export class RoadBuilder {
 
   updateGateSnaps() {
     if (this.selectedNode && this.cursor.isLeftButtonPressed) {
-      this.fixtures.updateSnapGates();
+      this.fixtures.updateSnapGates(this.selectedNode.id);
       return true;
     }
     return false;
@@ -288,13 +288,16 @@ export class RoadBuilder {
   }
 
   get toJSON() {
-    // console.log('toJSON v', version);
     return {
       version: version++,
       nodes: this.nodes.list.map((value) => value.toJSON),
       segments: this.segments.list.map((value) => value.toJSON),
       fixtures: this.fixtures.list.map((value) => value.toJSON),
     } as RoadsDump;
+  }
+
+  private initReactions() {
+
   }
 
   constructor(
