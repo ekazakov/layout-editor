@@ -33,7 +33,7 @@ export class DndStore {
     }
 
     const nodeId = this.selection.getSingleSelection("node");
-    const node = this.nodes.get(nodeId);
+    const node = this.nodes.getNode(nodeId);
     if (node) {
       const diff = subtract(cursorStore.snapPosition, node.position);
       node.moveBy(diff);

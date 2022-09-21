@@ -14,17 +14,17 @@ export function deleteSegment(
   fixtures: FixturesStore,
   id: string,
 ) {
-  const segment = segments.get(id);
+  const segment = segments.getSegment(id);
 
   segments._delete(id);
   if (segment) {
-    const nodeStart = nodes.get(segment.start.id);
+    const nodeStart = nodes.getNode(segment.start.id);
 
     nodeStart?.segmentIds.delete(id);
     if (nodeStart?.segmentIds.size === 0) {
       nh.deleteNode(nodes, segments, fixtures, nodeStart.id);
     }
-    const nodeEnd = nodes.get(segment.end.id);
+    const nodeEnd = nodes.getNode(segment.end.id);
     nodeEnd?.segmentIds.delete(id);
     if (nodeEnd?.segmentIds.size === 0) {
       nh.deleteNode(nodes, segments, fixtures, nodeEnd.id);
@@ -63,7 +63,7 @@ export function splitSegmentAt(
   id: string,
   p: Position,
 ) {
-  const segment = segments.get(id);
+  const segment = segments.getSegment(id);
 
   if (!segment) {
     throw new Error(`Segment ${id} doesn't exist`);
@@ -144,14 +144,14 @@ export function addSegment(
     return;
   }
   const nodesToJoin = [startId];
-  const endNode = nodes.get(endId);
+  const endNode = nodes.getNode(endId);
 
   if (!endNode) {
     throw new Error(`Node ${endId} doesn't exists`);
   }
 
   for (const int of intersections) {
-    const segment = segments.get(int.segmentId);
+    const segment = segments.getSegment(int.segmentId);
     if (!segment) {
       throw new Error(`Segment ${int.segmentId} doesn't exist`);
     }

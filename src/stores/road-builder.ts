@@ -1,4 +1,4 @@
-import { computed, makeAutoObservable, trace } from "mobx";
+import { computed, makeAutoObservable } from "mobx";
 import { ItemType, RoadsDump, SelectableItemType } from "../types";
 import { SelectionManagerStore } from "./selection/selection-manager";
 import { CursorStore } from "./cursor";
@@ -237,8 +237,8 @@ export class RoadBuilder {
       this.nodes.set(node.id, node);
     });
     dump.segments.forEach((dump) => {
-      const nodeStart = this.nodes.get(dump.startNodeId)!;
-      const nodeEnd = this.nodes.get(dump.endNodeId)!;
+      const nodeStart = this.nodes.getNode(dump.startNodeId)!;
+      const nodeEnd = this.nodes.getNode(dump.endNodeId)!;
       const segment = new RoadSegment(nodeStart, nodeEnd, dump.id);
       this.segments.set(segment.id, segment);
     });
@@ -253,7 +253,7 @@ export class RoadBuilder {
   }
 
   get selectedNode() {
-    return this.nodes.get(this.getSelectedItemId("node"));
+    return this.nodes.getNode(this.getSelectedItemId("node"));
   }
 
   get selectedGate() {
@@ -296,9 +296,7 @@ export class RoadBuilder {
     } as RoadsDump;
   }
 
-  private initReactions() {
-
-  }
+  private initReactions() {}
 
   constructor(
     private readonly selection: SelectionManagerStore,

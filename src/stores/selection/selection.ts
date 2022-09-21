@@ -12,7 +12,7 @@ export class Selection {
     const nodes = new Set(this.selectedNodes.map((node) => node.id));
 
     this.selectedSegments.forEach(({ id }) => {
-      const segment = this.segments.get(id);
+      const segment = this.segments.getSegment(id);
       if (segment) {
         nodes.add(segment.start.id);
         nodes.add(segment.end.id);
@@ -27,7 +27,7 @@ export class Selection {
     });
 
     nodes.forEach((id) => {
-      const node = this.nodes.get(id);
+      const node = this.nodes.getNode(id);
       if (node) {
         if (node.fixtureId) {
           return;
@@ -94,14 +94,14 @@ export class Selection {
           break;
         }
         case "node": {
-          const node = this.nodes.get(id);
+          const node = this.nodes.getNode(id);
           if (node) {
             result.push(toJS(node.position));
           }
           break;
         }
         case "segment": {
-          const segment = this.segments.get(id);
+          const segment = this.segments.getSegment(id);
           if (segment) {
             const { start, end } = segment;
             result.push(toJS(start.position));

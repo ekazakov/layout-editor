@@ -5,7 +5,7 @@ import { SegmentStore } from "../segments";
 import { FixturesStore } from "../fixtures";
 
 export function getNode(nodes: NodeStore, id: string) {
-  return nodes.get(id);
+  return nodes.getNode(id);
 }
 
 export function deleteNode(
@@ -14,7 +14,7 @@ export function deleteNode(
   fixtures: FixturesStore,
   nodeId: string,
 ) {
-  const node = nodes.get(nodeId);
+  const node = nodes.getNode(nodeId);
   if (!node) {
     return false;
   }
@@ -45,7 +45,7 @@ export function isConnected(
   const node = nodes.get(aId);
   if (node) {
     for (const segmentId of node.segmentIds) {
-      const segment = segments.get(segmentId);
+      const segment = segments.getSegment(segmentId);
       if (segment!.start.id === bId || segment!.end.id === bId) {
         return true;
       }

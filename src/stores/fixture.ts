@@ -158,7 +158,7 @@ export class Fixture {
     gates.forEach((dump) => {
       const gate = new Gate(dump.position, this.id, dump.id);
       if (dump.connectionId) {
-        const node = nodes.get(dump.connectionId);
+        const node = nodes.getNode(dump.connectionId);
         if (!node) {
           throw Error(`Can't find node ${dump.connectionId}`);
         }

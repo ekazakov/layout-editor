@@ -8,7 +8,6 @@ import { FixturesStore } from "./fixtures";
 export class NodeStore {
   private segments: SegmentStore = null!;
   private fixtures: FixturesStore = null!;
-  // private selection: SelectionManagerStore = null!;
   private readonly nodes: Map<string, RoadNode> = new Map<string, RoadNode>();
 
   set = (id: string, node: RoadNode) => this.nodes.set(id, node);
@@ -23,7 +22,7 @@ export class NodeStore {
 
   addNode = (node: RoadNode) => this.nodes.set(node.id, node);
 
-  get = (id: string): RoadNode | undefined => this.nodes.get(id);
+  getNode = (id: string) => this.nodes.get(id);
 
   has = (id: string): boolean => this.nodes.has(id);
 
@@ -56,8 +55,4 @@ export class NodeStore {
   setFixtures(fixtures: FixturesStore) {
     this.fixtures = fixtures;
   }
-
-  // setSelection(selection: SelectionManagerStore) {
-  //   this.selection = selection;
-  // }
 }

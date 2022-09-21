@@ -41,8 +41,8 @@ export class SegmentStore {
 
   addSegment(startId: string, endId: string) {
     const line = {
-      start: this.nodes.get(startId)!,
-      end: this.nodes.get(endId)!,
+      start: this.nodes.getNode(startId)!,
+      end: this.nodes.getNode(endId)!,
     };
     this.updateIntersectionsWithRoad(line);
     sh.addSegment(
@@ -87,7 +87,7 @@ export class SegmentStore {
   splitSegmentAt = (id: string, p: Position) =>
     sh.splitSegmentAt(this.nodes, this, this.fixtures, id, p);
 
-  get = (id: string) => this.segments.get(id);
+  getSegment = (id: string) => this.segments.get(id);
 
   has = (id: string) => this.segments.has(id);
 

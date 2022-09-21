@@ -48,7 +48,7 @@ export class FixturesStore {
     if (!nodeId) {
       throw new Error();
     }
-    const node = this.nodes.get(nodeId);
+    const node = this.nodes.getNode(nodeId);
     if (!node) {
       return;
     }

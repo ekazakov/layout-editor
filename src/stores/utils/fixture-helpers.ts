@@ -1,9 +1,8 @@
 import { RoadNode } from "../road-node";
 import { Fixture } from "../fixture";
-import { SelectionManagerStore } from "../selection/selection-manager";
 
 export function getGate(fixtureList: Fixture[], id: string) {
-  return fixtureList.find((fixtue) => fixtue.getGate(id))?.getGate(id);
+  return fixtureList.find((fixture) => fixture.getGate(id))?.getGate(id);
 }
 
 export function connectToGate(fixtureList: Fixture[], gateId: string, node: RoadNode) {
