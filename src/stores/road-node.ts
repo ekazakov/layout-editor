@@ -39,7 +39,7 @@ export class RoadNode {
     return this._position.y;
   }
 
-  get track() {
+  get toJSON() {
     return {
       id: this.id,
       position: {
@@ -63,7 +63,4 @@ export class RoadNode {
     return node;
   }
 
-  toJSON() {
-    return this.track;
-  }
 }

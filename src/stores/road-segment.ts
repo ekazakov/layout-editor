@@ -5,9 +5,8 @@ import { RoadNode } from "./road-node";
 
 export class RoadSegment {
   public readonly id: string;
-
-  private _p1: RoadNode;
-  private _p2: RoadNode;
+  private readonly _p1: RoadNode;
+  private readonly _p2: RoadNode;
 
   get start() {
     return this._p1;
@@ -41,7 +40,7 @@ export class RoadSegment {
     this._p2 = nodeEnd;
   }
 
-  toJSON() {
+  get toJSON() {
     return {
       id: this.id,
       startNodeId: this._p1.id,

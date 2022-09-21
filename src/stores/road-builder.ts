@@ -1,4 +1,4 @@
-import { computed, makeAutoObservable } from "mobx";
+import { computed, makeAutoObservable, trace } from "mobx";
 import { ItemType, RoadsDump, SelectableItemType } from "../types";
 import { SelectionManagerStore } from "./selection/selection-manager";
 import { CursorStore } from "./cursor";
@@ -12,6 +12,8 @@ import { findHoveredElements, matchElementTypeAtPosition } from "../utils/find-h
 import { SelectionRect } from "./selection/selection-rect";
 
 type ActionFn = () => boolean;
+
+let version = 0;
 
 export class RoadBuilder {
   private getCurrentElementId() {
@@ -286,10 +288,12 @@ export class RoadBuilder {
   }
 
   get toJSON() {
+    // console.log('toJSON v', version);
     return {
-      nodes: this.nodes.list.map((value) => value.toJSON()),
-      segments: this.segments.list.map((value) => value.toJSON()),
-      fixtures: this.fixtures.list.map((value) => value.toJSON()),
+      version: version++,
+      nodes: this.nodes.list.map((value) => value.toJSON),
+      segments: this.segments.list.map((value) => value.toJSON),
+      fixtures: this.fixtures.list.map((value) => value.toJSON),
     } as RoadsDump;
   }
 

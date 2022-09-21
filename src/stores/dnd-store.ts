@@ -14,23 +14,17 @@ function subtract(p1: Position, p2: Position) {
 }
 
 export class DndStore {
-  private start: Position | undefined = undefined;
   private isDragging: boolean = false;
 
   startDrag = () => {
     this.isDragging = true;
     this.undoManager.stopTrackingChanges();
-    this.start = { x: this.cursor.snapPosition.x, y: this.cursor.snapPosition.y };
   };
 
   endDrag = () => {
-    if (this.isDragHappened) {
-      this.undoManager.updateUndoStack();
-    }
+    this.undoManager.updateUndoStack();
     this.undoManager.trackChanges();
-
     this.isDragging = false;
-    this.start = undefined;
   };
 
   onDrag = () => {
@@ -48,15 +42,6 @@ export class DndStore {
 
     this.selection.moveBy(this.cursor.movement);
   };
-
-  private get isDragHappened() {
-    if (!this.start) {
-      return false;
-    }
-
-    const end = { x: this.cursor.snapPosition.x, y: this.cursor.snapPosition.y };
-    return Math.abs(end.x - this.start.x) > 1 || Math.abs(end.y - this.start.y) > 0;
-  }
 
   constructor(
     private selection: SelectionManagerStore,

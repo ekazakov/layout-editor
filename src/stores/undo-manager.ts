@@ -18,14 +18,23 @@ export class UndoManagerStore<T = any> {
     this._stopTrackingChanges?.();
   }
 
+  private update(value: T) {
+    // @ts-ignore
+    if (this.undoStack[this.undoPointer].version === value.version) {
+      return;
+    }
+
+    this.undoPointer += 1;
+    this.undoStack[this.undoPointer] = value;
+    this.undoStack.length = this.undoPointer + 1;
+  }
+
   trackChanges = () => {
     this._stopTrackingChanges?.();
     this._stopTrackingChanges = reaction(
       this.readObservable,
       (newValue) => {
-        this.undoPointer += 1;
-        this.undoStack[this.undoPointer] = newValue;
-        this.undoStack.length = this.undoPointer + 1;
+        this.update(newValue);
       },
       { equals: comparer.structural, name: "ChangesTracking" },
     );
@@ -36,9 +45,7 @@ export class UndoManagerStore<T = any> {
       return;
     }
     this.isPaused = false;
-    this.undoPointer += 1;
-    this.undoStack[this.undoPointer] = this.readObservable();
-    this.undoStack.length = this.undoPointer + 1;
+    this.update(this.readObservable());
   };
 
   undo = () => {

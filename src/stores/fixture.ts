@@ -191,7 +191,7 @@ export class Fixture {
     return fixture;
   }
 
-  toJSON() {
+  get toJSON() {
     return {
       id: this.id,
       position: {
